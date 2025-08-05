@@ -51,31 +51,21 @@
 <body>
   <h1>Skaylabs</h1>
   <div class="ceo">Cristhian Skay - CEO</div>
-  <div class="clock" id="serverTime">Cargando hora del servidor...</div>
+<div id="clock" style="font-size: 1.5rem;"></div>
   <div class="slogan">"Hoy comienza mi etapa dev."</div>
 
-  <script>
-    async function fetchServerTime() {
-      try {
-        const res = await fetch('https://worldtimeapi.org/api/ip');
-        const data = await res.json();
-        const date = new Date(data.utc_datetime);
-        updateClock(date);
-      } catch (e) {
-        document.getElementById('serverTime').textContent = 'No se pudo obtener la hora del servidor';
-      }
-    }
+<script>
+  function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+  }
 
-    function updateClock(date) {
-      const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-      const clock = document.getElementById('serverTime');
-      setInterval(() => {
-        date.setSeconds(date.getSeconds() + 1);
-        clock.textContent = date.toLocaleTimeString('es-CO', options);
-      }, 1000);
-    }
+  setInterval(updateClock, 1000);
+  updateClock(); // Ejecutar inmediatamente
+</script>
 
-    fetchServerTime();
-  </script>
 </body>
 </html>
