@@ -46,26 +46,40 @@
       font-style: italic;
       text-shadow: 0 0 10px #00ffff;
     }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: #00ffff;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h1>Skaylabs</h1>
   <div class="ceo">Cristhian Skay - CEO</div>
-<div id="clock" style="font-size: 1.5rem;"></div>
-  <div class="slogan">"Hoy comienza mi etapa dev."</div>
+  <div id="clock" style="font-size: 1.5rem;"></div>
+  <button onclick="window.location.href='HV.html'">
+    Ir a HV
+  </button>
+  <div class="slogan">Hoy comienza mi etapa DEV.</div>
 
-<script>
-  function updateClock() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
-  }
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+    }
 
-  setInterval(updateClock, 1000);
-  updateClock(); // Ejecutar inmediatamente
-</script>
+    setInterval(updateClock, 1000);
+    updateClock(); // Ejecutar inmediatamente
+  </script>
 
 </body>
 </html>
