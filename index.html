@@ -1,176 +1,185 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkayLabs | Web Developer Showcase</title>
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkayLabs - Web Developer</title>
 
   <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 
-  <!-- Particles.js -->
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <!-- AOS Animations -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
 
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #2d00f7, #ff1493, #00eaff);
-      background-size: 400% 400%;
-      animation: gradientMove 8s ease infinite;
+      margin: 0;
+      font-family: "Roboto", sans-serif;
+      background: linear-gradient(135deg, #0d1b2a, #1b263b, #415a77);
       color: white;
       overflow-x: hidden;
     }
 
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    /* Logo fijo */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 200px;
+      padding: 25px;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      z-index: 999;
     }
 
-    .glass {
-      backdrop-filter: blur(12px);
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    main {
+      padding: 100px 10%;
     }
 
-    .icon-hover:hover {
-      transform: scale(1.2) rotate(4deg);
-      transition: 0.2s;
-      filter: drop-shadow(0 0 10px #fff);
+    h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 28px;
+      font-weight: 300;
+      color: #d6eaff;
+    }
+
+    .section {
+      margin-top: 120px;
+    }
+
+    .skills {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .skill-icon {
+      width: 70px;
+      filter: drop-shadow(0px 0px 4px rgba(255,255,255,0.2));
+      transition: transform 0.3s ease;
+    }
+
+    .skill-icon:hover {
+      transform: scale(1.2);
+    }
+
+    .about-box {
+      background: rgba(255,255,255,0.07);
+      padding: 25px;
+      border-radius: 10px;
+      max-width: 700px;
+      line-height: 1.7;
+    }
+
+    /* Easter egg */
+    .easter {
+      position: fixed;
+      bottom: 8px;
+      left: 8px;
+      opacity: 0.3;
+      font-size: 13px;
+      font-weight: 300;
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 34px; }
+      header { font-size: 22px; width: auto; }
     }
   </style>
 </head>
-
 <body>
 
-  <!-- Fondo de partículas -->
-  <div id="particles-js" class="absolute inset-0 -z-10"></div>
+  <header>SkayLabs</header>
 
-  <!-- LOGO SVG ANIMADO -->
-  <header class="flex justify-center mt-10">
-    <svg width="200" height="60" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <text x="10" y="55" font-size="50" font-family="Poppins" font-weight="600"
-            fill="url(#grad)" stroke="#fff" stroke-width="1" letter-spacing="2">
-        SkayLabs
-      </text>
+  <main>
 
-      <defs>
-        <linearGradient id="grad" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stop-color="#00eaff" />
-          <stop offset="50%" stop-color="#ff1493" />
-          <stop offset="100%" stop-color="#00eaff" />
-        </linearGradient>
-      </defs>
-    </svg>
-  </header>
+    <!-- HERO -->
+    <section data-aos="fade-up">
+      <h1>Hola, soy Cristhian</h1>
+      <h2><span id="typing"></span></h2>
+    </section>
 
-  <!-- HERO -->
-  <section class="text-center py-16 px-6 max-w-4xl mx-auto">
-    <h1 class="text-4xl md:text-6xl font-semibold mb-4">
-      Developer Futurista
-    </h1>
-    <p class="text-lg text-gray-200 mb-6">
-      Bienvenido a SkayLabs, donde desarrollo proyectos modernos, creativos y con identidad.
-      Mi objetivo: Transformar ideas en experiencias digitales profesionales.
-    </p>
-
-    <!-- Pixelart (cambiar imagen cuando la tengas) -->
-    <div class="mx-auto w-40 h-40 bg-white bg-opacity-10 rounded-xl shadow-lg flex items-center justify-center">
-      <span class="text-sm text-gray-300">PixelArt aquí</span>
-    </div>
-  </section>
-
-  <!-- SKILLS -->
-  <section class="py-12 max-w-5xl mx-auto px-6">
-    <h2 class="text-3xl font-semibold mb-8 text-center">Tecnologías</h2>
-
-    <div class="flex flex-wrap justify-center gap-6 text-xl">
-      <img src="vue.png" class="w-14 icon-hover" title="Vue.js">
-      <img src="js.png" class="w-14 icon-hover" title="JavaScript">
-      <img src="html.png" class="w-14 icon-hover" title="HTML">
-      <img src="css.png" class="w-14 icon-hover" title="CSS">
-      <img src="astro.png" class="w-14 icon-hover" title="Astro">
-      <img src="php.png" class="w-14 icon-hover" title="PHP">
-      <img src="sweetalert.png" class="w-14 icon-hover" title="SweetAlert">
-      <img src="bootstrap.png" class="w-14 icon-hover" title="Bootstrap">
-    </div>
-
-    <h3 class="text-2xl font-semibold mt-10 mb-4 text-center">Progreso de aprendizaje</h3>
-
-    <div class="space-y-6">
-      <div>
-        <p>Angular - 30%</p>
-        <div class="w-full h-3 bg-white bg-opacity-20 rounded-full">
-          <div class="h-3 bg-pink-400 rounded-full" style="width:30%"></div>
-        </div>
+    <!-- SOBRE MI -->
+    <section class="section" data-aos="fade-right">
+      <h2>Sobre mí</h2>
+      <div class="about-box">
+        <p>29 años, Ingeniero de Sistemas y Web Developer Full Stack con gusto por el diseño web, animaciones y experiencias digitales modernas.</p>
+        <p>Experiencia en JavaScript, Python, frontend, backend y arquitectura web moderna.</p>
+        <p>Inglés: Avanzado.</p>
       </div>
-      <div>
-        <p>JavaScript - 75%</p>
-        <div class="w-full h-3 bg-white bg-opacity-20 rounded-full">
-          <div class="h-3 bg-blue-400 rounded-full" style="width:75%"></div>
-        </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="section" data-aos="zoom-in">
+      <h2>Tecnologías con las que trabajo</h2>
+
+      <div class="skills">
+
+        <!-- JavaScript -->
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript">
+
+        <!-- Python -->
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python">
+
+        <!-- React -->
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React">
+
+        <!-- NodeJS -->
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node">
+
+        <!-- HTML -->
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML">
+
+        <!-- CSS -->
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS">
+
       </div>
-      <div>
-        <p>TypeScript - 40%</p>
-        <div class="w-full h-3 bg-white bg-opacity-20 rounded-full">
-          <div class="h-3 bg-purple-400 rounded-full" style="width:40%"></div>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- PROYECTOS -->
-  <section class="py-16 px-6 text-center">
-    <h2 class="text-3xl font-semibold mb-10">Proyectos</h2>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+  </main>
 
-      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
-        <h3 class="text-xl font-semibold">BiECO</h3>
-        <p class="text-gray-200 text-sm mb-4">Productos ecológicos, sostenibles, con identidad de marca.</p>
-        <a href="https://skaylabs.site/bieco.html" class="underline text-pink-300">Ver proyecto</a>
-      </div>
+  <!-- Easter Egg -->
+  <div class="easter">33H</div>
 
-      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
-        <h3 class="text-xl font-semibold">Gestor Financiero</h3>
-        <p class="text-gray-200 text-sm mb-4">Gestión de gastos y proyecciones económicas para usuarios.</p>
-        <a href="https://skaylabs.site/finanzas.html" class="underline text-pink-300">Ver proyecto</a>
-      </div>
-
-      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
-        <h3 class="text-xl font-semibold">Proyecto 3</h3>
-        <p class="text-gray-200 text-sm mb-4">Próximamente...</p>
-      </div>
-
-      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
-        <h3 class="text-xl font-semibold">Proyecto 4</h3>
-        <p class="text-gray-200 text-sm mb-4">Próximamente...</p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- PIE -->
-  <footer class="py-10 text-center text-gray-200">
-    © 2025 SkayLabs — Creative Coding & Web Design
-  </footer>
-
-  <!-- CONFIG DE PARTICULAS -->
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
   <script>
-    particlesJS("particles-js", {
-      "particles": {
-        "number": { "value": 75 },
-        "color": { "value": ["#00eaff", "#ff1493"] },
-        "shape": { "type": "circle" },
-        "opacity": { "value": 0.6 },
-        "size": { "value": 3 },
-        "move": { "speed": 1.2 }
+    AOS.init();
+  </script>
+
+  <!-- Tipeo -->
+  <script>
+    const text = ["Web Developer", "Full Stack", "Diseño Web", "Frontend & Backend"];
+    let i = 0, j = 0, isDeleting = false;
+    let speed = 100;
+
+    function type() {
+      const typing = document.getElementById("typing");
+
+      if (!isDeleting && j < text[i].length) {
+        typing.innerHTML += text[i].charAt(j);
+        j++;
+      } else if (isDeleting && j > 0) {
+        typing.innerHTML = text[i].substring(0, j-1);
+        j--;
+      } else if (!isDeleting && j === text[i].length) {
+        isDeleting = true;
+        speed = 70;
+      } else if (isDeleting && j === 0) {
+        isDeleting = false;
+        i = (i + 1) % text.length;
+        speed = 120;
       }
-    });
+
+      setTimeout(type, speed);
+    }
+    type();
   </script>
 
 </body>
