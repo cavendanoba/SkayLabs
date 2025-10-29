@@ -11,6 +11,8 @@
   <!-- AOS Animations -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
 
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Particles.js -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
@@ -198,9 +200,9 @@
 
   <!-- Animación de tipeo -->
   <script>
-    const text = ["Web Developer", "Full Stack", "Diseño Web", "Frontend & Backend"];
+    const text = ["Web Developer", "SkayClouds", "Full Stack", "Diseño Web", "Frontend & Backend"];
     let i = 0, j = 0, isDeleting = false;
-    let speed = 100;
+    let speed = 300;
 
     function type() {
       const typing = document.getElementById("typing");
@@ -217,7 +219,7 @@
       } else if (isDeleting && j === 0) {
         isDeleting = false;
         i = (i + 1) % text.length;
-        speed = 120;
+        speed = 220;
       }
 
       setTimeout(type, speed);
