@@ -11,6 +11,12 @@
   <!-- AOS Animations -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
 
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Particles.js -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
   <style>
     body {
       margin: 0;
@@ -95,6 +101,9 @@
 </head>
 <body>
 
+  <!-- Fondo de partículas -->
+  <div id="particles-js" class="absolute inset-0 -z-10"></div>
+
   <header>SkayLabs</header>
 
   <main>
@@ -109,15 +118,14 @@
     <section class="section" data-aos="fade-right">
       <h2>Sobre mí</h2>
       <div class="about-box">
-        <p>29 años, Ingeniero de Sistemas y Web Developer Full Stack con gusto por el diseño web, animaciones y experiencias digitales modernas.</p>
-        <p>Experiencia en JavaScript, Python, frontend, backend y arquitectura web moderna.</p>
-        <p>Inglés: Avanzado.</p>
+        <p>Bienvenido a SkayLabs, donde desarrollo proyectos modernos, creativos y con identidad.</p>
+        <p>Tengo 29 años, ingeniero de sistemas y Web Developer Full Stack me apasiona el diseño web, explorar animaciones y experiencias digitales modernas.</p>
       </div>
     </section>
 
     <!-- SKILLS -->
     <section class="section" data-aos="zoom-in">
-      <h2>Tecnologías con las que he trabajado</h2>
+      <h2>Tecnologías utilizadas en mis desarrollos</h2>
 
       <div class="skills">
 
@@ -130,8 +138,8 @@
         <!-- React -->
         <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React">
 
-        <!-- NodeJS -->
-        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node">
+        <!-- AstroJS -->
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/Astro/astro-original.svg" alt="AstroJS">
 
         <!-- HTML -->
         <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML">
@@ -142,9 +150,41 @@
       </div>
     </section>
 
+     <!-- PROYECTOS -->
+  <section class="py-16 px-6 text-center">
+    <h2 class="text-3xl font-semibold mb-10">Proyectos</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+
+      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
+        <h3 class="text-xl font-semibold">BiECO</h3>
+        <p class="text-gray-200 text-sm mb-4">Productos ecológicos, sostenibles, con identidad de marca.</p>
+        <a href="https://skaylabs.site/bieco" class="underline text-pink-300">Ver proyecto</a>
+      </div>
+
+      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
+        <h3 class="text-xl font-semibold">Gestor Financiero</h3>
+        <p class="text-gray-200 text-sm mb-4">Gestión de gastos y proyecciones económicas para usuarios.</p>
+        <a href="https://skaylabs.site/finanzas" class="underline text-pink-300">Ver proyecto</a>
+      </div>
+
+      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
+        <h3 class="text-xl font-semibold">Proyecto 3</h3>
+        <p class="text-gray-200 text-sm mb-4">En construcción...</p>
+      </div>
+
+      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
+        <h3 class="text-xl font-semibold">Proyecto 4</h3>
+        <p class="text-gray-200 text-sm mb-4">En construcción...</p>
+      </div>
+
+    </div>
+  </section>
+
+
   </main>
 
-  <!-- Easter Egg -->
+  <!-- Easter Egg, de nuestra motico -->
   <div class="easter">33H</div>
 
   <!-- Scripts -->
@@ -153,7 +193,12 @@
     AOS.init();
   </script>
 
-  <!-- Tipeo -->
+  <!-- Footer -->
+  <footer class="py-10 text-center text-gray-200">
+    © 2025 SkayLabs — Creative Coding & Futuristic Design
+  </footer>
+
+  <!-- Animación de tipeo -->
   <script>
     const text = ["Web Developer", "Full Stack", "Diseño Web", "Frontend & Backend"];
     let i = 0, j = 0, isDeleting = false;
