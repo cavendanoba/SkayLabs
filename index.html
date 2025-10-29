@@ -1,1261 +1,176 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkayLabs</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkayLabs | Web Developer Showcase</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- Particles.js -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
   <style>
-    /* cyrillic-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWub2bVmZiArmlw.woff2) format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWub2bVmQiArmlw.woff2) format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWub2bVmYiArmlw.woff2) format('woff2');
-  unicode-range: U+1F00-1FFF;
-}
-/* greek */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWub2bVmXiArmlw.woff2) format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* math */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWub2bVnoiArmlw.woff2) format('woff2');
-  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
-}
-/* symbols */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWub2bVn6iArmlw.woff2) format('woff2');
-  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
-}
-/* vietnamese */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWub2bVmbiArmlw.woff2) format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWub2bVmaiArmlw.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWub2bVmUiAo.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* cyrillic-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmZiArmlw.woff2) format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmQiArmlw.woff2) format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmYiArmlw.woff2) format('woff2');
-  unicode-range: U+1F00-1FFF;
-}
-/* greek */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmXiArmlw.woff2) format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* math */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVnoiArmlw.woff2) format('woff2');
-  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
-}
-/* symbols */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVn6iArmlw.woff2) format('woff2');
-  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
-}
-/* vietnamese */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmbiArmlw.woff2) format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmaiArmlw.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmUiAo.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* cyrillic-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuYjalmZiArmlw.woff2) format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuYjalmQiArmlw.woff2) format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuYjalmYiArmlw.woff2) format('woff2');
-  unicode-range: U+1F00-1FFF;
-}
-/* greek */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuYjalmXiArmlw.woff2) format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* math */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuYjalnoiArmlw.woff2) format('woff2');
-  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
-}
-/* symbols */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuYjaln6iArmlw.woff2) format('woff2');
-  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
-}
-/* vietnamese */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuYjalmbiArmlw.woff2) format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuYjalmaiArmlw.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuYjalmUiAo.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* cyrillic-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 300;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuaabVmZiArmlw.woff2) format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 300;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuaabVmQiArmlw.woff2) format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 300;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuaabVmYiArmlw.woff2) format('woff2');
-  unicode-range: U+1F00-1FFF;
-}
-/* greek */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 300;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuaabVmXiArmlw.woff2) format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* math */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 300;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuaabVnoiArmlw.woff2) format('woff2');
-  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
-}
-/* symbols */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 300;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuaabVn6iArmlw.woff2) format('woff2');
-  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
-}
-/* vietnamese */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 300;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuaabVmbiArmlw.woff2) format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 300;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuaabVmaiArmlw.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 300;
-  font-stretch: 100%;
-  font-display: block;
-  src: url(https://design.penpot.app/internal/gfonts/font/roboto/v49/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuaabVmUiAo.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-
-html, body {
-  margin: 0;
-  min-height: 100%;
-  min-width: 100%;
-  padding: 0;
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100vw;
-  min-height: 100vh;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-.text-node { background-clip: text !important; -webkit-background-clip: text !important; }
-
-/* Cover */
-.cover-3a1f95940f03 {
-  position: relative;
-  width: 1390px;
-  height: 724px;
-  background: radial-gradient(circle, rgba(149, 126, 210, 1) 0%,rgba(193, 171, 252, 1) 100%);
-  border-radius: 0px;
-  overflow: hidden;
-  z-index: 0;
-}
-
-/* Snackbar / Two-line Snackbar + Action */
-.snackbar-5ae95e1928a8 {
-  position: absolute;
-  left: 550px;
-  top: 528px;
-  width: 1390px;
-  height: 79.41px;
-  border-radius: 0px;
-  box-shadow: ;
-  overflow: hidden;
-  display: flex;
-  align-items: start;
-  align-content: stretch;
-  justify-content: start;
-  flex-direction: row;
-  flex-wrap: nowrap;
-}
-
-/* Wrapper */
-.wrapper-5ae95e1928a9 {
-  position: relative;
-  width: 276px;
-  height: 68px;
-  border-radius: 0px;
-  display: flex;
-  align-items: start;
-  align-content: stretch;
-  justify-content: start;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-  max-height: 68px;
-  min-height: 68px;
-}
-
-/* Background Layers */
-.background-e82e67a3d8cb {
-  position: relative;
-  width: 308px;
-  height: 68px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 4px 0px #0000000D, 0px 2px 2px 0px #00000017, 0px 1px 1px 0px #00000029;
-  overflow: hidden;
-  flex-shrink: 0;
-  margin: -68px 0px 0px 0px;
-  max-height: 68px;
-  min-height: 68px;
-}
-
-/* Elevated Background */
-.elevated-b-e82e67a3d8cd {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  width: 308px;
-  height: 68px;
-  background: #6750a4FF;
-  border-radius: 0px;
-  opacity: 0.11;
-}
-
-/* Background */
-.background-e82e67a3d8cc {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  width: 308px;
-  height: 68px;
-  background: #313033FF;
-  border-radius: 0px;
-}
-
-/* Container */
-.container-5ae95e1928ad {
-  position: relative;
-  width: 276px;
-  height: 68px;
-  border-radius: 0px;
-  display: flex;
-  align-items: center;
-  align-content: stretch;
-  justify-content: start;
-  gap: 12px;
-  padding: 0px 8px 0px 16px;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-  max-height: 68px;
-  min-height: 68px;
-}
-
-/* Button / Common / Text / Button Text */
-.button-c-5ae95e1928ae {
-  position: relative;
-  width: 65px;
-  height: 40px;
-  border-radius: 0px;
-  display: flex;
-  align-items: center;
-  align-content: stretch;
-  justify-content: center;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-}
-
-/* Container */
-.container-5ae95e1928af {
-  position: relative;
-  width: 65px;
-  height: 40px;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  align-content: stretch;
-  justify-content: center;
-  padding: 0px 12px 0px 12px;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-  max-height: 40px;
-  min-height: 40px;
-}
-
-/* Label */
-.label-e82e67a9a6cb {
-  height: 17px;
-  flex-shrink: 0;
-}
-.label-e82e67a9a6cb .root-0 {
-  
-  
-  display: flex;
-  white-space: break-spaces;
-  align-items: center;
-}
-.label-e82e67a9a6cb .root-0-paragraph-set-0 {
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: inherit;
-  
-  margin-right: 1px;
-  vertical-align: top;
-}
-.label-e82e67a9a6cb .root-0-paragraph-set-0-paragraph-0 {
-  font-size: 0;
-  line-height: 1.2;
-  margin: 0;
-  text-align: center;
-}
-.label-e82e67a9a6cb .root-0-paragraph-set-0-paragraph-0-text-0 {
-  color: rgba(103, 80, 164, 1);
-  text-transform: none;
-  
-  line-break: auto;
-  overflow-wrap: initial;
-  white-space: pre;
-  font-size: 14px;
-  text-rendering: geometricPrecision;
-  caret-color: rgba(103, 80, 164, 1);
-  text-decoration: none;
-  letter-spacing: 0.01px;
-  font-family: "Roboto";
-  font-style: normal;
-  font-weight: 500;
-}
-
-/* Two-line Text */
-.twoline-t-e82e67aa8065 {
-  height: 34px;
-  flex-shrink: 0;
-}
-.twoline-t-e82e67aa8065 .root-0 {
-  
-  
-  display: flex;
-  white-space: break-spaces;
-  align-items: flex-start;
-}
-.twoline-t-e82e67aa8065 .root-0-paragraph-set-0 {
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: inherit;
-  
-  margin-right: 1px;
-  vertical-align: top;
-}
-.twoline-t-e82e67aa8065 .root-0-paragraph-set-0-paragraph-0 {
-  font-size: 0;
-  line-height: 1.2;
-  margin: 0;
-  text-align: left;
-}
-.twoline-t-e82e67aa8065 .root-0-paragraph-set-0-paragraph-0-text-0 {
-  color: rgba(244, 239, 244, 1);
-  text-transform: none;
-  
-  line-break: auto;
-  overflow-wrap: initial;
-  white-space: pre;
-  font-size: 14px;
-  text-rendering: geometricPrecision;
-  caret-color: rgba(244, 239, 244, 1);
-  text-decoration: none;
-  letter-spacing: 0.02px;
-  font-family: "Roboto";
-  font-style: normal;
-  font-weight: 400;
-}
-.twoline-t-e82e67aa8065 .root-0-paragraph-set-0-paragraph-1 {
-  font-size: 0;
-  line-height: 1.2;
-  margin: 0;
-  text-align: left;
-}
-.twoline-t-e82e67aa8065 .root-0-paragraph-set-0-paragraph-1-text-0 {
-  color: rgba(244, 239, 244, 1);
-  text-transform: none;
-  
-  line-break: auto;
-  overflow-wrap: initial;
-  white-space: pre;
-  font-size: 14px;
-  text-rendering: geometricPrecision;
-  caret-color: rgba(244, 239, 244, 1);
-  text-decoration: none;
-  letter-spacing: 0.02px;
-  font-family: "Roboto";
-  font-style: normal;
-  font-weight: 400;
-}
-
-/* _Miscellaneous / Avatar / Avatar Container */
-.miscellan-5ae9886c595d {
-  position: absolute;
-  left: 675px;
-  top: 656px;
-  width: 40px;
-  height: 40px;
-  background: #eaddffFF;
-  border-radius: 20px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  align-content: stretch;
-  justify-content: center;
-  flex-direction: row;
-  flex-wrap: nowrap;
-}
-
-/* Text */
-.text-5ae9886c595e {
-  position: absolute;
-  left: 14.5px;
-  top: 10px;
-  height: 20px;
-  display: none;
-  flex-shrink: 0;
-}
-.text-5ae9886c595e .root-0 {
-  
-  
-  display: flex;
-  white-space: break-spaces;
-  align-items: flex-start;
-}
-.text-5ae9886c595e .root-0-paragraph-set-0 {
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: inherit;
-  
-  margin-right: 1px;
-  vertical-align: top;
-}
-.text-5ae9886c595e .root-0-paragraph-set-0-paragraph-0 {
-  font-size: 0;
-  line-height: 1.2;
-  margin: 0;
-  text-align: left;
-}
-.text-5ae9886c595e .root-0-paragraph-set-0-paragraph-0-text-0 {
-  color: rgba(33, 0, 94, 1);
-  text-transform: none;
-  
-  line-break: auto;
-  overflow-wrap: initial;
-  white-space: pre;
-  font-size: 16px;
-  text-rendering: geometricPrecision;
-  caret-color: rgba(33, 0, 94, 1);
-  text-decoration: none;
-  letter-spacing: 0.01px;
-  font-family: "Roboto";
-  font-style: normal;
-  font-weight: 500;
-}
-
-/* Radio Button / Radio Button [selected] */
-.radio-butt-5ae946f937bc {
-  position: absolute;
-  left: 873px;
-  top: 230px;
-  width: 20px;
-  height: 20px;
-  border-radius: 0px;
-}
-
-/* Container */
-.container-5ae946f937be {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  width: 20px;
-  height: 20px;
-  border-radius: 0px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  align-content: stretch;
-  justify-content: center;
-  flex-direction: row;
-  flex-wrap: nowrap;
-}
-
-/* Inner Circle */
-.inner-circ-5ae946f937bf {
-  width: 10px;
-  height: 10px;
-  background: #6750a4FF;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-/* Background - Outer Circle */
-.background-5ae946f937bd {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #6750a4FF;
-  border-radius: 10px;
-}
-
-/* Button / Icon / Outlined / Toggle / Icon Button Outlined Toggle [Unselected] */
-.button-i-5ae8dfa9838a {
-  position: absolute;
-  left: 20px;
-  top: 19px;
-  width: 48px;
-  height: 48px;
-  border-radius: 0px;
-}
-
-/* Container */
-.container-5ae8dfa9838c {
-  position: absolute;
-  left: 4px;
-  top: 4px;
-  width: 40px;
-  height: 40px;
-  border-radius: 0px;
-  display: flex;
-  align-items: center;
-  align-content: stretch;
-  justify-content: center;
-  flex-direction: row;
-  flex-wrap: nowrap;
-}
-
-/* settings_FILL0_wght400_GRAD0_opsz48 */
-.settings-f-5ae8dfa9838d > svg {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  transform: translate(0px,0px);
-}
-.settings-f-5ae8dfa9838d {
-  position: relative;
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-/* svg-path */
-.svgpath-5ae8dfa9838f > svg {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  transform: translate(0px,0px);
-}
-.svgpath-5ae8dfa9838f {
-  position: absolute;
-  left: 2px;
-  top: 2px;
-  width: 20px;
-  height: 20px;
-}
-
-/* base-background */
-.basebackg-5ae8dfa9838e > svg {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  transform: translate(0px,0px);
-}
-.basebackg-5ae8dfa9838e {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  width: 24px;
-  height: 24px;
-  display: none;
-}
-
-/* Background */
-.background-5ae8dfa9838b > svg {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  transform: translate(0px,0px);
-}
-.background-5ae8dfa9838b {
-  position: absolute;
-  left: 4px;
-  top: 4px;
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-}
-
-/* Headline */
-.headline-3a2344356e7c > svg {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  transform: translate(-140px,-136px);
-}
-.headline-3a2344356e7c {
-  position: absolute;
-  left: 291px;
-  top: 182.5px;
-  height: 209px;
-}
-.headline-3a2344356e7c .root-0 {
-  
-  
-  display: flex;
-  white-space: break-spaces;
-  align-items: flex-start;
-}
-.headline-3a2344356e7c .root-0-paragraph-set-0 {
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: inherit;
-  
-  margin-right: 1px;
-  vertical-align: top;
-}
-.headline-3a2344356e7c .root-0-paragraph-set-0-paragraph-0 {
-  font-size: 0;
-  line-height: 1.2;
-  margin: 0;
-  text-align: center;
-}
-.headline-3a2344356e7c .root-0-paragraph-set-0-paragraph-0-text-0 {
-  color: rgba(255, 255, 255, 1);
-  text-transform: none;
-  
-  line-break: auto;
-  overflow-wrap: initial;
-  white-space: pre;
-  font-size: 81.92566747572815px;
-  text-rendering: geometricPrecision;
-  caret-color: rgba(255, 255, 255, 1);
-  text-decoration: none;
-  letter-spacing: 0px;
-  font-family: "Roboto";
-  font-style: normal;
-  font-weight: 400;
-}
-.headline-3a2344356e7c .root-0-paragraph-set-0-paragraph-1 {
-  font-size: 0;
-  line-height: 1.2;
-  margin: 0;
-  text-align: center;
-}
-.headline-3a2344356e7c .root-0-paragraph-set-0-paragraph-1-text-0 {
-  color: rgba(255, 255, 255, 1);
-  text-transform: none;
-  
-  line-break: auto;
-  overflow-wrap: initial;
-  white-space: pre;
-  font-size: 91.98671435871232px;
-  text-rendering: geometricPrecision;
-  caret-color: rgba(255, 255, 255, 1);
-  text-decoration: none;
-  letter-spacing: 0px;
-  font-family: "Roboto";
-  font-style: normal;
-  font-weight: 700;
-}
-
-/* Subtitle */
-.subtitle-3a23a1a00c89 {
-  position: absolute;
-  left: 334px;
-  top: 419px;
-  width: 722px;
-  height: 66px;
-}
-.subtitle-3a23a1a00c89 .root-0 {
-  
-  
-  display: flex;
-  white-space: break-spaces;
-  align-items: flex-start;
-}
-.subtitle-3a23a1a00c89 .root-0-paragraph-set-0 {
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: inherit;
-  min-width: 100%;
-  margin-right: 1px;
-  vertical-align: top;
-}
-.subtitle-3a23a1a00c89 .root-0-paragraph-set-0-paragraph-0 {
-  font-size: 0;
-  line-height: 1.2;
-  margin: 0;
-  text-align: center;
-}
-.subtitle-3a23a1a00c89 .root-0-paragraph-set-0-paragraph-0-text-0 {
-  color: rgba(255, 255, 255, 1);
-  text-transform: none;
-  
-  line-break: auto;
-  overflow-wrap: initial;
-  white-space: break-spaces;
-  font-size: 28px;
-  text-rendering: geometricPrecision;
-  caret-color: rgba(255, 255, 255, 1);
-  text-decoration: none;
-  letter-spacing: 0px;
-  font-family: "Roboto";
-  font-style: normal;
-  font-weight: 300;
-}
-
-/* bg */
-.bg-5ae84a5a4be9 {
-  position: absolute;
-  left: -747px;
-  top: -164px;
-  width: 2784.06px;
-  height: 947.89px;
-  filter: blur(8px);
-}
-
-/* Ellipse */
-.ellipse-5ae83fbed93e {
-  position: absolute;
-  left: 28.53px;
-  top: 446.94px;
-  width: 975px;
-  height: 422px;
-  transform: matrix(0.99, -0.17, 0.17, 0.99, -0.00, -0.00);
-  background: #a766a7FF;
-  border-radius: 50%;
-  opacity: 0.2;
-}
-
-/* Ellipse */
-.ellipse-5ae832945638 {
-  position: absolute;
-  left: 1780.53px;
-  top: 433.94px;
-  width: 975px;
-  height: 422px;
-  transform: matrix(0.99, -0.17, 0.17, 0.99, -0.00, -0.00);
-  background: #a766a7FF;
-  border-radius: 50%;
-  opacity: 0.2;
-}
-
-/* Ellipse */
-.ellipse-3bbcba77fc7b {
-  position: absolute;
-  left: 528.53px;
-  top: 78.94px;
-  width: 975px;
-  height: 422px;
-  transform: matrix(0.99, -0.17, 0.17, 0.99, -0.00, -0.00);
-  background: #a766a7FF;
-  border-radius: 50%;
-  opacity: 0.2;
-}
-
-/* Version Container */
-.version-co-3bc65885e449 {
-  position: absolute;
-  left: 0px;
-  top: 665px;
-  width: 1390px;
-  height: 60px;
-  border-radius: 0px;
-  overflow: hidden;
-}
-
-/* Version */
-.version-3a2eec6a226f {
-  position: absolute;
-  left: 1045px;
-  top: 21px;
-  width: 310px;
-  height: 17px;
-  border-radius: 0px;
-  display: flex;
-  align-items: start;
-  align-content: stretch;
-  justify-content: start;
-  flex-direction: row;
-  flex-wrap: nowrap;
-}
-
-/* Rectangle */
-.rectangle-3bbe389fe9bd {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  width: 1390px;
-  height: 60px;
-  background: #fffbfeFF;
-  border-radius: 0px;
-  opacity: 0.4;
-}
-  </style>
-</head>
-<body>
-<!-- frame: Cover -->
-<div class="frame cover-3a1f95940f03">
-  <!-- frame: Version Container -->
-  <div class="frame version-co-3bc65885e449">
-    <!-- rect: Rectangle -->
-    <div class="shape rect rectangle-3bbe389fe9bd">
-    </div>
-    <!-- frame: Version -->
-    <div class="shape frame version-3a2eec6a226f">
-    </div>
-  </div>
-  <!-- group: bg -->
-  <div class="group bg-5ae84a5a4be9">
-    <!-- circle: Ellipse -->
-    <div class="shape circle ellipse-3bbcba77fc7b">
-    </div>
-    <!-- circle: Ellipse -->
-    <div class="shape circle ellipse-5ae832945638">
-    </div>
-    <!-- circle: Ellipse -->
-    <div class="shape circle ellipse-5ae83fbed93e">
-    </div>
-  </div>
-  <!-- text: Subtitle -->
-  <div class="shape text subtitle-3a23a1a00c89">
-    <div class="text-node-html" id="html-text-node-4fa12080-0d58-80a3-8002-3a23a1a00c89" data-x="569" data-y="600.9999999999999">
-      <div class="root rich-text root-0" xmlns="http://www.w3.org/1999/xhtml">
-        <div class="paragraph-set root-0-paragraph-set-0">
-          <p class="paragraph root-0-paragraph-set-0-paragraph-0" dir="auto"><span class="text-node root-0-paragraph-set-0-paragraph-0-text-0">Soy un Ingeniero de Sistemas con tres años de experiencia en la actualización y optimización de módulos.</span></p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- text: Headline -->
-  <div class="shape text headline-3a2344356e7c">
-    <svg width="1088" xmlns="http://www.w3.org/2000/svg" height="505" id="screenshot-4fa12080-0d58-80a3-8002-3a2344356e7c" viewBox="386 228.5 1088 505" style="-webkit-print-color-adjust::exact" xmlns:xlink="http://www.w3.org/1999/xlink" fill="none" version="1.1">
-      <style></style>
-      <g id="shape-4fa12080-0d58-80a3-8002-3a2344356e7c">
-        <defs>
-          <filter id="filter-render-6289" x="-0.12995049504950495" y="-0.5023923444976076" width="1.25990099009901" height="2.062200956937799" filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
-            <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
-            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"></feColorMatrix>
-            <feOffset dx="0" dy="4"></feOffset>
-            <feGaussianBlur stdDeviation="15"></feGaussianBlur>
-            <feColorMatrix type="matrix" values="0 0 0 0 0.403921568627451 0 0 0 0 0.3137254901960784 0 0 0 0 0.6431372549019608 0 0 0 0.3 0"></feColorMatrix>
-            <feBlend mode="normal" in2="BackgroundImageFix" result="filter_d9a61226-8431-8080-8002-5aebbf474eb3"></feBlend>
-            <feBlend mode="normal" in="SourceGraphic" in2="filter_d9a61226-8431-8080-8002-5aebbf474eb3" result="shape"></feBlend>
-          </filter>
-          <filter id="filter-shadow-render-6289" x="-0.12995049504950495" y="-0.5023923444976076" width="1.25990099009901" height="2.062200956937799" filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
-            <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
-            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"></feColorMatrix>
-            <feOffset dx="0" dy="4"></feOffset>
-            <feGaussianBlur stdDeviation="15"></feGaussianBlur>
-            <feColorMatrix type="matrix" values="0 0 0 0 0.403921568627451 0 0 0 0 0.3137254901960784 0 0 0 0 0.6431372549019608 0 0 0 0.3 0"></feColorMatrix>
-            <feBlend mode="normal" in2="BackgroundImageFix" result="filter_d9a61226-8431-8080-8002-5aebbf474eb3"></feBlend>
-            <feBlend mode="normal" in="SourceGraphic" in2="filter_d9a61226-8431-8080-8002-5aebbf474eb3" result="shape"></feBlend>
-          </filter>
-        </defs>
-        <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="526" y="364.5" width="808" height="209" filter="url(#filter-render-6289)" rx="0" ry="0">
-          <defs>
-            <pattern patternUnits="objectBoundingBox" width="807.34375" height="208.296875" id="fill-0-render-6289-0">
-              <g>
-                <rect width="807.34375" height="208.296875" style="fill:#ffffff;fill-opacity:1"></rect>
-              </g>
-            </pattern>
-            <pattern patternUnits="objectBoundingBox" width="807.34375" height="208.296875" id="fill-1-render-6289-0">
-              <g>
-                <rect width="807.34375" height="208.296875" style="fill:#ffffff;fill-opacity:1"></rect>
-              </g>
-            </pattern>
-          </defs>
-          <g class="fills" id="fills-4fa12080-0d58-80a3-8002-3a2344356e7c"><text x="754.75" y="462.5" dominant-baseline="ideographic" textLength="349.84375" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:81.9257px;text-decoration:rgb(255, 255, 255);direction:ltr;fill:#ffffff;fill-opacity:1">SkayLabs</text></g>
-          <defs>
-            <pattern patternUnits="objectBoundingBox" width="807.34375" height="208.296875" id="fill-0-render-6289-1">
-              <g>
-                <rect width="807.34375" height="208.296875" style="fill:#ffffff;fill-opacity:1"></rect>
-              </g>
-            </pattern>
-            <pattern patternUnits="objectBoundingBox" width="807.34375" height="208.296875" id="fill-1-render-6289-1">
-              <g>
-                <rect width="807.34375" height="208.296875" style="fill:#ffffff;fill-opacity:1"></rect>
-              </g>
-            </pattern>
-          </defs>
-          <g class="fills" id="fills-4fa12080-0d58-80a3-8002-3a2344356e7c"><text x="526" y="572.796875" dominant-baseline="ideographic" textLength="807.34375" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:91.9867px;text-decoration:rgb(255, 255, 255);direction:ltr;fill:#ffffff;fill-opacity:1">Cristhian Avendaño</text></g>
-        </g>
-      </g>
-    </svg>
-  </div>
-  <!-- frame: Button / Icon / Outlined / Toggle / Icon Button Outlined Toggle [Unselected] -->
-  <div class="frame button-i-5ae8dfa9838a">
-    <!-- rect: Background -->
-    <div class="shape rect background-5ae8dfa9838b">
-      <svg width="42" xmlns="http://www.w3.org/2000/svg" height="42" id="screenshot-d9a61226-8431-8080-8002-5ae8dfa9838b" viewBox="258 204 42 42" style="-webkit-print-color-adjust::exact" xmlns:xlink="http://www.w3.org/1999/xlink" fill="none" version="1.1">
-        <g id="shape-d9a61226-8431-8080-8002-5ae8dfa9838b" style="opacity:1">
-          <defs></defs>
-          <g class="fills" id="fills-d9a61226-8431-8080-8002-5ae8dfa9838b">
-            <rect rx="20" ry="20" x="259" y="205" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" width="40.000000000000455" height="40.00000000000088"></rect>
-          </g>
-          <g id="strokes-0e2d1fc4-a7e9-8027-8006-c7b2eab18503-d9a61226-8431-8080-8002-5ae8dfa9838b" class="strokes">
-            <g class="stroke-shape">
-              <defs></defs>
-              <rect rx="20" ry="20" x="259" y="205" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" width="40.000000000000455" height="40.00000000000088" style="fill:none;fill-opacity:none;stroke-width:1;stroke:#ffffff;stroke-opacity:1"></rect>
-            </g>
-          </g>
-        </g>
-      </svg>
-    </div>
-    <!-- frame: Container -->
-    <div class="frame container-5ae8dfa9838c">
-      <!-- group: settings_FILL0_wght400_GRAD0_opsz48 -->
-      <div class="shape group settings-f-5ae8dfa9838d">
-        <svg width="24" xmlns="http://www.w3.org/2000/svg" height="24" id="screenshot-d9a61226-8431-8080-8002-5ae8dfa9838d" viewBox="267 213 24 24" style="-webkit-print-color-adjust::exact" xmlns:xlink="http://www.w3.org/1999/xlink" fill="none" version="1.1">
-          <g id="shape-d9a61226-8431-8080-8002-5ae8dfa9838d" style="opacity:1;fill:#000000" height="48" width="48" rx="0" ry="0">
-            <defs></defs>
-            <g id="shape-d9a61226-8431-8080-8002-5ae8dfa9838e" style="display:none">
-              <defs></defs>
-              <g class="fills" id="fills-d9a61226-8431-8080-8002-5ae8dfa9838e">
-                <rect rx="0" ry="0" x="267" y="212.99999999999977" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" width="24" height="24.000000000000426" fill="none" style="fill:#fffbfe;fill-opacity:1"></rect>
-              </g>
-            </g>
-            <g id="shape-d9a61226-8431-8080-8002-5ae8dfa9838f">
-              <defs></defs>
-              <g class="fills" id="fills-d9a61226-8431-8080-8002-5ae8dfa9838f">
-                <path d="M276.70001220703125,235L276.20001220703125,231.85000610351562C275.88336181640625,231.73333740234375,275.54998779296875,231.5749969482422,275.20001220703125,231.375C274.8499755859375,231.1750030517578,274.54168701171875,230.96665954589844,274.2750244140625,230.75L271.32501220703125,232.10000610351562L269,228L271.70001220703125,226.02499389648438C271.66668701171875,225.875,271.64581298828125,225.70416259765625,271.63751220703125,225.5124969482422C271.629150390625,225.32083129882812,271.625,225.14999389648438,271.625,225C271.625,224.85000610351562,271.629150390625,224.67916870117188,271.63751220703125,224.4875030517578C271.64581298828125,224.29583740234375,271.66668701171875,224.125,271.70001220703125,223.97500610351562L269,222L271.32501220703125,217.89999389648438L274.2750244140625,219.25C274.54168701171875,219.03334045410156,274.8499755859375,218.8249969482422,275.20001220703125,218.625C275.54998779296875,218.4250030517578,275.88336181640625,218.27499389648438,276.20001220703125,218.1750030517578L276.70001220703125,215L281.29998779296875,215L281.79998779296875,218.14999389648438C282.11663818359375,218.26666259765625,282.45416259765625,218.42083740234375,282.8125,218.6125030517578C283.17083740234375,218.80416870117188,283.4749755859375,219.01666259765625,283.7249755859375,219.25L286.67498779296875,217.89999389648438L289,222L286.29998779296875,223.9250030517578C286.33331298828125,224.09165954589844,286.35418701171875,224.2708282470703,286.36248779296875,224.46249389648438C286.370849609375,224.65415954589844,286.375,224.8333282470703,286.375,225C286.375,225.1666717529297,286.370849609375,225.34165954589844,286.36248779296875,225.52499389648438C286.35418701171875,225.7083282470703,286.33331298828125,225.88333129882812,286.29998779296875,226.0500030517578L289,228L286.67498779296875,232.10000610351562L283.7249755859375,230.75C283.45831298828125,230.96665954589844,283.1541748046875,231.17916870117188,282.8125,231.3874969482422C282.4708251953125,231.59584045410156,282.13336181640625,231.75,281.79998779296875,231.85000610351562L281.29998779296875,235L276.70001220703125,235ZM279,228.25C279.9000244140625,228.25,280.66668701171875,227.93333435058594,281.29998779296875,227.3000030517578C281.933349609375,226.6666717529297,282.25,225.89999389648438,282.25,225C282.25,224.10000610351562,281.933349609375,223.3333282470703,281.29998779296875,222.6999969482422C280.66668701171875,222.06666564941406,279.9000244140625,221.75,279,221.75C278.0999755859375,221.75,277.33331298828125,222.06666564941406,276.70001220703125,222.6999969482422C276.066650390625,223.3333282470703,275.75,224.10000610351562,275.75,225C275.75,225.89999389648438,276.066650390625,226.6666717529297,276.70001220703125,227.3000030517578C277.33331298828125,227.93333435058594,278.0999755859375,228.25,279,228.25ZM279,226.75C278.51666259765625,226.75,278.10418701171875,226.57916259765625,277.76251220703125,226.2375030517578C277.42083740234375,225.8958282470703,277.25,225.48333740234375,277.25,225C277.25,224.51666259765625,277.42083740234375,224.1041717529297,277.76251220703125,223.7624969482422C278.10418701171875,223.42083740234375,278.51666259765625,223.25,279,223.25C279.48333740234375,223.25,279.89581298828125,223.42083740234375,280.23748779296875,223.7624969482422C280.57916259765625,224.1041717529297,280.75,224.51666259765625,280.75,225C280.75,225.48333740234375,280.57916259765625,225.8958282470703,280.23748779296875,226.2375030517578C279.89581298828125,226.57916259765625,279.48333740234375,226.75,279,226.75ZM279,225ZM277.9000244140625,233.5L280.0999755859375,233.5L280.45001220703125,230.6999969482422C281,230.56666564941406,281.52081298828125,230.35833740234375,282.01251220703125,230.0749969482422C282.504150390625,229.7916717529297,282.95001220703125,229.4499969482422,283.3499755859375,229.0500030517578L286,230.1999969482422L287,228.39999389648438L284.6500244140625,226.6750030517578C284.7166748046875,226.39166259765625,284.77081298828125,226.1125030517578,284.8125,225.83749389648438C284.85418701171875,225.5625,284.875,225.28334045410156,284.875,225C284.875,224.71665954589844,284.85833740234375,224.4375,284.82501220703125,224.16250610351562C284.79168701171875,223.8874969482422,284.73333740234375,223.60833740234375,284.6500244140625,223.3249969482422L287,221.60000610351562L286,219.8000030517578L283.3499755859375,220.9499969482422C282.9666748046875,220.51666259765625,282.5333251953125,220.15415954589844,282.04998779296875,219.8625030517578C281.566650390625,219.57083129882812,281.0333251953125,219.38333129882812,280.45001220703125,219.3000030517578L280.0999755859375,216.5L277.9000244140625,216.5L277.54998779296875,219.3000030517578C276.98333740234375,219.4166717529297,276.45416259765625,219.61666870117188,275.9625244140625,219.89999389648438C275.4708251953125,220.18333435058594,275.0333251953125,220.53334045410156,274.6500244140625,220.9499969482422L272,219.8000030517578L271,221.60000610351562L273.3499755859375,223.3249969482422C273.2833251953125,223.60833740234375,273.22918701171875,223.8874969482422,273.1875,224.16250610351562C273.14581298828125,224.4375,273.125,224.71665954589844,273.125,225C273.125,225.28334045410156,273.14581298828125,225.5625,273.1875,225.83749389648438C273.22918701171875,226.1125030517578,273.2833251953125,226.39166259765625,273.3499755859375,226.6750030517578L271,228.39999389648438L272,230.1999969482422L274.6500244140625,229.0500030517578C275.04998779296875,229.4499969482422,275.495849609375,229.7916717529297,275.98748779296875,230.0749969482422C276.47918701171875,230.35833740234375,277,230.56666564941406,277.54998779296875,230.6999969482422L277.9000244140625,233.5Z" style="fill:#fffbfe;fill-opacity:1"></path>
-              </g>
-            </g>
-          </g>
-        </svg>
-      </div>
-    </div>
-  </div>
-  <!-- frame: Radio Button / Radio Button [selected] -->
-  <div class="frame radio-butt-5ae946f937bc">
-    <!-- rect: Background - Outer Circle -->
-    <div class="shape rect background-5ae946f937bd">
-    </div>
-    <!-- frame: Container -->
-    <div class="frame container-5ae946f937be">
-      <!-- circle: Inner Circle -->
-      <div class="shape circle inner-circ-5ae946f937bf">
-      </div>
-    </div>
-  </div>
-  <!-- frame: _Miscellaneous / Avatar / Avatar Container -->
-  <div class="frame miscellan-5ae9886c595d">
-    <!-- text: Text -->
-    <div class="shape text text-5ae9886c595e">
-      <div class="text-node-html" id="html-text-node-d9a61226-8431-8080-8002-5ae9886c595e" data-x="924.5" data-y="848">
-        <div class="root rich-text root-0" xmlns="http://www.w3.org/1999/xhtml">
-          <div class="paragraph-set root-0-paragraph-set-0">
-            <p class="paragraph root-0-paragraph-set-0-paragraph-0" dir="auto"><span class="text-node root-0-paragraph-set-0-paragraph-0-text-0">A</span></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- frame: Snackbar / Two-line Snackbar + Action -->
-  <div class="frame snackbar-5ae95e1928a8">
-    <!-- frame: Wrapper -->
-    <div class="frame wrapper-5ae95e1928a9">
-      <!-- frame: Container -->
-      <div class="frame container-5ae95e1928ad">
-        <!-- text: Two-line Text -->
-        <div class="shape text twoline-t-e82e67aa8065">
-          <div class="text-node-html" id="html-text-node-def7c09e-aad8-805a-8005-e82e67aa8065" data-x="801" data-y="726.9999999999994">
-            <div class="root rich-text root-0" xmlns="http://www.w3.org/1999/xhtml">
-              <div class="paragraph-set root-0-paragraph-set-0">
-                <p class="paragraph root-0-paragraph-set-0-paragraph-0" dir="auto"><span class="text-node root-0-paragraph-set-0-paragraph-0-text-0">Two-line snackbar message</span></p>
-                <p class="paragraph root-0-paragraph-set-0-paragraph-1" dir="auto"><span class="text-node root-0-paragraph-set-0-paragraph-1-text-0">with action</span></p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- frame: Button / Common / Text / Button Text -->
-        <div class="frame button-c-5ae95e1928ae">
-          <!-- frame: Container -->
-          <div class="frame container-5ae95e1928af">
-            <!-- text: Label -->
-            <div class="shape text label-e82e67a9a6cb">
-              <div class="text-node-html" id="html-text-node-def7c09e-aad8-805a-8005-e82e67a9a6cb" data-x="984" data-y="735.4999999999994">
-                <div class="root rich-text root-0" xmlns="http://www.w3.org/1999/xhtml">
-                  <div class="paragraph-set root-0-paragraph-set-0">
-                    <p class="paragraph root-0-paragraph-set-0-paragraph-0" dir="auto"><span class="text-node root-0-paragraph-set-0-paragraph-0-text-0">Text Button</span></p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- frame: Background Layers -->
-      <div class="frame background-e82e67a3d8cb">
-        <!-- rect: Background -->
-        <div class="shape rect background-e82e67a3d8cc">
-        </div>
-        <!-- rect: Elevated Background -->
-        <div class="shape rect elevated-b-e82e67a3d8cd">
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-  <script>
-    function updateClock() {
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-      document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #2d00f7, #ff1493, #00eaff);
+      background-size: 400% 400%;
+      animation: gradientMove 8s ease infinite;
+      color: white;
+      overflow-x: hidden;
     }
 
-    setInterval(updateClock, 1000);
-    updateClock(); // Ejecutar inmediatamente
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .glass {
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .icon-hover:hover {
+      transform: scale(1.2) rotate(4deg);
+      transition: 0.2s;
+      filter: drop-shadow(0 0 10px #fff);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Fondo de partículas -->
+  <div id="particles-js" class="absolute inset-0 -z-10"></div>
+
+  <!-- LOGO SVG ANIMADO -->
+  <header class="flex justify-center mt-10">
+    <svg width="200" height="60" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <text x="10" y="55" font-size="50" font-family="Poppins" font-weight="600"
+            fill="url(#grad)" stroke="#fff" stroke-width="1" letter-spacing="2">
+        SkayLabs
+      </text>
+
+      <defs>
+        <linearGradient id="grad" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%" stop-color="#00eaff" />
+          <stop offset="50%" stop-color="#ff1493" />
+          <stop offset="100%" stop-color="#00eaff" />
+        </linearGradient>
+      </defs>
+    </svg>
+  </header>
+
+  <!-- HERO -->
+  <section class="text-center py-16 px-6 max-w-4xl mx-auto">
+    <h1 class="text-4xl md:text-6xl font-semibold mb-4">
+      Developer Futurista
+    </h1>
+    <p class="text-lg text-gray-200 mb-6">
+      Bienvenido a SkayLabs, donde desarrollo proyectos modernos, creativos y con identidad.
+      Mi objetivo: Transformar ideas en experiencias digitales profesionales.
+    </p>
+
+    <!-- Pixelart (cambiar imagen cuando la tengas) -->
+    <div class="mx-auto w-40 h-40 bg-white bg-opacity-10 rounded-xl shadow-lg flex items-center justify-center">
+      <span class="text-sm text-gray-300">PixelArt aquí</span>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="py-12 max-w-5xl mx-auto px-6">
+    <h2 class="text-3xl font-semibold mb-8 text-center">Tecnologías</h2>
+
+    <div class="flex flex-wrap justify-center gap-6 text-xl">
+      <img src="vue.png" class="w-14 icon-hover" title="Vue.js">
+      <img src="js.png" class="w-14 icon-hover" title="JavaScript">
+      <img src="html.png" class="w-14 icon-hover" title="HTML">
+      <img src="css.png" class="w-14 icon-hover" title="CSS">
+      <img src="astro.png" class="w-14 icon-hover" title="Astro">
+      <img src="php.png" class="w-14 icon-hover" title="PHP">
+      <img src="sweetalert.png" class="w-14 icon-hover" title="SweetAlert">
+      <img src="bootstrap.png" class="w-14 icon-hover" title="Bootstrap">
+    </div>
+
+    <h3 class="text-2xl font-semibold mt-10 mb-4 text-center">Progreso de aprendizaje</h3>
+
+    <div class="space-y-6">
+      <div>
+        <p>Angular - 30%</p>
+        <div class="w-full h-3 bg-white bg-opacity-20 rounded-full">
+          <div class="h-3 bg-pink-400 rounded-full" style="width:30%"></div>
+        </div>
+      </div>
+      <div>
+        <p>JavaScript - 75%</p>
+        <div class="w-full h-3 bg-white bg-opacity-20 rounded-full">
+          <div class="h-3 bg-blue-400 rounded-full" style="width:75%"></div>
+        </div>
+      </div>
+      <div>
+        <p>TypeScript - 40%</p>
+        <div class="w-full h-3 bg-white bg-opacity-20 rounded-full">
+          <div class="h-3 bg-purple-400 rounded-full" style="width:40%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROYECTOS -->
+  <section class="py-16 px-6 text-center">
+    <h2 class="text-3xl font-semibold mb-10">Proyectos</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+
+      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
+        <h3 class="text-xl font-semibold">BiECO</h3>
+        <p class="text-gray-200 text-sm mb-4">Productos ecológicos, sostenibles, con identidad de marca.</p>
+        <a href="https://skaylabs.site/bieco.html" class="underline text-pink-300">Ver proyecto</a>
+      </div>
+
+      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
+        <h3 class="text-xl font-semibold">Gestor Financiero</h3>
+        <p class="text-gray-200 text-sm mb-4">Gestión de gastos y proyecciones económicas para usuarios.</p>
+        <a href="https://skaylabs.site/finanzas.html" class="underline text-pink-300">Ver proyecto</a>
+      </div>
+
+      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
+        <h3 class="text-xl font-semibold">Proyecto 3</h3>
+        <p class="text-gray-200 text-sm mb-4">Próximamente...</p>
+      </div>
+
+      <div class="glass rounded-2xl p-6 hover:scale-105 transition">
+        <h3 class="text-xl font-semibold">Proyecto 4</h3>
+        <p class="text-gray-200 text-sm mb-4">Próximamente...</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PIE -->
+  <footer class="py-10 text-center text-gray-200">
+    © 2025 SkayLabs — Creative Coding & Web Design
+  </footer>
+
+  <!-- CONFIG DE PARTICULAS -->
+  <script>
+    particlesJS("particles-js", {
+      "particles": {
+        "number": { "value": 75 },
+        "color": { "value": ["#00eaff", "#ff1493"] },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.6 },
+        "size": { "value": 3 },
+        "move": { "speed": 1.2 }
+      }
+    });
   </script>
 
 </body>
