@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.ico">
   <title>SkayLabs - Web Developer</title>
 
   <!-- Google Font -->
@@ -101,7 +102,7 @@
 </head>
 <body>
 
-  <!-- Fondo de partículas -->
+  <!-- Particles background -->
   <div id="particles-js" class="absolute inset-0 -z-10"></div>
 
   <header>SkayLabs</header>
@@ -110,8 +111,8 @@
 
     <!-- HERO -->
     <section data-aos="fade-up">
-      <h1>Hola, soy Cristhian</h1>
-      <h2><span id="typing"></span></h2>
+      <h1>Hola, soy Cristhian o SkayClouds</h1>
+      <h2 style="height: auto;"><span id="typing"></span></h2>
     </section>
 
     <!-- SOBRE MI -->
@@ -119,7 +120,9 @@
       <h2>Sobre mí</h2>
       <div class="about-box">
         <p>Bienvenido a SkayLabs, donde desarrollo proyectos modernos, creativos y con identidad.</p>
-        <p>Tengo 29 años, ingeniero de sistemas y Web Developer Full Stack me apasiona el diseño web, explorar animaciones y experiencias digitales modernas.</p>
+        <p>Tengo 29 años, soy ingeniero de sistemas y web developer full stack me apasiona el diseño web, explorar animaciones y experiencias digitales modernas.</p>
+        <p>Mi objetivo es crear soluciones web que no solo sean funcionales, sino que también ofrezcan una experiencia de usuario atractiva y memorable.</p>
+        <p>Estoy en constante aprendizaje de nuevas tecnologías y tendencias para ofrecer lo mejor en cada proyecto.</p>
       </div>
     </section>
 
@@ -135,18 +138,29 @@
         <!-- Python -->
         <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python">
 
+        <!-- PhP -->
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP">
+
         <!-- React -->
         <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React">
 
         <!-- AstroJS -->
-        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/Astro/astro-original.svg" alt="AstroJS">
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/astro/astro-original.svg" alt="Astro">
 
         <!-- HTML -->
         <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML">
 
         <!-- CSS -->
         <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS">
+       
+        <!-- TailWind -->
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="TailWind">
 
+        <!-- NodeJS -->
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="NodeJS">   
+
+        <!-- PostgreSQL -->
+        <img class="skill-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" alt="PostgreSQL">
       </div>
     </section>
 
@@ -182,10 +196,11 @@
   </section>
 
 
-  </main>
-
+  
   <!-- Easter Egg, de nuestra motico -->
   <div class="easter">33H</div>
+  
+</main>
 
   <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
@@ -226,6 +241,20 @@
     }
     type();
   </script>
+
+  <script>
+    /* particles.js config - minimal */
+    if (window.particlesJS) {
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 60 },
+                size: { value: 3 },
+                color: { value: '#ffffff' },
+                line_linked: { enable: true, color: '#ffffff' }
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
