@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Página 404 — BiECO. Lo sentimos, la página no existe." />
+  <title>404 — Página no encontrada</title>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
+  </style>
+</head>
+<body class="bg-white text-gray-800">
+  <!-- Header -->
+  <header class="flex justify-between items-center p-5 shadow-md sticky top-0 bg-white z-50">
+    <div class="flex items-center space-x-2">
+      <img src="/assets/logo-bieco.png" alt="Logo BiECO" class="h-10 w-auto">
+      <span class="text-2xl font-semibold text-green-700">BiECO</span>
+    </div>
+
+    <nav class="hidden md:flex space-x-8 text-gray-700 font-medium">
+      <a href="/" class="hover:text-green-600">Inicio</a>
+      <a href="/bieco/index.html" class="hover:text-green-600">BiECO</a>
+      <a href="#" class="hover:text-green-600">Contacto</a>
+    </nav>
+  </header>
+
+  <!-- 404 Hero -->
+  <main class="min-h-[70vh] flex items-center justify-center bg-gradient-to-b from-green-50 to-white">
+    <div class="max-w-3xl text-center px-6 py-12">
+      <h1 class="text-6xl md:text-7xl font-extrabold text-green-700 mb-4">404</h1>
+      <p class="text-lg text-gray-700 mb-6">Lo sentimos — la página que buscas no existe o fue movida.</p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/" class="inline-block bg-green-600 text-white font-medium px-6 py-3 rounded-full hover:bg-green-700 transition">Volver al inicio</a>
+        <a href="/bieco/index.html" class="inline-block border border-green-600 text-green-600 font-medium px-6 py-3 rounded-full hover:bg-green-50 transition">Ir a BiECO</a>
+      </div>
+
+      <p class="text-sm text-gray-500 mt-6">Si crees que esto es un error, contáctanos por WhatsApp:</p>
+      <a href="https://api.whatsapp.com/send?phone=573192973372&text=Hola%20BiECO%2C%20encontr%C3%A9%20un%20enlace%20rota%20en%20su%20sitio" target="_blank" class="mt-3 inline-block bg-white text-green-700 px-5 py-2 rounded-full font-medium shadow-sm hover:bg-gray-100 transition">💬 Contactar por WhatsApp</a>
+
+      <div class="mt-8 text-sm text-gray-500">
+        <p>También puedes navegar por nuestras secciones:</p>
+        <div class="mt-3 flex flex-wrap justify-center gap-2">
+          <a href="/bieco/index.html#productos" class="text-green-600 hover:underline">Productos</a>
+          <a href="/bieco/index.html#beneficios" class="text-green-600 hover:underline">Beneficios</a>
+          <a href="/bieco/index.html#nosotros" class="text-green-600 hover:underline">Nosotros</a>
+          <a href="/bieco/index.html#contacto" class="text-green-600 hover:underline">Contacto</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-100 text-center py-6 text-gray-700">
+    <img src="/assets/logo-bieco.png" alt="Logo BiECO" class="h-10 mx-auto mb-3">
+    <p class="text-sm">© 2025 BiECO — Limpieza ecológica, ahorro inteligente.</p>
+  </footer>
+</body>
+</html>
