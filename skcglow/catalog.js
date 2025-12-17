@@ -138,12 +138,10 @@ export function renderCatalog(containerId) {
                  style="cursor: pointer; height: calc(8rem * 1.05);">
             <div class="flex-1 flex flex-col justify-between">
                 <div>
-                    <div class="flex items-start justify-between">
-                        <h4 class="font-bold text-lg">${product.name}</h4>
-                        <p class="font-bold text-xl mt-0 text-[#EC407A]">$${product.price.toLocaleString()}</p>
-                    </div>
+                    <h4 class="font-bold text-lg">${product.name}</h4>
                     <p class="text-sm text-gray-700 mt-2">${product.description || 'Sin descripción'}</p>
                     <p class="text-sm text-gray-700">Stock: ${product.stock}</p>
+                    <p class="font-bold text-xl mt-2 text-[#EC407A]">$${product.price.toLocaleString()}</p>
                 </div>
                 <button class="button small w-full mt-4 add-btn" data-id="${product.id}">
                     Agregar al carrito
