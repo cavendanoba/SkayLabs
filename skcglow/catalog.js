@@ -123,23 +123,22 @@ export function renderCatalog(containerId) {
     const catalog = getCatalog();
     catalog.forEach(product => {
         const card = document.createElement("div");
-        card.className = "bg-[#F8BBD0] rounded-2xl shadow-xl p-4 text-black border border-yellow-200 flex flex-col h-full";
+        card.className = "bg-[#F8BBD0] rounded-2xl shadow-xl p-6 text-black border border-yellow-200 flex flex-col h-full";
         card.style.cursor = "pointer";
         card.dataset.productId = product.id;
 
         card.innerHTML = `
               <img src="${createBlurPlaceholder('#EC407A')}" 
                   data-lazy-src="${product.image || 'assets/default.png'}" 
-                 class="w-full object-cover rounded-xl mb-3 cursor-pointer hover:opacity-80 transition blur-image" 
+                 class="w-full object-cover rounded-xl mb-4 cursor-pointer hover:opacity-80 transition blur-image" 
                  alt="${product.name}" 
                  onerror="this.src='assets/default.png'; this.onerror=null;" 
                  data-product-id="${product.id}" 
                  loading="lazy"
-                 style="cursor: pointer; height: calc(8rem * 1.05);">
+                 style="cursor: pointer; height: 400px;">
             <div class="flex-1 flex flex-col justify-between">
                 <div>
                     <h4 class="font-bold text-lg">${product.name}</h4>
-                    <p class="text-sm text-gray-700 mt-2">${product.description || 'Sin descripción'}</p>
                     <p class="text-sm text-gray-700">Stock: ${product.stock}</p>
                     <p class="font-bold text-xl mt-2 text-[#EC407A]">$${product.price.toLocaleString()}</p>
                 </div>

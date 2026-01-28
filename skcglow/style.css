@@ -1,8 +1,9 @@
         :root {
-            --primary-color: #ff4081;
-            --secondary-color: #303f9f;
-            --background-color: #f5f5f5;
+            --primary-color: #BAC7DE ;
+            --secondary-color: #EBA2A4;
+            --background-color: #E6D1CA;
             --text-color: #212121;
+            --header-color: #815a41;
         }
         
         body {
@@ -23,8 +24,8 @@
         /* From Uiverse.io by satyamchaudharydev */
         /* inspired form gumroad website */
         .button {
-            --bg: #000;
-            --hover-bg: #f48fb1;
+            --bg: #a0346e;
+            --hover-bg: #ffc4a6;
             --hover-text: #000;
             color: #fff;
             cursor: pointer;

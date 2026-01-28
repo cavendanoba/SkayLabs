@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKC Glow - Belleza & Maquillaje</title>
+    <title>DISCORDIA - Belleza & Maquillaje</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/skcglow/assets/logo-ico-transp.png">
     <link rel="apple-touch-icon" href="/skcglow/assets/logo-ico-transp.png">
@@ -21,31 +21,48 @@
 
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+    </style>
 
     <!-- Style-->
      <link rel="stylesheet" href="style.css">
 
 </head>
 
-<body class="bg-[#0f0f0f] text-white">
+<body class="bg-gradient-to-br from-[#faf8f7] to-[#f5ede8] text-gray-900" style="font-family: 'Playfair Display', serif;">
 
     <!-- -------------------------------------- -->
     <!-- HEADER -->
     <!-- -------------------------------------- -->
-    <header class="fixed top-0 left-0 w-full bg-black/80 backdrop-blur-md z-50 shadow-xl">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center">
-                <img src="/skcglow/assets/logo-ico-transp.png" alt="SKC Glow" class="w-10 h-10 mr-3">
-                <h1 class="text-3xl font-bold text-[#F8BBD0] drop-shadow-[0_0_8px_#EC407A]">SKC Glow</h1>
+    <header class="fixed top-0 left-0 w-full bg-white backdrop-blur-md z-50 shadow-lg border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-3 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <!-- <img src="/skcglow/assets/logo-ico-transp.png" alt="DISCORDIA" class="w-10 h-10"> -->
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent" style="font-family: 'Playfair Display', serif; font-weight: 700;">DISCORDIA</h1>
             </div>
 
-            <nav class="hidden md:flex gap-8 text-pink-200">
-                <a href="#productos" class="hover:text-white">Productos</a>
-                <a href="#cajas" class="hover:text-white">Combos Regalo</a>
-                <a href="#valores" class="hover:text-white">Nosotros</a>
-                <a href="#pagos" class="hover:text-white">Pagos</a>
-                <a href="javascript:carrito()" class="hover:text-white">Carrito</a>
+            <!-- Search Bar -->
+            <div class="hidden lg:flex items-center bg-gray-50 rounded-full px-4 py-2 w-96">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" placeholder="Buscar productos..." class="bg-transparent ml-2 outline-none w-full text-sm text-gray-700">
+            </div>
+
+            <nav class="hidden md:flex gap-6 text-gray-700 font-medium">
+                <a href="#productos" class="hover:text-[#6d165a] transition">Catálogo</a>
+                <a href="#categorias" class="hover:text-[#6d165a] transition">Categorías</a>
+                <a href="#cajas" class="hover:text-[#6d165a] transition">Combos</a>
+                <a href="#valores" class="hover:text-[#6d165a] transition">Nosotros</a>
             </nav>
+
+            <button id="openCart" class="relative flex items-center justify-center bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white p-3 rounded-full hover:shadow-lg transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <span id="cartCount" class="absolute -top-2 -right-2 bg-[#ffc4a6] text-[#6d165a] text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">0</span>
+            </button>
         </div>
     </header>
 
@@ -55,91 +72,316 @@
     <!-- HERO -->
     <!-- -------------------------------------- -->
     <section
-        class="bg-gradient-to-br from-[#e7ddd3] to-[#e6aa9f] text-black py-28 text-center relative overflow-hidden">
+        class="bg-gradient-to-br from-[#6d165a] via-[#a0346e] to-[#ec5c8d] text-white py-24 text-center relative overflow-hidden">
+        
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 left-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
+        </div>
 
-        <h2 class="text-5xl font-extrabold mb-6" data-aos="zoom-in">
-            <span id="typed"></span>
-        </h2>
+        <div class="relative z-10">
+            <h2 class="text-6xl font-extrabold mb-6" data-aos="zoom-in">
+                <span id="typed"></span>
+            </h2>
 
-        <p class="text-lg max-w-2xl mx-auto" data-aos="fade-up">
-            Marcas originales, precios increíbles, estilo que te acompaña.
-        </p>
+            <p class="text-xl max-w-2xl mx-auto mb-4 text-[#ffc4a6]" data-aos="fade-up">
+                Marcas originales, precios increíbles, estilo que te acompaña.
+            </p>
 
-        <a href="#productos"
-            class="inline-block mt-8 bg-[#0f0f0f] text-white px-8 py-3 rounded-full text-lg font-semibold transition hover:bg-[#EC407A]">
-            Ver Catálogo
-        </a>
+            <a href="#productos"
+                class="inline-block mt-8 bg-[#ffc4a6] text-[#6d165a] px-10 py-4 rounded-full text-lg font-bold transition hover:bg-[#ff8c91] hover:text-white hover:shadow-lg transform hover:scale-105 hidden">
+                ✨ Ver Catálogo
+            </a>
+        </div>
     </section>
 
     <!-- -------------------------------------- -->
-    <!-- CATÁLOGO -->
+    <!-- CATEGORÍAS -->
     <!-- -------------------------------------- -->
-    <section id="productos" class="max-w-7xl mx-auto px-6 py-16">
+    <section id="categorias" class="max-w-7xl mx-auto px-3 py-16">
+        <h2 class="text-3xl font-bold text-gray-900 mb-12" data-aos="fade-up">Explora por Categoría</h2>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6" data-aos="fade-up">
+            <!-- Categoría 1 -->
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
+                    <span class="text-5xl">💄</span>
+                </div>
+                <h3 class="text-center font-bold text-gray-900 mt-4">Labiales</h3>
+                <p class="text-center text-sm text-gray-600">12 productos</p>
+            </div>
 
-        <h3 class="text-4xl font-bold text-center mb-12 text-[#F6E27F]" data-aos="fade-up">
-            Nuestro Catálogo
-        </h3>
+            <!-- Categoría 2 -->
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
+                    <span class="text-5xl">👁️</span>
+                </div>
+                <h3 class="text-center font-bold text-gray-900 mt-4">Ojos</h3>
+                <p class="text-center text-sm text-gray-600">18 productos</p>
+            </div>
 
-        <div id="catalog" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+            <!-- Categoría 3 -->
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#a0346e] to-[#6d165a] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
+                    <span class="text-5xl">🧴</span>
+                </div>
+                <h3 class="text-center font-bold text-gray-900 mt-4">Bases</h3>
+                <p class="text-center text-sm text-gray-600">8 productos</p>
+            </div>
+
+            <!-- Categoría 4 -->
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#6d165a] to-[#ec5c8d] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
+                    <span class="text-5xl">✨</span>
+                </div>
+                <h3 class="text-center font-bold text-gray-900 mt-4">Destacados</h3>
+                <p class="text-center text-sm text-gray-600">15 productos</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- -------------------------------------- -->
+    <!-- FILTROS Y CATÁLOGO -->
+    <!-- -------------------------------------- -->
+    <section id="productos" class="max-w-7xl mx-auto px-3 py-12">
+        <div class="flex gap-8">
+            <!-- Panel de Filtros -->
+            <aside class="hidden lg:block w-64 flex-shrink-0">
+                <div class="sticky top-24 bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+                    <h3 class="font-bold text-lg text-gray-900 mb-6">Filtros</h3>
+
+                    <!-- Rango de Precio -->
+                    <div class="mb-8 pb-8 border-b border-gray-200">
+                        <h4 class="font-semibold text-gray-900 mb-4">Precio</h4>
+                        <div class="space-y-3">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                <span class="ml-3 text-sm text-gray-700">$10.000 - $30.000</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                <span class="ml-3 text-sm text-gray-700">$30.000 - $50.000</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                <span class="ml-3 text-sm text-gray-700">$50.000+</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Marcas -->
+                    <div class="mb-8 pb-8 border-b border-gray-200">
+                        <h4 class="font-semibold text-gray-900 mb-4">Marca</h4>
+                        <div class="space-y-3">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                <span class="ml-3 text-sm text-gray-700">Original</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                <span class="ml-3 text-sm text-gray-700">Premium</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                <span class="ml-3 text-sm text-gray-700">Profesional</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Stock -->
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-4">Disponibilidad</h4>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                            <span class="ml-3 text-sm text-gray-700">En Stock</span>
+                        </label>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Catálogo Principal -->
+            <div class="flex-1">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">
+                        👝 Nuestro Catálogo 💖
+                    </h2>
+                    <div class="flex gap-3">
+                        <select class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:border-[#ec5c8d] focus:outline-none focus:border-[#ec5c8d]">
+                            <option>Ordenar por</option>
+                            <option>Más recientes</option>
+                            <option>Menor precio</option>
+                            <option>Mayor precio</option>
+                            <option>Más vendidos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="catalog" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
 
             <!-- Producto genérico (se repite) -->
             <template id="product-card-template">
-                <div class="bg-[#F8BBD0] rounded-2xl shadow-xl p-4 text-black border border-yellow-200"
+                <div class="bg-white rounded-2xl shadow-lg p-6 text-gray-900 border-2 border-[#ec5c8d] transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-[#ff8c91]"
                     data-aos="zoom-in">
-                    <img src="/skcglow/assets/placeholder-product.jpg" class="w-full object-cover rounded-xl mb-3" style="height: calc(9rem * 1.2)">
-                    <h4 class="font-bold text-sm">Producto</h4>
-                    <p class="text-xs text-gray-700">Descripción breve.</p>
-                    <p class="text-xs text-gray-700">Stock: --</p>
-                    <p class="font-bold text-xs text-base mt-0 text-[#EC407A]">$35.000</p>
-                    <button class="button small w-full mt-3 add-to-cart">
-                        Agregar al carrito
+                    <div class="relative mb-4 overflow-hidden rounded-xl bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] h-48 flex items-center justify-center group">
+                        <img src="/skcglow/assets/placeholder-product.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                        <div class="absolute top-4 right-4 bg-[#ec5c8d] text-white px-3 py-1 rounded-full text-xs font-bold">NUEVO</div>
+                    </div>
+                    <h4 class="font-bold text-lg text-[#6d165a] mb-2">Producto</h4>
+                    
+                    <!-- Rating -->
+                    <div class="flex items-center gap-1 mb-3">
+                        <span class="text-yellow-400">★★★★★</span>
+                        <span class="text-xs text-gray-600">(24)</span>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <p class="font-bold text-2xl text-[#a0346e]">$35.000</p>
+                            <p class="text-xs text-gray-500 line-through">$45.000</p>
+                        </div>
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-bold">-22%</span>
+                    </div>
+
+                    <button class="button small w-full add-to-cart bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
+                        🛒 Agregar al carrito
                     </button>
                 </div>
             </template>
 
             <!-- El catálogo será renderizado desde `catalog.js` -->
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- -------------------------------------- -->
-    <!-- CAJAS DE REGALO -->
+    <!-- DESTACADOS / BESTSELLERS -->
     <!-- -------------------------------------- -->
-    <section id="cajas" class="py-20 bg-[#0f0f0f]">
-        <h3 class="text-4xl font-bold text-center text-[#F6E27F] mb-12" data-aos="fade-up">
-            Cajas de Regalo Personalizadas 🎁
-        </h3>
+    <section class="bg-gray-50 py-20">
+        <div class="max-w-7xl mx-auto px-3">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">⭐ Más Vendidos</h2>
+                <p class="text-gray-600 text-lg">Los favoritos de nuestras clientas</p>
+            </div>
 
-        <p class="max-w-3xl mx-auto text-center text-gray-300 mb-10" data-aos="fade-up">
-            Elige productos individuales o nuestras cajas pre-armadas con diseños navideños.
-            El regalo perfecto para sorprender con estilo.
-        </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Best Seller 1 -->
+                <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300" data-aos="zoom-in">
+                    <div class="relative overflow-hidden bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] h-60 flex items-center justify-center">
+                        <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">BESTSELLER</div>
+                        <span class="text-6xl">💄</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg text-[#6d165a] mb-2">Labial Premium</h3>
+                        <div class="flex gap-1 mb-3">
+                            <span class="text-yellow-400 text-sm">★★★★★</span>
+                            <span class="text-xs text-gray-600">(156)</span>
+                        </div>
+                        <p class="text-2xl font-bold text-[#a0346e] mb-4">$28.000</p>
+                        <button class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
+                            Agregar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Best Seller 2 -->
+                <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300" data-aos="zoom-in">
+                    <div class="relative overflow-hidden bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] h-60 flex items-center justify-center">
+                        <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">BESTSELLER</div>
+                        <span class="text-6xl">👁️</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg text-[#6d165a] mb-2">Sombra Mate</h3>
+                        <div class="flex gap-1 mb-3">
+                            <span class="text-yellow-400 text-sm">★★★★★</span>
+                            <span class="text-xs text-gray-600">(89)</span>
+                        </div>
+                        <p class="text-2xl font-bold text-[#a0346e] mb-4">$15.000</p>
+                        <button class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
+                            Agregar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Best Seller 3 -->
+                <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300" data-aos="zoom-in">
+                    <div class="relative overflow-hidden bg-gradient-to-br from-[#a0346e] to-[#6d165a] h-60 flex items-center justify-center">
+                        <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">BESTSELLER</div>
+                        <span class="text-6xl">🧴</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg text-[#6d165a] mb-2">Base Perfecta</h3>
+                        <div class="flex gap-1 mb-3">
+                            <span class="text-yellow-400 text-sm">★★★★★</span>
+                            <span class="text-xs text-gray-600">(234)</span>
+                        </div>
+                        <p class="text-2xl font-bold text-[#a0346e] mb-4">$32.000</p>
+                        <button class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
+                            Agregar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Best Seller 4 -->
+                <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300" data-aos="zoom-in">
+                    <div class="relative overflow-hidden bg-gradient-to-br from-[#6d165a] to-[#ec5c8d] h-60 flex items-center justify-center">
+                        <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">BESTSELLER</div>
+                        <span class="text-6xl">✨</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg text-[#6d165a] mb-2">Brillo Radiante</h3>
+                        <div class="flex gap-1 mb-3">
+                            <span class="text-yellow-400 text-sm">★★★★☆</span>
+                            <span class="text-xs text-gray-600">(167)</span>
+                        </div>
+                        <p class="text-2xl font-bold text-[#a0346e] mb-4">$22.000</p>
+                        <button class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
+                            Agregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section id="cajas" class="py-20 bg-gradient-to-r from-[#6d165a] to-[#a0346e]">
+        <div class="text-center text-white mb-12" data-aos="fade-up">
+            <h3 class="text-5xl font-bold text-[#ffc4a6] mb-4">
+                🎁 Cajas Regalo Personalizadas
+            </h3>
+            <p class="text-lg text-white max-w-3xl mx-auto">
+                Elige productos individuales o nuestras cajas pre-armadas con diseños especiales.
+                El regalo perfecto para sorprender con estilo.
+            </p>
+        </div>
 
         <div class="max-w-5xl mx-auto text-center">
             <img src="/skcglow/assets/no-stock.png"
-                class="mx-auto w-64 rounded-3xl shadow-2xl border-2 border-yellow-300" data-aos="zoom-in">
+                class="mx-auto w-64 rounded-3xl shadow-2xl border-4 border-[#ffc4a6]" data-aos="zoom-in">
         </div>
     </section>
 
     <!-- -------------------------------------- -->
     <!-- VALORES -->
     <!-- -------------------------------------- -->
-    <section id="valores" class="max-w-6xl mx-auto px-6 py-20">
-        <h3 class="text-4xl font-bold text-center text-[#F6E27F] mb-12" data-aos="fade-up">Nuestro Propósito</h3>
+    <section id="valores" class="max-w-6xl mx-auto px-3 py-20">
+        <h3 class="text-5xl font-bold text-center text-[#6d165a] mb-16" data-aos="fade-up">Nuestro Propósito</h3>
 
-        <div class="grid md:grid-cols-2 gap-10 items-center">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
 
             <img src="/skcglow/assets/logo-full-transp.png"
-                class="rounded-3xl shadow-xl border border-yellow-200 w-full h-80 object-contain" data-aos="fade-right">
+                class="rounded-3xl shadow-2xl border-4 border-[#ec5c8d] w-full h-80 object-contain bg-white p-4" data-aos="fade-right">
 
             <div data-aos="fade-left">
-                <p class="text-gray-300 leading-relaxed text-lg">
+                <p class="text-gray-700 leading-relaxed text-lg space-y-4">
                     Desde la ingeniería y la administración construimos un emprendimiento basado en:
                     <br><br>
-                    ⭐ Optimización continúa
-                    ⭐ Servicio al cliente de alta calidad
-                    ⭐ Procesos eficientes
-                    ⭐ Análisis de mercado real
-                    ⭐ Innovación constante para ofrecer siempre los mejores precios
+                    <span class="block text-[#a0346e] font-bold">⭐ Optimización continúa</span>
+                    <span class="block text-[#a0346e] font-bold">⭐ Servicio al cliente de alta calidad</span>
+                    <span class="block text-[#a0346e] font-bold">⭐ Procesos eficientes</span>
+                    <span class="block text-[#a0346e] font-bold">⭐ Análisis de mercado real</span>
+                    <span class="block text-[#a0346e] font-bold">⭐ Innovación constante para ofrecer siempre los mejores precios</span>
                 </p>
             </div>
 
@@ -149,45 +391,200 @@
     <!-- -------------------------------------- -->
     <!-- MÉTODOS DE PAGO -->
     <!-- -------------------------------------- -->
-    <section id="pagos" class="bg-black py-20">
-        <h3 class="text-4xl font-bold text-center text-[#F6E27F] mb-10" data-aos="fade-up">
-            Métodos de Pago
-        </h3>
+    <section id="pagos" class="bg-white py-20">
+        <div class="max-w-6xl mx-auto px-3">
+            <h3 class="text-5xl font-bold text-center text-[#6d165a] mb-16" data-aos="fade-up">
+                💳 Métodos de Pago
+            </h3>
 
-        <div class="max-w-4xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
 
-            <div class="p-6 flex items-center justify-center h-24 bg-[#F8BBD0] text-black rounded-2xl shadow-xl border border-yellow-200" data-aos="zoom-in" title="Nequi">
-                <svg height="40" viewBox="4.86 5.41 559.65 132.36" width="180" xmlns="http://www.w3.org/2000/svg"><path d="m32.44 30.19c.73-.6 1.47-1.19 2.2-1.79.58-.03 1.14-.07 1.06-.89l-.05.06c9.45-3.76 18.12-9.03 26.92-14.04l1.25-.03c12.32 5.87 24.91 11.09 37.68 15.88.56.39 1.13.77 1.69 1.16 6.99 8.99 14.48 17.54 22.09 26l.15.94c-3.9 11.81-6.79 23.9-9.78 35.97-.32.6-.63 1.19-.95 1.79-9.47 10.39-18.95 20.78-28.42 31.17-.6-.24-1.23-.44-1.8-.73-13.33-6.92-26.65-13.85-39.97-20.78-.66-.5-1.31-1-1.97-1.5-.03-.64-.31-1.04-1.01-1.03l.04.04c-.07-1.63-1.34-2.6-2.16-3.8-8.81-12.97-18.64-25.22-26.87-38.59 2.13-3.13 4.34-6.2 6.36-9.4 4.36-6.91 10.16-12.87 13.54-20.43z" fill="#231c46"/><path d="m432.54 73.12c.15 9.56-2.87 18.01-9.04 25.22-1.82 2.13-1.68 3.33.31 5.1 2.48 2.2 4.77 4.64 6.94 7.16 1.89 2.2 1.3 3.69-1.72 3.73-5.1.08-10.5.99-13.88-4.41-1.47-2.36-3.14-1.42-5.06-.46-19.26 9.59-40.71 4.05-52.74-13.55-11.29-16.52-8.58-40.9 6.14-55.34 13.9-13.64 35.39-15.46 51.1-3.98 12.28 8.98 17.81 21.5 17.95 36.53zm-26.96 25.16c-4.94-4.44-9.3-8.3-13.59-12.24-1.11-1.02-2.05-2.3-1.24-3.97.77-1.59 2.24-1.6 3.79-1.77 4.65-.51 8.38.67 11.38 4.54 2.02 2.6 4.65 4.73 7.01 7.06 10.33-10.56 10.29-29.61-.07-41.36-9.79-11.1-26.59-12.99-38.38-4.31-12.41 9.13-15.99 29.55-7.51 42.74 8.24 12.8 24 17.13 38.61 9.31zm-172.25-10.37c0-18.85.16-36.17-.11-53.49-.07-4.77 1.88-5.48 5.94-5.36 3.89.11 6.5.08 6.44 5.42-.27 24.81-.11 49.63-.14 74.44 0 1.9.7 4.26-1.76 5.22-2.51.98-3.98-.88-5.44-2.52-15.3-17.14-30.61-34.28-45.92-51.42-1.51-1.69-3.06-3.35-4.69-5.13-1.47 1.87-.84 3.58-.84 5.14-.03 15.99-.12 31.98.14 47.96.07 4.65-1.09 6.46-6.11 6.35-4.63-.11-6.44-1.11-6.39-6.15.24-24.48.09-48.96.14-73.44 0-2.01-.96-4.69 1.91-5.57 2.77-.85 4.99.19 7 2.46 14.53 16.49 29.16 32.89 43.76 49.32 1.72 1.95 3.47 3.87 6.07 6.77z" fill="#251d48"/><path d="m459.81 60.17c0-8.82.24-17.66-.09-26.47-.21-5.59 3.41-4.43 6.6-4.59 3.48-.18 6.06-.05 6.01 4.79-.19 17.14-.28 34.3.13 51.44.32 13.34 13.74 21.01 25.3 14.87 5.03-2.67 8-6.89 8.68-12.59 1.31-10.95.4-21.95.61-32.93.13-6.99.17-13.99-.03-20.97-.1-3.39.88-4.69 4.48-4.67 7.86.05 7.87-.14 7.86 7.89-.01 15.48.11 30.97-.09 46.45-.2 15.72-9.61 27.24-24.4 30.36-16.01 3.37-33.12-8.78-34.42-25.14-.75-9.42-.14-18.96-.14-28.44-.16.01-.33.01-.5 0z" fill="#2a1f4b"/><path d="m278.2 71.78c-.01-12.48.1-24.97-.07-37.45-.05-3.67.68-5.37 4.91-5.26 11.82.28 23.65.31 35.46 0 4.89-.13 4.91 2.47 4.9 5.95-.01 3.58.13 6.61-5.05 6.4-7.98-.32-15.98.05-23.97-.14-2.93-.07-4.16.5-3.96 3.76.3 4.98.26 9.99.01 14.97-.15 2.97.97 3.56 3.69 3.5 7.82-.16 15.66.21 23.47-.14 4.8-.22 6 1.63 5.88 6.09-.11 4.07-.43 6.56-5.62 6.27-7.97-.45-15.98-.02-23.97-.17-2.58-.05-3.51.65-3.44 3.33.17 6.65.22 13.32-.01 19.97-.11 3.1 1.23 3.47 3.82 3.43 8.16-.13 16.32.17 24.47-.13 4.52-.17 4.81 2.24 4.66 5.6-.15 3.28.77 6.8-4.7 6.69-11.98-.24-23.98-.18-35.96-.01-3.58.05-4.59-1.32-4.56-4.69.13-12.67.05-25.32.04-37.97z" fill="#251d48"/><path d="m551.91 71.4c.01-12.49.24-24.98-.1-37.46-.16-5.84 3.49-4.7 6.86-4.88 3.64-.2 5.82.29 5.78 5.01-.22 25.14-.23 50.28.01 75.42.05 4.83-2.3 5-5.85 4.92-3.58-.08-6.95.59-6.81-5.05.32-12.65.11-25.31.11-37.96z" fill="#231c46"/><path d="m12.54 60.02c8.23 13.37 18.07 25.62 26.88 38.58.82 1.21 2.09 2.17 2.16 3.8-10.56-4.22-20.89-9.07-29.89-16.01-6.03-4.65-6.83-14.58-2.95-21.37.98-1.72 2.18-3.31 3.28-4.96.17-.01.34-.02.52-.04z" fill="#40bacd"/><path d="m44.52 104.9c13.32 6.93 26.64 13.86 39.97 20.78.57.3 1.2.49 1.8.73.05.23.08.45.1.68-2.08 2.11-4.07 4.33-6.27 6.32-4.68 4.24-12.23 4.36-16.03-.56-6.96-8.99-13.91-18.03-19.57-27.95z" fill="#e73b7b"/><path d="m86.38 127.1c-.01-.23-.05-.46-.1-.68 9.47-10.39 18.94-20.78 28.42-31.17-1.61 9.43-4.32 18.59-7.18 27.68-2.07 6.58-8.72 9.24-15.3 6.85-2-.74-3.89-1.78-5.84-2.68z" fill="#40bacd"/><path d="m101.51 29.39c-12.78-4.79-25.37-10.01-37.69-15.88 3.37-2.77 7.39-4.39 11.24-6.27 3.74-1.83 7.19-.86 9.85 2.28 5.58 6.58 11.07 13.24 16.6 19.87zm14.14 64.07c2.99-12.06 5.88-24.15 9.78-35.97 2.79 1.9 4.64 4.71 6.57 7.34 2.61 3.57 2.61 7.58-.35 10.99-5.21 5.99-10.65 11.77-16 17.64zm-103.11-33.44c-.17.01-.35.03-.52.04-3.56-11.97-.75-18.83 10.23-24.72 3.35-1.8 6.79-3.44 10.19-5.15-3.38 7.56-9.18 13.52-13.54 20.43-2.02 3.2-4.24 6.27-6.36 9.4z" fill="#e73b7b"/><g fill="#40bacd"><path d="m125.29 56.55c-7.61-8.46-15.1-17.01-22.09-26 5.97 2.44 11.99 4.79 17.91 7.35 5.6 2.42 7.47 6.18 6.15 12-.52 2.24-1.31 4.43-1.97 6.65zm-62.72-43.01c-8.8 5.01-17.47 10.28-26.92 14.04 2.64-5.88 6.76-10.79 10.76-15.71 2.04-2.5 5.28-3.24 8.56-1.76 2.54 1.15 5.07 2.29 7.6 3.43z"/><path d="m35.7 27.52c.09.82-.48.86-1.06.89.08-.63.41-.94 1.06-.89zm5.84 74.85c.69 0 .98.39 1.01 1.03-.61-.08-1.1-.27-1.01-1.03z"/></g></svg>
+                <div class="p-8 flex items-center justify-center h-32 bg-gradient-to-br from-[#ec5c8d] to-[#ff8c91] text-white rounded-2xl shadow-lg border-2 border-[#a0346e] transition hover:scale-105" data-aos="zoom-in" title="Nequi">
+                    <svg height="40" viewBox="4.86 5.41 559.65 132.36" width="180" xmlns="http://www.w3.org/2000/svg"><path d="m32.44 30.19c.73-.6 1.47-1.19 2.2-1.79.58-.03 1.14-.07 1.06-.89l-.05.06c9.45-3.76 18.12-9.03 26.92-14.04l1.25-.03c12.32 5.87 24.91 11.09 37.68 15.88.56.39 1.13.77 1.69 1.16 6.99 8.99 14.48 17.54 22.09 26l.15.94c-3.9 11.81-6.79 23.9-9.78 35.97-.32.6-.63 1.19-.95 1.79-9.47 10.39-18.95 20.78-28.42 31.17-.6-.24-1.23-.44-1.8-.73-13.33-6.92-26.65-13.85-39.97-20.78-.66-.5-1.31-1-1.97-1.5-.03-.64-.31-1.04-1.01-1.03l.04.04c-.07-1.63-1.34-2.6-2.16-3.8-8.81-12.97-18.64-25.22-26.87-38.59 2.13-3.13 4.34-6.2 6.36-9.4 4.36-6.91 10.16-12.87 13.54-20.43z" fill="#fff"/><path d="m432.54 73.12c.15 9.56-2.87 18.01-9.04 25.22-1.82 2.13-1.68 3.33.31 5.1 2.48 2.2 4.77 4.64 6.94 7.16 1.89 2.2 1.3 3.69-1.72 3.73-5.1.08-10.5.99-13.88-4.41-1.47-2.36-3.14-1.42-5.06-.46-19.26 9.59-40.71 4.05-52.74-13.55-11.29-16.52-8.58-40.9 6.14-55.34 13.9-13.64 35.39-15.46 51.1-3.98 12.28 8.98 17.81 21.5 17.95 36.53zm-26.96 25.16c-4.94-4.44-9.3-8.3-13.59-12.24-1.11-1.02-2.05-2.3-1.24-3.97.77-1.59 2.24-1.6 3.79-1.77 4.65-.51 8.38.67 11.38 4.54 2.02 2.6 4.65 4.73 7.01 7.06 10.33-10.56 10.29-29.61-.07-41.36-9.79-11.1-26.59-12.99-38.38-4.31-12.41 9.13-15.99 29.55-7.51 42.74 8.24 12.8 24 17.13 38.61 9.31zm-172.25-10.37c0-18.85.16-36.17-.11-53.49-.07-4.77 1.88-5.48 5.94-5.36 3.89.11 6.5.08 6.44 5.42-.27 24.81-.11 49.63-.14 74.44 0 1.9.7 4.26-1.76 5.22-2.51.98-3.98-.88-5.44-2.52-15.3-17.14-30.61-34.28-45.92-51.42-1.51-1.69-3.06-3.35-4.69-5.13-1.47 1.87-.84 3.58-.84 5.14-.03 15.99-.12 31.98.14 47.96.07 4.65-1.09 6.46-6.11 6.35-4.63-.11-6.44-1.11-6.39-6.15.24-24.48.09-48.96.14-73.44 0-2.01-.96-4.69 1.91-5.57 2.77-.85 4.99.19 7 2.46 14.53 16.49 29.16 32.89 43.76 49.32 1.72 1.95 3.47 3.87 6.07 6.77z" fill="#fff"/></svg>
+                </div>
+
+                <div class="p-8 flex items-center justify-center h-32 bg-gradient-to-br from-[#ec5c8d] to-[#ff8c91] text-white rounded-2xl shadow-lg border-2 border-[#a0346e] transition hover:scale-105" data-aos="zoom-in" title="Daviplata">
+                    <svg height="48" viewBox="5.88 9.87 291 157.1" width="380" xmlns="http://www.w3.org/2000/svg"><path d="m153.43 60.84c.42-3.45 1.29-6.41 2.48-9.25 2.61-6.21 5.48-12.32 8.04-18.56 3.42-8.35 9.89-11.83 18.52-12.17 6.29-.25 12.44.37 18.34 2.7.79.31 1.26.38 1.66-.55.42-.96 1.09-1.81 1.62-2.73.87-1.54 1-3.06.08-4.7-1.14-2.05-.68-3.81 1.09-4.77 1.74-.94 4.01-.42 4.93 1.14 1.03 1.76.57 3.8-1.3 4.96-.93.58-1.46 1.26-1.55 2.33-.03.39-.12.8-.27 1.16-1.35 3.25-1.68 6.2-.08 9.77 1.89 4.22.64 8.89-.66 13.24-5.51 18.45-14.87 34.74-27.79 48.99-2.55 2.81-5.58 4.92-9.58 5.04-.79.03-1.14.6-1.58 1.06-5.6 5.88-11.84 10.78-19.79 13.15-4.89 1.46-9.92 1.65-14.96 1.69-2.74.02-5.04-1.05-6.79-3.18-6.47-7.86-11.01-16.64-12.7-26.77-.19-1.14-.57-2.29-.28-3.69 3.74 3.02 7.53 5.76 11.8 7.74 5.6 2.61 11.36 4.18 17.5 2.19 2.51-.81 5.07-1.75 6.17-4.55.34-.87.78-.43 1.18-.14 1.72 1.24 3.42 2.51 5.13 3.77 2.35 1.74 4.79 3.3 7.56 4.34 4.67 1.76 8.72.75 12.2-2.7 4.36-4.32 7.71-9.44 10.99-14.58 6.57-10.3 11.83-21.26 15.92-32.77.94-2.64 1.28-5.4 1.24-8.21-.06-3.49-1.72-5.88-4.86-7.3-4.59-2.08-9.45-2.44-14.39-2.17-1.06.06-2.11.21-3.16.34-6.14.72-10.51 3.8-13.28 9.42-3.31 6.71-6.23 13.58-9.38 20.35-.93 1.99-1.97 3.87-4.05 5.41zm-11.73 33.67c-.27-.02-.53-.08-.78-.05-1.08.15-2.3 1.4-3.13-.49-.07-.15-1.51.03-1.22 1.01.33 1.13-.1 1.72-.93 2.32-1.12.81-1.64 1.89-1.08 3.28.54 1.36 1.75 1.25 2.86 1.21 1.65-.05 3.29-.24 4.94-.26.74-.01 1.72-.06 1.89 1 .14.92-.32 1.67-1.08 2.2-.95.66-2.09.78-3.17 1.07-.64.17-1.65.06-1.33 1.19.33 1.15 1.14.4 1.74.28 1.37-.26 2.78-1.51 4.01.37.22.34.87-.1 1.22-.37.48-.36.14-.69-.18-.94-1.11-.88-.51-1.62.23-2.27.96-.84 1.3-1.83.81-3.01-.54-1.31-1.65-1.58-2.94-1.5-1.71.1-3.43.23-5.14.19-.61-.01-1.63.18-1.72-.88-.06-.78.38-1.41 1.11-1.73.66-.29 1.37-.48 2.04-.75.84-.34 1.76-.64 1.85-1.87zm-130.35 60.54c0-2.12-.02-4.24.01-6.37.02-1.45.18-2.93 2.13-2.94s2.13 1.41 2.13 2.91c0 3.85.03 7.69-.02 11.54-.01 1.04.25 1.52 1.36 1.67 4.76.64 9.39.38 13.77-1.76 5.01-2.45 8.06-9.62 1.67-14.83-3.6-2.94-7.85-3.66-12.24-4.01-3.66-.29-7.27.11-10.8 1.11-1.24.35-2.47.55-2.99-.95-.49-1.44.34-2.45 1.62-2.98 2.8-1.17 5.78-1.37 8.77-1.44 5.42-.13 10.73.51 15.7 2.8 4.51 2.08 7.79 5.27 8.62 10.4.91 5.66-2.36 11.32-8.11 13.88-5.82 2.6-11.93 2.89-18.12 1.84-2.46-.42-3.31-1.59-3.49-4.11-.01-.13-.01-.27-.01-.4v-6.36zm50.69-18.06c1.96-.01 3.44 1 4.82 2.16 2.77 2.33 4.82 5.26 6.75 8.28 2.78 4.36 5.11 8.94 7.14 13.69.26.6.47 1.24.58 1.88.26 1.55-.25 2.8-1.81 3.31-1.65.54-2.43-.57-2.97-1.89-2.39-5.82-5.15-11.45-8.68-16.68-1.11-1.65-2.33-3.21-3.95-4.42-1.22-.91-2.39-.94-3.64-.05-1.71 1.21-2.95 2.85-4.1 4.55-3.44 5.05-6.13 10.49-8.47 16.11-.6 1.45-1.19 2.97-3.24 2.36-1.61-.48-2.29-2.34-1.48-4.31 3.04-7.36 6.66-14.41 11.87-20.52 1.9-2.22 4.02-4.22 7.18-4.47z" fill="#fff"/></svg>
+                </div>
+
+                <div class="p-8 bg-gradient-to-br from-[#ec5c8d] to-[#ff8c91] text-white rounded-2xl shadow-lg border-2 border-[#a0346e] transition hover:scale-105 flex items-center justify-center h-32 font-bold text-lg" data-aos="zoom-in">
+                    🏦 Transferencia Bancaria
+                </div>
+
+                <div class="p-8 bg-gradient-to-br from-[#6d165a] to-[#a0346e] text-white rounded-2xl shadow-lg border-2 border-[#ec5c8d] transition hover:scale-105 flex items-center justify-center h-32 font-bold text-lg"
+                    data-aos="zoom-in">
+                    📍 Contraentrega Bogotá
+                </div>
+
             </div>
-
-            <div class="p-6 flex items-center justify-center h-24 bg-[#F8BBD0] text-black rounded-2xl shadow-xl border border-yellow-200" data-aos="zoom-in" title="Daviplata">
-                <svg height="48" viewBox="5.88 9.87 291 157.1" width="380" xmlns="http://www.w3.org/2000/svg"><path d="m153.43 60.84c.42-3.45 1.29-6.41 2.48-9.25 2.61-6.21 5.48-12.32 8.04-18.56 3.42-8.35 9.89-11.83 18.52-12.17 6.29-.25 12.44.37 18.34 2.7.79.31 1.26.38 1.66-.55.42-.96 1.09-1.81 1.62-2.73.87-1.54 1-3.06.08-4.7-1.14-2.05-.68-3.81 1.09-4.77 1.74-.94 4.01-.42 4.93 1.14 1.03 1.76.57 3.8-1.3 4.96-.93.58-1.46 1.26-1.55 2.33-.03.39-.12.8-.27 1.16-1.35 3.25-1.68 6.2-.08 9.77 1.89 4.22.64 8.89-.66 13.24-5.51 18.45-14.87 34.74-27.79 48.99-2.55 2.81-5.58 4.92-9.58 5.04-.79.03-1.14.6-1.58 1.06-5.6 5.88-11.84 10.78-19.79 13.15-4.89 1.46-9.92 1.65-14.96 1.69-2.74.02-5.04-1.05-6.79-3.18-6.47-7.86-11.01-16.64-12.7-26.77-.19-1.14-.57-2.29-.28-3.69 3.74 3.02 7.53 5.76 11.8 7.74 5.6 2.61 11.36 4.18 17.5 2.19 2.51-.81 5.07-1.75 6.17-4.55.34-.87.78-.43 1.18-.14 1.72 1.24 3.42 2.51 5.13 3.77 2.35 1.74 4.79 3.3 7.56 4.34 4.67 1.76 8.72.75 12.2-2.7 4.36-4.32 7.71-9.44 10.99-14.58 6.57-10.3 11.83-21.26 15.92-32.77.94-2.64 1.28-5.4 1.24-8.21-.06-3.49-1.72-5.88-4.86-7.3-4.59-2.08-9.45-2.44-14.39-2.17-1.06.06-2.11.21-3.16.34-6.14.72-10.51 3.8-13.28 9.42-3.31 6.71-6.23 13.58-9.38 20.35-.93 1.99-1.97 3.87-4.05 5.41zm-11.73 33.67c-.27-.02-.53-.08-.78-.05-1.08.15-2.3 1.4-3.13-.49-.07-.15-1.51.03-1.22 1.01.33 1.13-.1 1.72-.93 2.32-1.12.81-1.64 1.89-1.08 3.28.54 1.36 1.75 1.25 2.86 1.21 1.65-.05 3.29-.24 4.94-.26.74-.01 1.72-.06 1.89 1 .14.92-.32 1.67-1.08 2.2-.95.66-2.09.78-3.17 1.07-.64.17-1.65.06-1.33 1.19.33 1.15 1.14.4 1.74.28 1.37-.26 2.78-1.51 4.01.37.22.34.87-.1 1.22-.37.48-.36.14-.69-.18-.94-1.11-.88-.51-1.62.23-2.27.96-.84 1.3-1.83.81-3.01-.54-1.31-1.65-1.58-2.94-1.5-1.71.1-3.43.23-5.14.19-.61-.01-1.63.18-1.72-.88-.06-.78.38-1.41 1.11-1.73.66-.29 1.37-.48 2.04-.75.84-.34 1.76-.64 1.85-1.87zm-130.35 60.54c0-2.12-.02-4.24.01-6.37.02-1.45.18-2.93 2.13-2.94s2.13 1.41 2.13 2.91c0 3.85.03 7.69-.02 11.54-.01 1.04.25 1.52 1.36 1.67 4.76.64 9.39.38 13.77-1.76 5.01-2.45 8.06-9.62 1.67-14.83-3.6-2.94-7.85-3.66-12.24-4.01-3.66-.29-7.27.11-10.8 1.11-1.24.35-2.47.55-2.99-.95-.49-1.44.34-2.45 1.62-2.98 2.8-1.17 5.78-1.37 8.77-1.44 5.42-.13 10.73.51 15.7 2.8 4.51 2.08 7.79 5.27 8.62 10.4.91 5.66-2.36 11.32-8.11 13.88-5.82 2.6-11.93 2.89-18.12 1.84-2.46-.42-3.31-1.59-3.49-4.11-.01-.13-.01-.27-.01-.4v-6.36zm50.69-18.06c1.96-.01 3.44 1 4.82 2.16 2.77 2.33 4.82 5.26 6.75 8.28 2.78 4.36 5.11 8.94 7.14 13.69.26.6.47 1.24.58 1.88.26 1.55-.25 2.8-1.81 3.31-1.65.54-2.43-.57-2.97-1.89-2.39-5.82-5.15-11.45-8.68-16.68-1.11-1.65-2.33-3.21-3.95-4.42-1.22-.91-2.39-.94-3.64-.05-1.71 1.21-2.95 2.85-4.1 4.55-3.44 5.05-6.13 10.49-8.47 16.11-.6 1.45-1.19 2.97-3.24 2.36-1.61-.48-2.29-2.34-1.48-4.31 3.04-7.36 6.66-14.41 11.87-20.52 1.9-2.22 4.02-4.22 7.18-4.47z" fill="#e01a19"/><path d="m236.69 162.37c.06 1.82-.51 2.97-2.05 3.29-1.56.32-2.25-.76-2.77-2-2.55-6.12-5.41-12.09-9.29-17.51-.27-.38-.55-.75-.85-1.1-3.53-4.19-5.37-4.2-8.73.09-4.23 5.43-7.17 11.58-9.87 17.86-.18.43-.33.87-.54 1.28-.5.95-1.22 1.59-2.38 1.42-1.1-.16-1.77-.88-2.1-1.88-.25-.77-.23-1.57.09-2.34 3.2-7.6 6.9-14.91 12.36-21.2.13-.15.26-.3.4-.44 4.57-4.76 8.09-4.86 12.65-.06 5.89 6.21 9.54 13.8 12.86 21.56.18.4.19.89.22 1.03zm21.42-.23c.01-.04.08-.65.31-1.18 2.86-6.8 6.25-13.31 10.83-19.14 1.27-1.62 2.68-3.13 4.41-4.28 2.69-1.79 4.9-1.75 7.56.08 2.22 1.53 3.92 3.57 5.48 5.72 3.9 5.4 6.95 11.27 9.55 17.38.23.54.44 1.13.49 1.7.14 1.56-.43 2.8-2.02 3.21-1.54.39-2.28-.64-2.81-1.91-2.14-5.22-4.62-10.27-7.59-15.06-1.19-1.92-2.48-3.77-4.14-5.32-2.07-1.93-3.41-1.98-5.49-.03-2.59 2.44-4.36 5.49-6.11 8.54-2.21 3.86-4.11 7.86-5.79 11.98-.49 1.19-1.25 2.14-2.69 1.82-1.51-.33-2.13-1.44-1.99-3.51z" fill="#8c8a8e"/><path d="m96.41 166.45c-1.62-.04-2.9-.83-4.08-1.85-2.19-1.88-3.85-4.2-5.38-6.61-3.19-5.05-5.75-10.42-7.93-15.97-.36-.93-.74-1.88-.44-2.9.32-1.06.88-1.95 2.13-2.08 1.22-.12 1.79.66 2.17 1.66 1.33 3.53 2.81 7 4.5 10.37 1.68 3.38 3.41 6.74 5.88 9.64 2.37 2.78 3.94 2.84 6.27.06 3.75-4.47 6.09-9.75 8.44-15.01.75-1.69 1.37-3.44 2.09-5.15.41-.97 1.03-1.76 2.24-1.56 1.2.19 1.81 1.02 2.03 2.15.14.72.09 1.45-.18 2.15-2.8 7.17-6.06 14.11-10.76 20.28-1.01 1.32-2.15 2.53-3.5 3.52-1.03.78-2.15 1.33-3.48 1.3z" fill="#e01a19"/><path d="m141.71 140.39c-3.67.13-6.88.42-10.05 1.28-1.4.38-3.35.9-3.84-1.17-.44-1.87 1.33-2.36 2.76-2.71 9-2.23 17.84-2.23 26.39 1.9 1.21.58 2.29 1.35 3.24 2.28 2.45 2.39 2.39 5.27-.11 7.64-1.44 1.37-3.25 2.03-5.1 2.56-3.61 1.03-7.3 1.28-11.03 1.16-1.15-.04-2.18-.4-2.17-1.78.01-1.41 1.06-1.68 2.21-1.7 2.85-.05 5.7-.2 8.5-.81.58-.13 1.16-.29 1.71-.52 1.26-.53 2.38-1.22 2.46-2.81s-1.11-2.19-2.23-2.73c-4.16-2.05-8.62-2.56-12.74-2.59zm30.65 5.85c0 1.86.03 3.71-.01 5.57-.08 4.09 1.81 6.93 5.63 8.43 4.08 1.6 8.3 1.5 12.54.96 1.53-.19 2.99-.22 3.24 1.6.24 1.78-1.12 2.31-2.65 2.51-3.83.51-7.65.58-11.48 0-7.72-1.18-12.29-6.16-12.57-13.99-.14-3.9-.05-7.82-.01-11.73.02-2.06 1.09-3.26 2.72-3.24 1.62.02 2.57 1.2 2.6 3.33.02 2.19 0 4.38-.01 6.56zm78.27 6.13c0 3.45.02 6.9-.01 10.34-.01 2.06-.79 3.05-2.36 2.98-1.87-.09-2.47-1.36-2.47-2.98-.02-6.83-.07-13.66.03-20.49.02-1.61-.47-2.05-2.01-1.96-2.12.12-4.24.05-6.37 0-1.26-.03-2.58-.38-2.68-1.82-.1-1.39 1.21-1.75 2.34-1.98.64-.13 1.31-.16 1.97-.16 6.17-.01 12.34-.01 18.51 0 .6 0 1.21-.02 1.78.11 1.1.25 2.4.5 2.29 1.99-.1 1.36-1.25 1.81-2.45 1.85-1.99.08-3.98.05-5.97.05-2.62.01-2.62 0-2.62 2.53.02 3.18.02 6.36.02 9.54z" fill="#8c8a8e"/><path d="m124.36 151.99c0 3.77.02 7.54-.01 11.31-.01 2.17-.83 3.19-2.42 3.14-1.55-.05-2.42-1.16-2.42-3.23-.01-7.61-.01-15.22 0-22.83 0-2.09.86-3.23 2.38-3.27 1.57-.05 2.46 1.12 2.47 3.36.02 3.84 0 7.68 0 11.52zm54.76-100.86c1.91.17 3.82.3 5.73.53.46.06 1.15.07 1.22.79.07.64-.25 1.15-.74 1.54-1 .81-2.26.89-3.41.83-3.77-.18-7.54-.45-11.17-1.62-3.77-1.21-4.96-3.1-4.14-6.91 1.07-4.99 4.15-8.95 7.05-12.97.5-.7 1.17-.46 1.78-.12.74.41.67.98.37 1.69-1.09 2.65-2.9 4.89-4.26 7.38-.73 1.33-1.55 2.62-1.96 4.1-.6 2.19.09 3.6 2.24 4.32 2.37.79 4.84.57 7.29.44z" fill="#e01a19"/><path d="m139.38 155.61c0 2.52-.02 5.04.01 7.56.01 1.62-.72 2.51-2.36 2.53-1.67.03-2.65-.72-2.65-2.48 0-5.11.02-10.21-.01-15.32-.01-1.73.85-2.69 2.48-2.69 1.61 0 2.57.89 2.55 2.64-.04 2.58-.02 5.17-.02 7.76z" fill="#8c8a8e"/><path d="m141.7 94.51c-.08 1.22-1 1.53-1.85 1.88-.67.27-1.38.46-2.04.75-.72.32-1.17.95-1.11 1.73.09 1.07 1.11.87 1.72.88 1.71.04 3.43-.09 5.14-.19 1.29-.07 2.4.19 2.94 1.5.48 1.18.15 2.17-.81 3.01-.74.65-1.34 1.39-.23 2.27.32.25.65.58.18.94-.35.26-1 .7-1.22.37-1.23-1.88-2.64-.63-4.01-.37-.6.12-1.41.87-1.74-.28-.32-1.13.69-1.02 1.33-1.19 1.08-.29 2.22-.41 3.17-1.07.76-.53 1.23-1.27 1.08-2.2-.17-1.06-1.15-1.01-1.89-1-1.65.01-3.29.21-4.94.26-1.11.03-2.32.14-2.86-1.21-.56-1.39-.04-2.47 1.08-3.28.83-.6 1.26-1.19.93-2.32-.28-.98 1.16-1.16 1.22-1.01.84 1.88 2.06.63 3.13.49.25-.04.5.02.78.04z" fill="#fff"/></svg>
-            </div>
-
-            <div class="p-6 bg-[#F8BBD0] text-black rounded-2xl shadow-xl border border-yellow-200" data-aos="zoom-in">
-                Transferencia Bancaria 
-            </div>
-
-            <div class="p-6 bg-[#EC407A] text-white rounded-2xl shadow-xl border border-yellow-200 font-bold"
-                data-aos="zoom-in">
-                Contraentrega Bogotá / Soacha
-            </div>
-
         </div>
     </section>
 
     <!-- -------------------------------------- -->
-    <!-- FOOTER -->
+    <!-- TESTIMONIOS -->
     <!-- -------------------------------------- -->
-    <footer class="bg-black py-10 text-center text-gray-400">
-        <p>Atención 24/7 – SKC Glow © 2025</p>
-        <div class="flex justify-center gap-8 mt-4">
-            <a href="#" target="_blank" class="hover:opacity-80 transition" title="Síguenos en Instagram">
-                <img width="45" height="45" src="https://img.icons8.com/pulsar-color/96/instagram-new.png" alt="instagram-new"/>
-            </a>
-            <a href="#" target="_blank" class="hover:opacity-80 transition" title="Síguenos en TikTok">
-                <img width="45" height="45" src="https://img.icons8.com/pulsar-color/96/tiktok.png" alt="tiktok"/>
-            </a>
+    <section class="bg-gradient-to-r from-[#6d165a] to-[#a0346e] py-20">
+        <div class="max-w-7xl mx-auto px-3">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl font-bold text-white mb-4">💬 Lo Que Nuestras Clientas Dicen</h2>
+                <p class="text-[#ffc4a6] text-lg">Opiniones reales de quienes confían en DISCORDIA</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Testimonio 1 -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg" data-aos="zoom-in">
+                    <div class="flex gap-1 mb-4">
+                        <span class="text-yellow-400">★★★★★</span>
+                    </div>
+                    <p class="text-gray-700 mb-6 italic">
+                        "Excelente calidad y los mejores precios. Mis productos de maquillaje favoritos están aquí. ¡Muy recomendado!"
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] rounded-full"></div>
+                        <div>
+                            <p class="font-bold text-gray-900">María López</p>
+                            <p class="text-sm text-gray-600">Bogotá</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonio 2 -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg" data-aos="zoom-in">
+                    <div class="flex gap-1 mb-4">
+                        <span class="text-yellow-400">★★★★★</span>
+                    </div>
+                    <p class="text-gray-700 mb-6 italic">
+                        "La entrega fue rápida y los productos llegaron en perfectas condiciones. Definitivamente vuelvo a comprar."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] rounded-full"></div>
+                        <div>
+                            <p class="font-bold text-gray-900">Daniela Ruiz</p>
+                            <p class="text-sm text-gray-600">Soacha</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonio 3 -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg" data-aos="zoom-in">
+                    <div class="flex gap-1 mb-4">
+                        <span class="text-yellow-400">★★★★★</span>
+                    </div>
+                    <p class="text-gray-700 mb-6 italic">
+                        "El servicio al cliente es impecable. Resolvieron todas mis dudas y me ayudaron a elegir los productos perfectos."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-[#a0346e] to-[#6d165a] rounded-full"></div>
+                        <div>
+                            <p class="font-bold text-gray-900">Sandra Torres</p>
+                            <p class="text-sm text-gray-600">Cundinamarca</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <footer class="bg-gray-900 text-gray-300 py-16">
+        <div class="max-w-7xl mx-auto px-3">
+            <!-- Footer Top Section -->
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <!-- Company Info -->
+                <div data-aos="fade-up">
+                    <h3 class="text-2xl font-bold text-white mb-4">✨ DISCORDIA</h3>
+                    <p class="text-sm leading-relaxed mb-6">
+                        Tu tienda online de maquillaje profesional. Productos de alta calidad con las mejores marcas internacionales.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="https://instagram.com" target="_blank" class="hover:text-[#ec5c8d] transition transform hover:scale-110" title="Instagram">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.057-1.645.069-4.849.069-3.204 0-3.584-.012-4.849-.069-3.259-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/>
+                                <circle cx="12" cy="12" r="3.6"/>
+                                <circle cx="18.406" cy="5.594" r="0.9"/>
+                            </svg>
+                        </a>
+                        <a href="https://tiktok.com" target="_blank" class="hover:text-[#ec5c8d] transition transform hover:scale-110" title="TikTok">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.1 1.82 2.89 2.89 0 0 1 2.31-4.64 2.86 2.86 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-.54-.05z"/>
+                            </svg>
+                        </a>
+                        <a href="https://whatsapp.com" target="_blank" class="hover:text-[#ec5c8d] transition transform hover:scale-110" title="WhatsApp">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-9.746 9.798c0 2.649.738 5.195 2.141 7.432L2.1 21.9l7.973-2.087a9.82 9.82 0 004.756 1.207h.005c5.368 0 9.746-4.355 9.746-9.799 0-2.611-.738-5.067-2.141-7.46a9.87 9.87 0 00-7.604-3.769m0-2.04C6.444 2.904 2 7.349 2 12.85c0 2.929.755 5.729 2.208 8.148L2 22l8.221-2.141C13.966 21.88 17.772 20.271 20.52 17.463c2.75-2.808 4.047-6.596 4.047-10.613 0-5.5-4.444-9.944-9.968-9.944z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <div data-aos="fade-up" data-aos-delay="100">
+                    <h4 class="text-white font-bold mb-4 text-lg">Navegación</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#productos" class="hover:text-[#ec5c8d] transition">Catálogo</a></li>
+                        <li><a href="#categorias" class="hover:text-[#ec5c8d] transition">Categorías</a></li>
+                        <li><a href="#destacados" class="hover:text-[#ec5c8d] transition">Bestsellers</a></li>
+                        <li><a href="#testimonios" class="hover:text-[#ec5c8d] transition">Testimonios</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div data-aos="fade-up" data-aos-delay="200">
+                    <h4 class="text-white font-bold mb-4 text-lg">Contacto</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-2">
+                            <span class="text-[#ec5c8d] mt-1">📧</span>
+                            <span>info@discordia.com</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-[#ec5c8d] mt-1">📱</span>
+                            <a href="https://wa.me/573508311346" class="hover:text-[#ec5c8d] transition">+57 350 831 1346</a>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-[#ec5c8d] mt-1">🕒</span>
+                            <span>Atención 24/7</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-[#ec5c8d] mt-1">📍</span>
+                            <span>Bogotá, Colombia</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Payment Methods -->
+                <div data-aos="fade-up" data-aos-delay="300">
+                    <h4 class="text-white font-bold mb-4 text-lg">Métodos de Pago</h4>
+                    <div class="space-y-2 text-sm">
+                        <p class="flex items-center gap-2">
+                            <span class="text-[#ec5c8d]">✓</span> Tarjetas de Crédito/Débito
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <span class="text-[#ec5c8d]">✓</span> Nequi & Daviplata
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <span class="text-[#ec5c8d]">✓</span> Transferencia Bancaria
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <span class="text-[#ec5c8d]">✓</span> Contraentrega (Bogotá)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="border-t border-gray-700 my-8"></div>
+
+            <!-- Footer Bottom -->
+            <div class="flex flex-col md:flex-row justify-between items-center text-sm">
+                <p class="text-gray-400">
+                    &copy; 2025 <span class="text-[#ec5c8d] font-bold">DISCORDIA</span> — Todos los derechos reservados.
+                </p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-[#ec5c8d] transition">Política de Privacidad</a>
+                    <a href="#" class="hover:text-[#ec5c8d] transition">Términos de Servicio</a>
+                    <a href="#" class="hover:text-[#ec5c8d] transition">Cambios y Devoluciones</a>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -196,7 +593,7 @@
     <!-- -------------------------------------- -->
     <!-- WHATSAPP BUTTON -->
      <a href="https://wa.me/573508311346"
-         class="fixed z-40 transition hover:scale-110 flex items-center justify-center"
+         class="fixed z-40 transition hover:scale-110 flex items-center justify-center animate-pulse"
          style="bottom:6rem;right:1rem;width:80px;height:80px;"
          target="_blank"
          title="Contáctanos por WhatsApp">
@@ -207,41 +604,48 @@
 
     <!-- CART BUTTON  -->
     <button id="openCart"
-        class="fixed bottom-6 right-6 bg-[#EC407A] hover:bg-[#F8BBD0] text-white p-3 rounded-full shadow-xl text-xl z-50">
+        class="fixed bottom-6 right-6 bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] hover:from-[#ff8c91] hover:to-[#ffc4a6] text-white p-4 rounded-full shadow-xl text-xl z-50 transition transform hover:scale-110">
         <img width="35" height="35" src="https://img.icons8.com/stickers/100/fast-cart.png" alt="fast-cart"/>
-        <span id="cartCount" class="absolute -top-2 -right-2 bg-[#F6E27F] text-black text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center">0</span>
+        <span id="cartCount" class="absolute -top-3 -right-3 bg-[#ffc4a6] text-[#6d165a] text-sm font-bold rounded-full w-7 h-7 flex items-center justify-center">0</span>
     </button>
-    
-    <!-- -------------------------------------- -->
-    <!-- BOTONES FLOTANTES -->
-    <!-- -------------------------------------- -->
 
     <!-- Carrito Sidebar -->
     <div id="cartSidebar"
-        class="fixed top-0 right-0 w-80 h-full bg-[#0f0f0f] text-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
-        <div class="p-4 flex justify-between items-center border-b border-gray-700">
-            <h2 class="text-xl font-bold text-[#F8BBD0]">Tu carrito</h2>
-            <button id="closeCart" class="text-white text-2xl">&times;</button>
+        class="fixed top-0 right-0 w-96 h-full bg-white text-gray-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col overflow-hidden">
+        <div class="p-6 flex justify-between items-center border-b border-gray-200 bg-gradient-to-r from-[#ffc4a6] to-[#ff8c91]">
+            <h2 class="text-2xl font-bold text-white">🛒 Tu Carrito</h2>
+            <button id="closeCart" class="text-white text-3xl hover:text-gray-200 font-light">&times;</button>
         </div>
 
-        <div id="cartItems" class="p-4 space-y-4 max-h-[70vh] overflow-y-auto"></div>
+        <div id="cartItems" class="flex-1 p-6 space-y-4 overflow-y-auto"></div>
 
-        <div class="p-4 border-t border-gray-700">
-            <p class="text-lg mb-2">Total: <span id="cartTotal" class="font-bold text-[#F6E27F]">$0</span></p>
+        <div class="p-6 border-t border-gray-200 bg-gray-50">
+            <div class="mb-6">
+                <div class="flex justify-between mb-3">
+                    <span class="text-gray-700">Subtotal:</span>
+                    <span class="font-semibold text-gray-900">$0</span>
+                </div>
+                <div class="flex justify-between mb-4">
+                    <span class="text-gray-700">Envío:</span>
+                    <span class="font-semibold text-gray-900">Gratis</span>
+                </div>
+                <div class="border-t border-gray-300 pt-3 flex justify-between">
+                    <span class="font-bold text-lg text-gray-900">Total:</span>
+                    <span id="cartTotal" class="font-bold text-2xl bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent">$0</span>
+                </div>
+            </div>
 
             <button id="checkoutBtn"
-                class="w-full bg-[#EC407A] hover:bg-[#F8BBD0] text-black font-bold py-2 rounded-xl transition">
-                Finalizar compra
+                class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-3 rounded-xl transition hover:shadow-lg mb-3">
+                ✅ Finalizar Compra
             </button>
 
             <button id="clearCart"
-                class="w-full mt-2 bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-xl transition">
-                Vaciar carrito
+                class="w-full bg-gray-200 hover:bg-gray-300 text-gray-900 font-bold py-2 rounded-xl transition">
+                🗑️ Vaciar Carrito
             </button>
         </div>
     </div>
-
-    <!-- Aside del carrito -->
 
     <!-- Cargamos la app como módulo: inicializa AOS/Typed y renderiza el catálogo -->
     <script type="module" src="/skcglow/app.js"></script>
