@@ -8,7 +8,7 @@ export const products = [
   { id: 1,  name: "ILUMINADOR HORNEADO", price: 18000, stock: 12, image: "skcglow/assets/1.jpg", description: "Iluminador compacto horneado de larga duración con acabado luminoso." },
   { id: 2,  name: "RUBOR LIQUIDO CON APLICADOR", price: 19000, stock: 12, image: "assets/2.jpg", description: "Rubor líquido de fácil aplicación con aplicador incorporado." },
   { id: 3,  name: "RUBOR HORNEADO INDIVIDUAL", price: 20000, stock: 12, image: "assets/3.jpg", description: "Rubor horneado individual con pigmentación rica y duradera." },
-  { id: 4,  name: "CORRECTOR EN BARRA 8 TONOS", price: 4000, stock: 24, image: "assets/4.jpg", description: "Corrector multitono en formato de barra para cobertura total." },
+  { id: 4,  name: "CORRECTOR EN BARRA 8 TONOS", price: 4000, stock: 24, category: 'Corrector', image: "assets/4.jpg", description: "Corrector multitono en formato de barra para cobertura total." },
   { id: 5,  name: "BETUN PARA CEJAS CREMA Y POLVO", price: 20000, stock: 12, image: "assets/5.jpg", description: "Set 2 en 1 con crema y polvo para cejas perfectas." },
   { id: 6,  name: "TINTA PARA LABIOS", price: 9000, stock: 27, image: "assets/6.jpg", description: "Tinta de larga duración con acabado mate intenso." },
   { id: 7,  name: "BROCHA TRENDY DOBLE CEJAS CEPILLO", price: 8000, stock: 2, image: "assets/7.jpg", description: "Brocha doble especializada para aplicar maquillaje en cejas." },

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DISCORDIA - Belleza & Maquillaje</title>
+    <title>DISCORDIA</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/skcglow/assets/logo-ico-transp.png">
     <link rel="apple-touch-icon" href="/skcglow/assets/logo-ico-transp.png">
@@ -22,7 +22,36 @@
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap">
     <style>
+        /* Fuente para títulos y subtítulos */
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+    </style>
+
+    <!-- Fuente principal para el resto del contenido -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Sparkle / star mouse effect */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            left: 0; top: 0;
+            transform: translate(-50%, -50%);
+            will-change: transform, opacity;
+            z-index: 9999;
+            display: inline-block;
+            opacity: 0;
+            animation: sparkleAnim 900ms cubic-bezier(.2,.8,.2,1) forwards;
+        }
+
+        .sparkle svg { display: block; }
+
+        @keyframes sparkleAnim {
+            0% { opacity: 1; transform: translate(-50%, -50%) translateY(0) scale(0.5) rotate(0deg); }
+            60% { opacity: 0.9; transform: translate(-50%, -50%) translateY(-12px) scale(1.1) rotate(90deg); }
+            100% { opacity: 0; transform: translate(-50%, -50%) translateY(-36px) scale(1.6) rotate(180deg); }
+        }
     </style>
 
     <!-- Style-->
@@ -30,7 +59,7 @@
 
 </head>
 
-<body class="bg-gradient-to-br from-[#faf8f7] to-[#f5ede8] text-gray-900" style="font-family: 'Playfair Display', serif;">
+<body class="bg-gradient-to-br from-[#faf8f7] to-[#f5ede8] text-gray-900">
 
     <!-- -------------------------------------- -->
     <!-- HEADER -->
@@ -38,31 +67,40 @@
     <header class="fixed top-0 left-0 w-full bg-white backdrop-blur-md z-50 shadow-lg border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-3 py-4 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <!-- <img src="/skcglow/assets/logo-ico-transp.png" alt="DISCORDIA" class="w-10 h-10"> -->
-                <h1 class="text-3xl font-bold bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent" style="font-family: 'Playfair Display', serif; font-weight: 700;">DISCORDIA</h1>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent" style="font-weight: 700;">DISCORDIA</h1>
             </div>
 
             <!-- Search Bar -->
-            <div class="hidden lg:flex items-center bg-gray-50 rounded-full px-4 py-2 w-96">
+            <div class="flex items-center bg-gray-50 rounded-full px-4 py-2 w-full max-w-md">
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
-                <input type="text" placeholder="Buscar productos..." class="bg-transparent ml-2 outline-none w-full text-sm text-gray-700">
+                <input id="searchInput" type="text" placeholder="Buscar productos..." class="bg-transparent ml-2 outline-none w-full text-sm text-gray-700">
             </div>
 
-            <nav class="hidden md:flex gap-6 text-gray-700 font-medium">
+            <nav id="mainNav" class="hidden md:flex gap-6 text-gray-700 font-medium">
                 <a href="#productos" class="hover:text-[#6d165a] transition">Catálogo</a>
                 <a href="#categorias" class="hover:text-[#6d165a] transition">Categorías</a>
                 <a href="#cajas" class="hover:text-[#6d165a] transition">Combos</a>
                 <a href="#valores" class="hover:text-[#6d165a] transition">Nosotros</a>
             </nav>
 
-            <button id="openCart" class="relative flex items-center justify-center bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white p-3 rounded-full hover:shadow-lg transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            <!-- Mobile menu button -->
+            <button id="mobileMenuBtn" class="md:hidden ml-3 p-2 rounded-md focus:outline-none">
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
-                <span id="cartCount" class="absolute -top-2 -right-2 bg-[#ffc4a6] text-[#6d165a] text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">0</span>
             </button>
+
+            <!-- Mobile nav (hidden by default) -->
+            <div id="mobileNav" class="hidden absolute right-4 top-20 bg-white rounded-lg shadow-lg py-4 px-6 w-48">
+                <a href="#productos" class="block py-2">Catálogo</a>
+                <a href="#categorias" class="block py-2">Categorías</a>
+                <a href="#cajas" class="block py-2">Combos</a>
+                <a href="#valores" class="block py-2">Nosotros</a>
+            </div>
+
+            <!-- Se usa solo el carrito flotante (removido del navbar) -->
         </div>
     </header>
 
@@ -169,32 +207,19 @@
                         </div>
                     </div>
 
-                    <!-- Marcas -->
+                    <!-- Categorías dinámicas (renderizadas por JS) -->
                     <div class="mb-8 pb-8 border-b border-gray-200">
-                        <h4 class="font-semibold text-gray-900 mb-4">Marca</h4>
-                        <div class="space-y-3">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
-                                <span class="ml-3 text-sm text-gray-700">Original</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
-                                <span class="ml-3 text-sm text-gray-700">Premium</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
-                                <span class="ml-3 text-sm text-gray-700">Profesional</span>
-                            </label>
-                        </div>
+                        <h4 class="font-semibold text-gray-900 mb-4">Categorías</h4>
+                        <div id="categoryFilters" class="flex flex-wrap"></div>
                     </div>
 
-                    <!-- Stock -->
+                    <!-- Precio -->
                     <div>
-                        <h4 class="font-semibold text-gray-900 mb-4">Disponibilidad</h4>
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
-                            <span class="ml-3 text-sm text-gray-700">En Stock</span>
-                        </label>
+                        <h4 class="font-semibold text-gray-900 mb-4">Precio</h4>
+                        <div class="flex gap-2 items-center">
+                            <input id="priceMin" type="number" placeholder="Mín" class="w-1/2 px-3 py-2 border rounded" />
+                            <input id="priceMax" type="number" placeholder="Máx" class="w-1/2 px-3 py-2 border rounded" />
+                        </div>
                     </div>
                 </div>
             </aside>
@@ -647,13 +672,11 @@
         </div>
     </div>
 
-    <!-- Cargamos la app como módulo: inicializa AOS/Typed y renderiza el catálogo -->
-    <script type="module" src="/skcglow/app.js"></script>
-
-    <!-- Scripts -->
+    <!-- Scripts: primero librerías globales, luego el módulo de la app -->
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="/skcglow/app.js"></script>
+    <!-- Cargamos la app como módulo: inicializa AOS/Typed y renderiza el catálogo -->
+    <script type="module" src="/skcglow/app.js"></script>
 
 </body>
 

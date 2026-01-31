@@ -110,7 +110,7 @@ export function showProductModal(productId, cartCallback) {
 }
 
 // Renderiza los productos en un contenedor (grid)
-export function renderCatalog(containerId) {
+export function renderCatalog(containerId, options = {}) {
     const container = document.getElementById(containerId);
 
     if (!container) {
@@ -120,7 +120,20 @@ export function renderCatalog(containerId) {
 
     container.innerHTML = ""; // Limpia por si se recarga
 
-    const catalog = getCatalog();
+    // Aplicar filtros proporcionados en options (search, category, priceRange)
+    let catalog = getCatalog();
+    const { search = '', category = 'all', priceMin = 0, priceMax = Infinity } = options;
+
+    if (search && search.trim() !== '') {
+        const q = search.trim().toLowerCase();
+        catalog = catalog.filter(p => (p.name || '').toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q));
+    }
+
+    if (category && category !== 'all') {
+        catalog = catalog.filter(p => p.category && p.category.toLowerCase() === category.toLowerCase());
+    }
+
+    catalog = catalog.filter(p => (p.price || 0) >= priceMin && (p.price || 0) <= priceMax);
     catalog.forEach(product => {
         const card = document.createElement("div");
         card.className = "bg-[#F8BBD0] rounded-2xl shadow-xl p-6 text-black border border-yellow-200 flex flex-col h-full";
@@ -182,4 +195,68 @@ export function renderCatalog(containerId) {
     
     // Inicializar lazy loading con blur-up
     setupLazyLoadingWithBlur();
+}
+
+// Utilidades para UI de filtros
+export function setupFilters() {
+    const searchInput = document.getElementById('searchInput');
+    const categoryContainer = document.getElementById('categoryFilters');
+    const priceMin = document.getElementById('priceMin');
+    const priceMax = document.getElementById('priceMax');
+
+    // Crear lista de categorías únicas
+    const catalog = getCatalog();
+    const categories = Array.from(new Set(catalog.map(p => p.category).filter(Boolean)));
+
+    if (categoryContainer) {
+        categoryContainer.innerHTML = `<button class="px-3 py-1 mr-2 mb-2 bg-gray-100 rounded" data-cat="all">Todas</button>` +
+            categories.map(c => `<button class="px-3 py-1 mr-2 mb-2 bg-gray-100 rounded" data-cat="${c}">${c}</button>`).join('');
+
+        categoryContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            const cat = btn.dataset.cat;
+            applyFilters();
+        });
+    }
+
+    // Search
+    if (searchInput) {
+        let to;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(to);
+            to = setTimeout(() => applyFilters(), 250);
+        });
+    }
+
+    // Price inputs
+    if (priceMin) priceMin.addEventListener('input', applyFilters);
+    if (priceMax) priceMax.addEventListener('input', applyFilters);
+
+    // Funcion que lee UI y re-renderiza
+    function applyFilters() {
+        const search = (searchInput && searchInput.value) || '';
+        const selectedCatBtn = categoryContainer && categoryContainer.querySelector('button.bg-yellow-200');
+        let category = 'all';
+        if (categoryContainer) {
+            const active = categoryContainer.querySelector('button.active');
+            if (active) category = active.dataset.cat;
+        }
+
+        const pmin = priceMin ? parseFloat(priceMin.value) || 0 : 0;
+        const pmax = priceMax ? parseFloat(priceMax.value) || Infinity : Infinity;
+
+        renderCatalog('catalog', { search, category, priceMin: pmin, priceMax: pmax });
+    }
+
+    // Small helper to toggle active class on category buttons
+    if (categoryContainer) {
+        categoryContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            categoryContainer.querySelectorAll('button').forEach(b => b.classList.remove('active', 'bg-yellow-200'));
+            btn.classList.add('active', 'bg-yellow-200');
+            applyFilters();
+        });
+    }
 }

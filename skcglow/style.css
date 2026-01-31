@@ -7,7 +7,15 @@
         }
         
         body {
-            font-family: "Poppins", sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Force Playfair for header title and navigation links */
+        header h1,
+        #mainNav,
+        #mainNav a,
+        #mobileNav {
+            font-family: 'Playfair Display', serif;
         }
 
         /* Blur-up effect para lazy loading */

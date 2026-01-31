@@ -146,34 +146,37 @@ export function renderCart() {
 // WHATSAPP + SIDEBAR
 // =========================
 
-const checkoutBtn = document.getElementById("checkoutBtn");
-if (checkoutBtn) {
-    checkoutBtn.addEventListener("click", () => {
-        const phone = "573508311346"; // Número de WhatsApp del negocio
+// Inicializar listeners que dependen del DOM cuando esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener("click", () => {
+            const phone = "573508311346"; // Número de WhatsApp del negocio
 
-        let message = "Hola! Quisiera comprar estos productos:%0A%0A";
+            let message = "Hola! Quisiera comprar estos productos:%0A%0A";
 
-        cart.forEach((p) => {
-            message += `• ${p.name} (x${p.quantity}) - $${p.price.toLocaleString()}%0A`;
+            cart.forEach((p) => {
+                message += `• ${p.name} (x${p.quantity}) - $${p.price.toLocaleString()}%0A`;
+            });
+
+            message += `%0ATotal: $${cartTotal().toLocaleString()}`;
+
+            window.open(`https://wa.me/${phone}?text=${message}`);
         });
+    }
 
-        message += `%0ATotal: $${cartTotal().toLocaleString()}`;
+    const sidebar = document.getElementById("cartSidebar");
+    const openCartBtn = document.getElementById("openCart");
+    const closeCartBtn = document.getElementById("closeCart");
+    const clearCartBtn = document.getElementById("clearCart");
 
-        window.open(`https://wa.me/${phone}?text=${message}`);
-    });
-}
+    if (openCartBtn && sidebar) openCartBtn.onclick = () => sidebar.classList.remove("translate-x-full");
+    if (closeCartBtn && sidebar) closeCartBtn.onclick = () => sidebar.classList.add("translate-x-full");
+    if (clearCartBtn) clearCartBtn.onclick = clearCart;
 
-const sidebar = document.getElementById("cartSidebar");
-const openCartBtn = document.getElementById("openCart");
-const closeCartBtn = document.getElementById("closeCart");
-const clearCartBtn = document.getElementById("clearCart");
-
-if (openCartBtn && sidebar) openCartBtn.onclick = () => sidebar.classList.remove("translate-x-full");
-if (closeCartBtn && sidebar) closeCartBtn.onclick = () => sidebar.classList.add("translate-x-full");
-if (clearCartBtn) clearCartBtn.onclick = clearCart;
-
-// Render inicial
-renderCart();
+    // Render inicial
+    renderCart();
+});
 
 // Función de comodidad para abrir el carrito desde el menú u otros lugares
 export function carrito() {
