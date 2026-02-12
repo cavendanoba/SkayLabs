@@ -263,7 +263,7 @@
     <!-- HERO -->
     <section class="hero" data-aos="fade-up">
       <div>
-        <h1>Hola, soy Cristhian</h1>
+        <h1><span id="greeting">Hola</span>, soy Cristhian</h1>
         <h2><span id="typing"></span></h2>
         <p class="text-lg text-gray-300 mt-6 max-w-2xl mx-auto">
           Ingeniero de Sistemas y Desarrollador Web Full Stack apasionado por crear soluciones digitales innovadoras y experiencias de usuario excepcionales.
@@ -445,6 +445,28 @@
       duration: 1000,
       once: true
     });
+  </script>
+
+  <!-- Dynamic Greeting -->
+  <script>
+    function updateGreeting() {
+      const hour = new Date().getHours();
+      const greetingElement = document.getElementById('greeting');
+      
+      let greeting;
+      if (hour >= 5 && hour < 12) {
+        greeting = 'Buenos días';
+      } else if (hour >= 12 && hour < 20) {
+        greeting = 'Buenas tardes';
+      } else {
+        greeting = 'Buenas noches';
+      }
+      
+      greetingElement.textContent = greeting;
+    }
+    
+    // Update greeting on page load
+    updateGreeting();
   </script>
 
   <!-- Footer -->
