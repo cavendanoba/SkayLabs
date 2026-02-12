@@ -453,6 +453,8 @@
       const hour = new Date().getHours();
       const greetingElement = document.getElementById('greeting');
       
+      if (!greetingElement) return;
+      
       let greeting;
       if (hour >= 5 && hour < 12) {
         greeting = 'Buenos días';
