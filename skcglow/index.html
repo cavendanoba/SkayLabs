@@ -4,7 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DISCORDIA</title>
+    <title>DISCORDIA - Maquillaje Profesional de Alta Calidad</title>
+    <meta name="description" content="Descubre DISCORDIA, tu tienda online de maquillaje profesional. Productos originales con precios transparentes, envío rápido y atención personalizada. Labiales, rubores, sombras y más.">
+    <meta name="keywords" content="maquillaje, cosméticos, labiales, rubor, sombras, belleza, tienda online, Colombia">
+    <meta name="author" content="DISCORDIA">
+    <meta name="robots" content="index, follow">
+    <link rel="manifest" href="/skcglow/manifest.json">
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/skcglow/assets/logo-ico-transp.png">
     <link rel="apple-touch-icon" href="/skcglow/assets/logo-ico-transp.png">
@@ -20,7 +25,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <!-- Google Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap">
     <style>
         /* Fuente para títulos y subtítulos */
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
@@ -67,7 +71,7 @@
     <header class="fixed top-0 left-0 w-full bg-white backdrop-blur-md z-50 shadow-lg border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-3 py-4 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <h1 class="text-3xl font-bold bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent" style="font-weight: 700;">DISCORDIA</h1>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent" style="font-family: 'Playfair Display', serif;">DISCORDIA</h1>
             </div>
 
             <!-- Search Bar -->
@@ -76,6 +80,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
                 <input id="searchInput" type="text" placeholder="Buscar productos..." class="bg-transparent ml-2 outline-none w-full text-sm text-gray-700">
+                <div id="searchSpinner" class="hidden ml-2">
+                    <div class="w-4 h-4 border border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                </div>
             </div>
 
             <nav id="mainNav" class="hidden md:flex gap-6 text-gray-700 font-medium">
@@ -91,6 +98,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
+
+            <!-- Theme toggle -->
+            <button id="themeToggle" class="ml-3 p-2 rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 transition">🌙</button>
 
             <!-- Mobile nav (hidden by default) -->
             <div id="mobileNav" class="hidden absolute right-4 top-20 bg-white rounded-lg shadow-lg py-4 px-6 w-48">
@@ -109,25 +119,24 @@
     <!-- -------------------------------------- -->
     <!-- HERO -->
     <!-- -------------------------------------- -->
-    <section
-        class="bg-gradient-to-br from-[#6d165a] via-[#a0346e] to-[#ec5c8d] text-white py-24 text-center relative overflow-hidden">
+    <section class="hero-section bg-gradient-to-br from-[#6d165a] via-[#a0346e] to-[#ec5c8d] text-white py-24 text-center relative overflow-hidden">
         
         <div class="absolute inset-0 opacity-10">
             <div class="absolute top-10 left-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
             <div class="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
         </div>
 
-        <div class="relative z-10">
-            <h2 class="text-6xl font-extrabold mb-6" data-aos="zoom-in">
-                <span id="typed"></span>
+        <div class="relative z-10 px-4">
+            <h2 class="text-4xl md:text-6xl font-extrabold mb-4" style="font-family: 'Playfair Display', serif;" data-aos="zoom-in">
+                <span id="typed">Belleza con propósito</span>
             </h2>
 
-            <p class="text-xl max-w-2xl mx-auto mb-4 text-[#ffc4a6]" data-aos="fade-up">
-                Marcas originales, precios increíbles, estilo que te acompaña.
+            <p class="text-md md:text-xl max-w-2xl mx-auto mb-6 text-[#ffc4a6]" data-aos="fade-up">
+                Marcas originales y precios transparentes. Descubre nuestras novedades.
             </p>
 
             <a href="#productos"
-                class="inline-block mt-8 bg-[#ffc4a6] text-[#6d165a] px-10 py-4 rounded-full text-lg font-bold transition hover:bg-[#ff8c91] hover:text-white hover:shadow-lg transform hover:scale-105 hidden">
+                class="inline-block mt-2 bg-[#ffc4a6] text-[#6d165a] px-6 md:px-10 py-3 rounded-full text-sm md:text-lg font-bold transition hover:bg-[#ff8c91] hover:text-white hover:shadow-lg transform hover:scale-105">
                 ✨ Ver Catálogo
             </a>
         </div>
@@ -137,13 +146,15 @@
     <!-- CATEGORÍAS -->
     <!-- -------------------------------------- -->
     <section id="categorias" class="max-w-7xl mx-auto px-3 py-16">
-        <h2 class="text-3xl font-bold text-gray-900 mb-12" data-aos="fade-up">Explora por Categoría</h2>
+        <h2 class="text-3xl font-bold text-gray-900 mb-12" style="font-family: 'Playfair Display', serif;" data-aos="fade-up">Explora por Categoría</h2>
         
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6" data-aos="fade-up">
             <!-- Categoría 1 -->
             <div class="group cursor-pointer">
                 <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
-                    <span class="text-5xl">💄</span>
+                    <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
                 </div>
                 <h3 class="text-center font-bold text-gray-900 mt-4">Labiales</h3>
                 <p class="text-center text-sm text-gray-600">12 productos</p>
@@ -152,7 +163,9 @@
             <!-- Categoría 2 -->
             <div class="group cursor-pointer">
                 <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
-                    <span class="text-5xl">👁️</span>
+                    <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
                 </div>
                 <h3 class="text-center font-bold text-gray-900 mt-4">Ojos</h3>
                 <p class="text-center text-sm text-gray-600">18 productos</p>
@@ -161,7 +174,9 @@
             <!-- Categoría 3 -->
             <div class="group cursor-pointer">
                 <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#a0346e] to-[#6d165a] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
-                    <span class="text-5xl">🧴</span>
+                    <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
                 </div>
                 <h3 class="text-center font-bold text-gray-900 mt-4">Bases</h3>
                 <p class="text-center text-sm text-gray-600">8 productos</p>
@@ -170,7 +185,9 @@
             <!-- Categoría 4 -->
             <div class="group cursor-pointer">
                 <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#6d165a] to-[#ec5c8d] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
-                    <span class="text-5xl">✨</span>
+                    <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
                 </div>
                 <h3 class="text-center font-bold text-gray-900 mt-4">Destacados</h3>
                 <p class="text-center text-sm text-gray-600">15 productos</p>
@@ -182,32 +199,34 @@
     <!-- FILTROS Y CATÁLOGO -->
     <!-- -------------------------------------- -->
     <section id="productos" class="max-w-7xl mx-auto px-3 py-12">
+        <!-- Breadcrumbs -->
+        <nav class="text-sm text-gray-600 mb-4">
+            <a href="#" class="hover:text-[#ec5c8d]">Inicio</a> > <span>Catálogo</span>
+        </nav>
         <div class="flex gap-8">
             <!-- Panel de Filtros -->
-            <aside class="hidden lg:block w-64 flex-shrink-0">
+            <aside id="filtersPanel" class="hidden lg:block w-64 flex-shrink-0">
                 <div class="sticky top-24 bg-white rounded-2xl p-6 shadow-md border border-gray-100">
                     <h3 class="font-bold text-lg text-gray-900 mb-6">Filtros</h3>
 
-                    <!-- Rango de Precio -->
-                    <div class="mb-8 pb-8 border-b border-gray-200">
-                        <h4 class="font-semibold text-gray-900 mb-4">Precio</h4>
-                        <div class="space-y-3">
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
-                                <span class="ml-3 text-sm text-gray-700">$10.000 - $30.000</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
-                                <span class="ml-3 text-sm text-gray-700">$30.000 - $50.000</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
-                                <span class="ml-3 text-sm text-gray-700">$50.000+</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Categorías dinámicas (renderizadas por JS) -->
+                        <!-- Rango de Precio -->
+                        <div class="mb-8 pb-8 border-b border-gray-200">
+                            <h4 class="font-semibold text-gray-900 mb-4">Precio</h4>
+                            <div class="space-y-3">
+                                <label class="flex items-center cursor-pointer">
+                                    <input id="priceRange1Mobile" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                    <span class="ml-3 text-sm text-gray-700">$10.000 - $30.000</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input id="priceRange2Mobile" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                    <span class="ml-3 text-sm text-gray-700">$30.000 - $50.000</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input id="priceRange3Mobile" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                    <span class="ml-3 text-sm text-gray-700">$50.000+</span>
+                                </label>
+                            </div>
+                        </div>                    <!-- Categorías dinámicas (renderizadas por JS) -->
                     <div class="mb-8 pb-8 border-b border-gray-200">
                         <h4 class="font-semibold text-gray-900 mb-4">Categorías</h4>
                         <div id="categoryFilters" class="flex flex-wrap"></div>
@@ -224,10 +243,57 @@
                 </div>
             </aside>
 
+            <!-- Mobile Filters Modal -->
+            <div id="mobileFiltersModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 lg:hidden">
+                <div class="fixed top-0 right-0 w-80 h-full bg-white p-6 overflow-y-auto">
+                    <button id="closeMobileFilters" class="absolute top-4 right-4 text-gray-500 text-2xl">&times;</button>
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+                        <h3 class="font-bold text-lg text-gray-900 mb-6">Filtros</h3>
+
+                        <!-- Rango de Precio -->
+                        <div class="mb-8 pb-8 border-b border-gray-200">
+                            <h4 class="font-semibold text-gray-900 mb-4">Precio</h4>
+                            <div class="space-y-3">
+                                <label class="flex items-center cursor-pointer">
+                                    <input id="priceRange1" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                    <span class="ml-3 text-sm text-gray-700">$10.000 - $30.000</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input id="priceRange2" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                    <span class="ml-3 text-sm text-gray-700">$30.000 - $50.000</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input id="priceRange3" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                    <span class="ml-3 text-sm text-gray-700">$50.000+</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Categorías dinámicas -->
+                        <div class="mb-8 pb-8 border-b border-gray-200">
+                            <h4 class="font-semibold text-gray-900 mb-4">Categorías</h4>
+                            <div id="categoryFiltersMobile" class="flex flex-wrap"></div>
+                        </div>
+
+                        <!-- Precio -->
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-4">Precio</h4>
+                            <div class="flex gap-2 items-center">
+                                <input id="priceMinMobile" type="number" placeholder="Mín" class="w-1/2 px-3 py-2 border rounded" />
+                                <input id="priceMaxMobile" type="number" placeholder="Máx" class="w-1/2 px-3 py-2 border rounded" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:hidden mb-4 w-full px-3">
+                <button id="toggleFilters" class="w-full bg-white rounded-lg p-3 shadow text-gray-800 font-semibold">Filtros y Orden</button>
+            </div>
+
             <!-- Catálogo Principal -->
             <div class="flex-1">
                 <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900">
+                    <h2 class="text-3xl font-bold text-gray-900" style="font-family: 'Playfair Display', serif;">
                         👝 Nuestro Catálogo 💖
                     </h2>
                     <div class="flex gap-3">
@@ -248,7 +314,7 @@
                 <div class="bg-white rounded-2xl shadow-lg p-6 text-gray-900 border-2 border-[#ec5c8d] transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-[#ff8c91]"
                     data-aos="zoom-in">
                     <div class="relative mb-4 overflow-hidden rounded-xl bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] h-48 flex items-center justify-center group">
-                        <img src="/skcglow/assets/placeholder-product.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                        <img src="/skcglow/assets/placeholder-product.jpg" loading="lazy" alt="Producto de belleza" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
                         <div class="absolute top-4 right-4 bg-[#ec5c8d] text-white px-3 py-1 rounded-full text-xs font-bold">NUEVO</div>
                     </div>
                     <h4 class="font-bold text-lg text-[#6d165a] mb-2">Producto</h4>
@@ -267,13 +333,26 @@
                         <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-bold">-22%</span>
                     </div>
 
-                    <button class="button small w-full add-to-cart bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
+                    <button class="w-full add-btn bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
                         🛒 Agregar al carrito
                     </button>
                 </div>
             </template>
 
             <!-- El catálogo será renderizado desde `catalog.js` -->
+                </div>
+
+                <!-- Result count -->
+                <p id="resultCount" class="text-center mt-4 text-gray-600"></p>
+
+                <!-- Load More Button -->
+                <div id="loadMoreContainer" class="text-center mt-8 hidden">
+                    <button id="loadMoreBtn" class="bg-[#ec5c8d] text-white px-6 py-3 rounded-full hover:bg-[#ff8c91] transition">Cargar más productos</button>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="hidden text-center mt-4">
+                    <div class="inline-block w-6 h-6 border-2 border-[#ec5c8d] border-t-transparent rounded-full animate-spin"></div>
                 </div>
             </div>
         </div>
@@ -285,16 +364,17 @@
     <section class="bg-gray-50 py-20">
         <div class="max-w-7xl mx-auto px-3">
             <div class="text-center mb-16" data-aos="fade-up">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">⭐ Más Vendidos</h2>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4" style="font-family: 'Playfair Display', serif;">⭐ Más Vendidos</h2>
                 <p class="text-gray-600 text-lg">Los favoritos de nuestras clientas</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Best Seller 1 -->
                 <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300" data-aos="zoom-in">
                     <div class="relative overflow-hidden bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] h-60 flex items-center justify-center">
                         <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">BESTSELLER</div>
-                        <span class="text-6xl">💄</span>
+                        <svg class="w-20 h-20 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
                     </div>
                     <div class="p-6">
                         <h3 class="font-bold text-lg text-[#6d165a] mb-2">Labial Premium</h3>
@@ -303,7 +383,7 @@
                             <span class="text-xs text-gray-600">(156)</span>
                         </div>
                         <p class="text-2xl font-bold text-[#a0346e] mb-4">$28.000</p>
-                        <button class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
+                        <button class="w-full add-btn bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
                             Agregar
                         </button>
                     </div>
@@ -313,7 +393,9 @@
                 <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300" data-aos="zoom-in">
                     <div class="relative overflow-hidden bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] h-60 flex items-center justify-center">
                         <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">BESTSELLER</div>
-                        <span class="text-6xl">👁️</span>
+                        <svg class="w-20 h-20 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
                     </div>
                     <div class="p-6">
                         <h3 class="font-bold text-lg text-[#6d165a] mb-2">Sombra Mate</h3>
@@ -322,7 +404,7 @@
                             <span class="text-xs text-gray-600">(89)</span>
                         </div>
                         <p class="text-2xl font-bold text-[#a0346e] mb-4">$15.000</p>
-                        <button class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
+                        <button class="w-full add-btn bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
                             Agregar
                         </button>
                     </div>
@@ -332,7 +414,9 @@
                 <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300" data-aos="zoom-in">
                     <div class="relative overflow-hidden bg-gradient-to-br from-[#a0346e] to-[#6d165a] h-60 flex items-center justify-center">
                         <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">BESTSELLER</div>
-                        <span class="text-6xl">🧴</span>
+                        <svg class="w-20 h-20 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
                     </div>
                     <div class="p-6">
                         <h3 class="font-bold text-lg text-[#6d165a] mb-2">Base Perfecta</h3>
@@ -341,7 +425,7 @@
                             <span class="text-xs text-gray-600">(234)</span>
                         </div>
                         <p class="text-2xl font-bold text-[#a0346e] mb-4">$32.000</p>
-                        <button class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
+                        <button class="w-full add-btn bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition">
                             Agregar
                         </button>
                     </div>
@@ -351,7 +435,9 @@
                 <div class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300" data-aos="zoom-in">
                     <div class="relative overflow-hidden bg-gradient-to-br from-[#6d165a] to-[#ec5c8d] h-60 flex items-center justify-center">
                         <div class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">BESTSELLER</div>
-                        <span class="text-6xl">✨</span>
+                        <svg class="w-20 h-20 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
                     </div>
                     <div class="p-6">
                         <h3 class="font-bold text-lg text-[#6d165a] mb-2">Brillo Radiante</h3>
@@ -383,7 +469,7 @@
 
         <div class="max-w-5xl mx-auto text-center">
             <img src="/skcglow/assets/no-stock.png"
-                class="mx-auto w-64 rounded-3xl shadow-2xl border-4 border-[#ffc4a6]" data-aos="zoom-in">
+                loading="lazy" alt="Imagen de producto no disponible" class="mx-auto w-64 rounded-3xl shadow-2xl border-4 border-[#ffc4a6]" data-aos="zoom-in">
         </div>
     </section>
 
@@ -391,12 +477,12 @@
     <!-- VALORES -->
     <!-- -------------------------------------- -->
     <section id="valores" class="max-w-6xl mx-auto px-3 py-20">
-        <h3 class="text-5xl font-bold text-center text-[#6d165a] mb-16" data-aos="fade-up">Nuestro Propósito</h3>
+        <h3 class="text-5xl font-bold text-center text-[#6d165a] mb-16" style="font-family: 'Playfair Display', serif;" data-aos="fade-up">Nuestro Propósito</h3>
 
         <div class="grid md:grid-cols-2 gap-16 items-center">
 
             <img src="/skcglow/assets/logo-full-transp.png"
-                class="rounded-3xl shadow-2xl border-4 border-[#ec5c8d] w-full h-80 object-contain bg-white p-4" data-aos="fade-right">
+                loading="lazy" alt="Logo de Discordia" class="rounded-3xl shadow-2xl border-4 border-[#ec5c8d] w-full h-80 object-contain bg-white p-4" data-aos="fade-right">
 
             <div data-aos="fade-left">
                 <p class="text-gray-700 leading-relaxed text-lg space-y-4">
@@ -418,7 +504,7 @@
     <!-- -------------------------------------- -->
     <section id="pagos" class="bg-white py-20">
         <div class="max-w-6xl mx-auto px-3">
-            <h3 class="text-5xl font-bold text-center text-[#6d165a] mb-16" data-aos="fade-up">
+            <h3 class="text-5xl font-bold text-center text-[#6d165a] mb-16" style="font-family: 'Playfair Display', serif;" data-aos="fade-up">
                 💳 Métodos de Pago
             </h3>
 
@@ -451,7 +537,7 @@
     <section class="bg-gradient-to-r from-[#6d165a] to-[#a0346e] py-20">
         <div class="max-w-7xl mx-auto px-3">
             <div class="text-center mb-16" data-aos="fade-up">
-                <h2 class="text-4xl font-bold text-white mb-4">💬 Lo Que Nuestras Clientas Dicen</h2>
+                <h2 class="text-4xl font-bold text-white mb-4" style="font-family: 'Playfair Display', serif;">💬 Lo Que Nuestras Clientas Dicen</h2>
                 <p class="text-[#ffc4a6] text-lg">Opiniones reales de quienes confían en DISCORDIA</p>
             </div>
 
@@ -517,7 +603,7 @@
             <div class="grid md:grid-cols-4 gap-12 mb-12">
                 <!-- Company Info -->
                 <div data-aos="fade-up">
-                    <h3 class="text-2xl font-bold text-white mb-4">✨ DISCORDIA</h3>
+                    <h3 class="text-2xl font-bold text-white mb-4" style="font-family: 'Playfair Display', serif;">✨ DISCORDIA</h3>
                     <p class="text-sm leading-relaxed mb-6">
                         Tu tienda online de maquillaje profesional. Productos de alta calidad con las mejores marcas internacionales.
                     </p>
@@ -618,8 +704,7 @@
     <!-- -------------------------------------- -->
     <!-- WHATSAPP BUTTON -->
      <a href="https://wa.me/573508311346"
-         class="fixed z-40 transition hover:scale-110 flex items-center justify-center animate-pulse"
-         style="bottom:6rem;right:1rem;width:80px;height:80px;"
+         class="fixed z-40 transition hover:scale-110 flex items-center justify-center animate-pulse bottom-24 right-4 w-20 h-20"
          target="_blank"
          title="Contáctanos por WhatsApp">
         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="60" height="90" viewBox="0 0 48 48">
@@ -677,6 +762,28 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <!-- Cargamos la app como módulo: inicializa AOS/Typed y renderiza el catálogo -->
     <script type="module" src="/skcglow/app.js"></script>
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "DISCORDIA",
+      "url": "https://discordia.com",
+      "logo": "/skcglow/assets/logo-full-transp.png",
+      "description": "Tienda online de maquillaje profesional con productos de alta calidad.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+57-350-831-1346",
+        "contactType": "customer service",
+        "availableLanguage": "Spanish"
+      },
+      "sameAs": [
+        "https://instagram.com/discordia",
+        "https://tiktok.com/@discordia"
+      ]
+    }
+    </script>
 
 </body>
 

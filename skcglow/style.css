@@ -1,63 +1,28 @@
-        :root {
-            --primary-color: #BAC7DE ;
-            --secondary-color: #EBA2A4;
-            --background-color: #E6D1CA;
-            --text-color: #212121;
-            --header-color: #815a41;
-        }
-        
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-        }
+:root {
+    --primary-color: #BAC7DE;
+    --secondary-color: #EBA2A4;
+}
 
-        /* Force Playfair for header title and navigation links */
-        header h1,
-        #mainNav,
-        #mainNav a,
-        #mobileNav {
-            font-family: 'Playfair Display', serif;
-        }
+/* Base font for the site (Tailwind utilities still handle most spacing/colors) */
+body {
+    font-family: 'Space Grotesk', sans-serif;
+}
 
-        /* Blur-up effect para lazy loading */
-        .blur-image {
-            filter: blur(10px);
-            transition: filter 0.8s ease-out, opacity 0.8s ease-out;
-        }
+/* Use Playfair for header/title and navigation to keep the brand look */
+header h1,
+#mainNav,
+#mainNav a,
+#mobileNav {
+    font-family: 'Playfair Display', serif;
+}
 
-        .blur-image.loaded {
-            filter: blur(0);
-            opacity: 1;
-        }
+/* Blur-up effect used by lazy-loading images */
+.blur-image {
+    filter: blur(10px);
+    transition: filter 0.8s ease-out, opacity 0.8s ease-out;
+}
 
-        /* From Uiverse.io by satyamchaudharydev */
-        /* inspired form gumroad website */
-        .button {
-            --bg: #a0346e;
-            --hover-bg: #ffc4a6;
-            --hover-text: #000;
-            color: #fff;
-            cursor: pointer;
-            border: 1px solid var(--bg);
-            border-radius: 4px;
-            padding: 0.8em 2em;
-            background: var(--bg);
-            transition: 0.2s;
-        }
-
-        .button:hover {
-            color: var(--hover-text);
-            transform: translate(-0.25rem, -0.25rem);
-            background: var(--hover-bg);
-            box-shadow: 0.25rem 0.25rem var(--bg);
-        }
-
-        .button:active {
-            transform: translate(0);
-            box-shadow: none;
-        }
-
-        /* small modifier to fit smaller templates */
-        .button.small {
-            padding: 0.5em 1em;
-            font-size: 0.9rem;
-        }
+.blur-image.loaded {
+    filter: blur(0);
+    opacity: 1;
+}

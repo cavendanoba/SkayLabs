@@ -1,6 +1,7 @@
 // catalog.js
-import { products } from "./products.js";
+import { products as fallbackProducts } from "./products.js";
 import { addToCart } from "./cart.js";
+import { createProductCard } from "./components/productCard.js";
 
 // Obtener catálogo actual (prefiere localStorage si fue modificado desde admin)
 function getCatalog() {
@@ -10,8 +11,25 @@ function getCatalog() {
     } catch (e) {
         console.warn('No se pudo leer skcCatalog desde localStorage', e);
     }
-    return products;
+    // fallback a datos cargados via fetch o al array local
+    return window.__SKC_CATALOG__ || fallbackProducts;
 }
+
+// Expose a getter globally so components (filters) can access catalog without circular imports
+if (typeof window !== 'undefined') {
+    window.getCatalog = getCatalog;
+}
+
+// Intentar cargar data/products.json en window.__SKC_CATALOG__ (async)
+fetch('/skcglow/data/products.json').then(r => {
+    if (r.ok) return r.json();
+    throw new Error('No data');
+}).then(data => {
+    window.__SKC_CATALOG__ = data;
+}).catch(() => {
+    // si falla, window.__SKC_CATALOG__ no se establece y se usará fallback
+    console.warn('No fue posible cargar data/products.json — usando fallback');
+});
 
 // Función para manejar el fallback de imágenes
 function handleImageError(img) {
@@ -80,14 +98,15 @@ export function showProductModal(productId, cartCallback) {
     Swal.fire({
         title: product.name,
         html: `
-            <div style="text-align: center;">
+            <div class="text-center px-4">
                  <img src="${product.image || 'assets/default.png'}" 
                      alt="${product.name}" 
-                     style="max-width: 100%; max-height: 400px; border-radius: 10px; margin: 10px auto; display: block;"
+                     class="mx-auto rounded-lg max-h-96 w-auto block my-4"
                      onerror="this.src='assets/default.png'">
-                <p style="margin: 15px 0; font-size: 14px; color: #666;">${product.description || 'Sin descripción disponible'}</p>
-                <p style="font-weight: bold; color: #EC407A; margin: 10px 0; font-size: 1.125rem;">Precio: $${product.price.toLocaleString()}</p>
-                <p style="margin: 5px 0; font-size: 13px;">Stock disponible: ${product.stock}</p>
+                <p class="text-sm text-gray-600 my-4">${product.description || 'Sin descripción disponible'}</p>
+                ${product.reviews ? product.reviews.map(r => `<div class="mt-2 p-2 bg-gray-100 rounded text-left"><strong>${r.user}:</strong> ⭐ ${r.rating}/5 - ${r.comment}</div>`).join('') : '<p class="text-sm text-gray-500">Sin reseñas aún.</p>'}
+                <p class="font-semibold text-[#EC407A] my-2">Precio: $${product.price.toLocaleString()}</p>
+                <p class="text-sm text-gray-500">Stock disponible: ${product.stock}</p>
             </div>
         `,
         // icon: 'info',
@@ -135,39 +154,29 @@ export function renderCatalog(containerId, options = {}) {
 
     catalog = catalog.filter(p => (p.price || 0) >= priceMin && (p.price || 0) <= priceMax);
     catalog.forEach(product => {
-        const card = document.createElement("div");
-        card.className = "bg-[#F8BBD0] rounded-2xl shadow-xl p-6 text-black border border-yellow-200 flex flex-col h-full";
-        card.style.cursor = "pointer";
-        card.dataset.productId = product.id;
-
-        card.innerHTML = `
-              <img src="${createBlurPlaceholder('#EC407A')}" 
-                  data-lazy-src="${product.image || 'assets/default.png'}" 
-                 class="w-full object-cover rounded-xl mb-4 cursor-pointer hover:opacity-80 transition blur-image" 
-                 alt="${product.name}" 
-                 onerror="this.src='assets/default.png'; this.onerror=null;" 
-                 data-product-id="${product.id}" 
-                 loading="lazy"
-                 style="cursor: pointer; height: 400px;">
-            <div class="flex-1 flex flex-col justify-between">
-                <div>
-                    <h4 class="font-bold text-lg">${product.name}</h4>
-                    <p class="text-sm text-gray-700">Stock: ${product.stock}</p>
-                    <p class="font-bold text-xl mt-2 text-[#EC407A]">$${product.price.toLocaleString()}</p>
-                </div>
-                <button class="button small w-full mt-4 add-btn" data-id="${product.id}">
-                    Agregar al carrito
-                </button>
-            </div>
-        `;
-
+        // normalize image path to allow fetch from /skcglow/
+        const imgPath = (product.image || 'assets/default.png').replace(/^\//, '');
+        const placeholder = createBlurPlaceholder('#EC407A');
+        const card = createProductCard(product, placeholder, imgPath);
         container.appendChild(card);
     });
 
-    // Delegación de eventos para los botones
-    container.addEventListener("click", (e) => {
-        const btn = e.target.closest(".add-btn");
-        const img = e.target.closest("img");
+    // Mostrar contador de resultados
+    const resultCount = document.getElementById('resultCount');
+    if (resultCount) {
+        resultCount.textContent = `Mostrando ${catalog.length} productos`;
+    }
+
+    // Mostrar botón de cargar más si hay productos
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    if (loadMoreContainer && catalog.length > 0) {
+        loadMoreContainer.classList.remove('hidden');
+    }
+
+    // Use a single onclick handler (replaces previous listeners on re-renders)
+    container.onclick = (e) => {
+        const btn = e.target.closest('.add-btn');
+        const img = e.target.closest('img');
 
         // Si se clickea en la imagen, abrir modal
         if (img && img.dataset.productId) {
@@ -191,72 +200,11 @@ export function renderCatalog(containerId, options = {}) {
                 });
             }
         }
-    });
+    };
     
     // Inicializar lazy loading con blur-up
     setupLazyLoadingWithBlur();
 }
 
 // Utilidades para UI de filtros
-export function setupFilters() {
-    const searchInput = document.getElementById('searchInput');
-    const categoryContainer = document.getElementById('categoryFilters');
-    const priceMin = document.getElementById('priceMin');
-    const priceMax = document.getElementById('priceMax');
-
-    // Crear lista de categorías únicas
-    const catalog = getCatalog();
-    const categories = Array.from(new Set(catalog.map(p => p.category).filter(Boolean)));
-
-    if (categoryContainer) {
-        categoryContainer.innerHTML = `<button class="px-3 py-1 mr-2 mb-2 bg-gray-100 rounded" data-cat="all">Todas</button>` +
-            categories.map(c => `<button class="px-3 py-1 mr-2 mb-2 bg-gray-100 rounded" data-cat="${c}">${c}</button>`).join('');
-
-        categoryContainer.addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (!btn) return;
-            const cat = btn.dataset.cat;
-            applyFilters();
-        });
-    }
-
-    // Search
-    if (searchInput) {
-        let to;
-        searchInput.addEventListener('input', () => {
-            clearTimeout(to);
-            to = setTimeout(() => applyFilters(), 250);
-        });
-    }
-
-    // Price inputs
-    if (priceMin) priceMin.addEventListener('input', applyFilters);
-    if (priceMax) priceMax.addEventListener('input', applyFilters);
-
-    // Funcion que lee UI y re-renderiza
-    function applyFilters() {
-        const search = (searchInput && searchInput.value) || '';
-        const selectedCatBtn = categoryContainer && categoryContainer.querySelector('button.bg-yellow-200');
-        let category = 'all';
-        if (categoryContainer) {
-            const active = categoryContainer.querySelector('button.active');
-            if (active) category = active.dataset.cat;
-        }
-
-        const pmin = priceMin ? parseFloat(priceMin.value) || 0 : 0;
-        const pmax = priceMax ? parseFloat(priceMax.value) || Infinity : Infinity;
-
-        renderCatalog('catalog', { search, category, priceMin: pmin, priceMax: pmax });
-    }
-
-    // Small helper to toggle active class on category buttons
-    if (categoryContainer) {
-        categoryContainer.addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (!btn) return;
-            categoryContainer.querySelectorAll('button').forEach(b => b.classList.remove('active', 'bg-yellow-200'));
-            btn.classList.add('active', 'bg-yellow-200');
-            applyFilters();
-        });
-    }
-}
+// setupFilters moved to components/filters.js to keep catalog rendering focused

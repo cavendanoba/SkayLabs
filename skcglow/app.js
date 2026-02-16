@@ -1,4 +1,5 @@
-import { renderCatalog, setupFilters } from './catalog.js';
+import { renderCatalog } from './catalog.js';
+import { setupFilters } from './components/filters.js';
 
 AOS.init({
     duration: 900,
@@ -27,6 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
         console.error('Error inicializando catalogo:', e);
     }
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/skcglow/sw.js')
+            .then(() => console.log('Service Worker registered'))
+            .catch(err => console.log('Service Worker registration failed', err));
+    }
     // Mobile nav toggle
     const mobileBtn = document.getElementById('mobileMenuBtn');
     const mobileNav = document.getElementById('mobileNav');
@@ -35,6 +43,64 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileNav.classList.toggle('hidden');
         });
     }
+
+    // Mobile filters toggle
+    const toggleFilters = document.getElementById('toggleFilters');
+    const mobileFiltersModal = document.getElementById('mobileFiltersModal');
+    const closeMobileFilters = document.getElementById('closeMobileFilters');
+    if (toggleFilters && mobileFiltersModal) {
+        toggleFilters.addEventListener('click', () => {
+            mobileFiltersModal.classList.remove('hidden');
+        });
+    }
+    if (closeMobileFilters) {
+        closeMobileFilters.addEventListener('click', () => {
+            mobileFiltersModal.classList.add('hidden');
+        });
+    }
+    if (mobileFiltersModal) {
+        mobileFiltersModal.addEventListener('click', (e) => {
+            if (e.target === mobileFiltersModal) {
+                mobileFiltersModal.classList.add('hidden');
+            }
+        });
+    }
+
+    // Load more button
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    if (loadMoreBtn && loadingSpinner && loadMoreContainer) {
+        loadMoreBtn.addEventListener('click', () => {
+            loadMoreContainer.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            // Simular carga de más productos
+            setTimeout(() => {
+                // Aquí se podría extender el catálogo o recargar con más items
+                // Por simplicidad, solo ocultar spinner
+                loadingSpinner.classList.add('hidden');
+                loadMoreContainer.classList.remove('hidden');
+            }, 2000);
+        });
+    }
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            themeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+        });
+    }
+
+    // Parallax effect for hero
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const hero = document.querySelector('.hero-section');
+        if (hero) {
+            hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+        }
+    });
 
     // Mouse sparkle / star effect
     (function setupSparkles() {
