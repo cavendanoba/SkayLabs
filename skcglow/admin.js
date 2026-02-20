@@ -1,13 +1,24 @@
 import { products } from './products.js';
+import { CONFIG } from './config.js';
 
 // Cargar catálogo desde localStorage si existe, si no usar products.js
-const stored = localStorage.getItem('skcCatalog');
-let catalog = stored ? JSON.parse(stored) : [...products];
+let catalog = [...products];
+try {
+    const stored = localStorage.getItem(CONFIG.CATALOG_STORAGE_KEY);
+    catalog = stored ? JSON.parse(stored) : [...products];
+} catch (e) {
+    console.warn('No se pudo leer skcCatalog desde localStorage', e);
+    catalog = [...products];
+}
 
 const panel = document.getElementById('admin-panel');
 
 function saveCatalog() {
-    localStorage.setItem('skcCatalog', JSON.stringify(catalog));
+    try {
+        localStorage.setItem(CONFIG.CATALOG_STORAGE_KEY, JSON.stringify(catalog));
+    } catch (e) {
+        console.warn('No se pudo guardar skcCatalog en localStorage', e);
+    }
 }
 
 function renderAdminPanel() {
@@ -63,8 +74,8 @@ function showAddProduct() {
             const name = document.getElementById('swal-name').value;
             const price = parseInt(document.getElementById('swal-price').value);
             const stock = parseInt(document.getElementById('swal-stock').value);
-            if (!name || isNaN(price) || isNaN(stock)) {
-                Swal.showValidationMessage('Todos los campos son obligatorios');
+            if (!name || isNaN(price) || isNaN(stock) || price <= 0 || stock < 0) {
+                Swal.showValidationMessage('Nombre requerido, precio > 0 y stock >= 0');
                 return false;
             }
             return { name, price, stock };
@@ -96,8 +107,8 @@ function showEditProduct(id) {
             const name = document.getElementById('swal-name').value;
             const price = parseInt(document.getElementById('swal-price').value);
             const stock = parseInt(document.getElementById('swal-stock').value);
-            if (!name || isNaN(price) || isNaN(stock)) {
-                Swal.showValidationMessage('Todos los campos son obligatorios');
+            if (!name || isNaN(price) || isNaN(stock) || price <= 0 || stock < 0) {
+                Swal.showValidationMessage('Nombre requerido, precio > 0 y stock >= 0');
                 return false;
             }
             return { name, price, stock };

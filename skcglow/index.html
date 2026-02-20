@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DISCORDIA - Belleza & Maquillaje</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/skcglow/assets/logo-ico-transp.png">
-    <link rel="apple-touch-icon" href="/skcglow/assets/logo-ico-transp.png">
+    <link rel="icon" type="image/png" href="./assets/logo-ico-transp.png">
+    <link rel="apple-touch-icon" href="./assets/logo-ico-transp.png">
 
     <!-- Tailwind v4 CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,7 +26,7 @@
     </style>
 
     <!-- Style-->
-     <link rel="stylesheet" href="style.css">
+     <link rel="stylesheet" href="./style.css">
 
 </head>
 
@@ -36,10 +36,9 @@
     <!-- HEADER -->
     <!-- -------------------------------------- -->
     <header class="fixed top-0 left-0 w-full bg-white backdrop-blur-md z-50 shadow-lg border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-3 py-4 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-3 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <!-- <img src="/skcglow/assets/logo-ico-transp.png" alt="DISCORDIA" class="w-10 h-10"> -->
-                <h1 class="text-3xl font-bold bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent" style="font-family: 'Playfair Display', serif; font-weight: 700;">DISCORDIA</h1>
+                <img src="./assets/logo-discordia.svg" alt="DISCORDIA" class="h-16 object-contain">
             </div>
 
             <!-- Search Bar -->
@@ -47,7 +46,7 @@
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
-                <input type="text" placeholder="Buscar productos..." class="bg-transparent ml-2 outline-none w-full text-sm text-gray-700">
+                <input id="catalogSearch" type="text" placeholder="Buscar productos..." class="bg-transparent ml-2 outline-none w-full text-sm text-gray-700">
             </div>
 
             <nav class="hidden md:flex gap-6 text-gray-700 font-medium">
@@ -57,11 +56,11 @@
                 <a href="#valores" class="hover:text-[#6d165a] transition">Nosotros</a>
             </nav>
 
-            <button id="openCart" class="relative flex items-center justify-center bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white p-3 rounded-full hover:shadow-lg transition">
+            <button id="openCartHeader" class="open-cart-btn relative flex items-center justify-center bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white p-3 rounded-full hover:shadow-lg transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
-                <span id="cartCount" class="absolute -top-2 -right-2 bg-[#ffc4a6] text-[#6d165a] text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">0</span>
+                <span class="cart-count-badge absolute -top-2 -right-2 bg-[#ffc4a6] text-[#6d165a] text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">0</span>
             </button>
         </div>
     </header>
@@ -143,7 +142,7 @@
     <!-- -------------------------------------- -->
     <!-- FILTROS Y CATÁLOGO -->
     <!-- -------------------------------------- -->
-    <section id="productos" class="max-w-7xl mx-auto px-3 py-12">
+    <section id="productos" class="max-w-[1800px] mx-auto px-4 lg:px-6 py-12">
         <div class="flex gap-8">
             <!-- Panel de Filtros -->
             <aside class="hidden lg:block w-64 flex-shrink-0">
@@ -156,15 +155,15 @@
                         <div class="space-y-3">
                             <label class="flex items-center cursor-pointer">
                                 <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
-                                <span class="ml-3 text-sm text-gray-700">$10.000 - $30.000</span>
+                                <span class="ml-3 text-sm text-gray-700">$10.000 - $20.000</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                                <span class="ml-3 text-sm text-gray-700">$20.000 - $30.000</span>
                             </label>
                             <label class="flex items-center cursor-pointer">
                                 <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
                                 <span class="ml-3 text-sm text-gray-700">$30.000 - $50.000</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
-                                <span class="ml-3 text-sm text-gray-700">$50.000+</span>
                             </label>
                         </div>
                     </div>
@@ -192,7 +191,7 @@
                     <div>
                         <h4 class="font-semibold text-gray-900 mb-4">Disponibilidad</h4>
                         <label class="flex items-center cursor-pointer">
-                            <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
+                            <input id="filterInStock" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-[#ec5c8d]">
                             <span class="ml-3 text-sm text-gray-700">En Stock</span>
                         </label>
                     </div>
@@ -202,28 +201,31 @@
             <!-- Catálogo Principal -->
             <div class="flex-1">
                 <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900">
-                        👝 Nuestro Catálogo 💖
-                    </h2>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">
+                            👝 Nuestro Catálogo 💖
+                        </h2>
+                        <p id="resultsCount" class="text-sm text-gray-600 mt-1">Cargando productos...</p>
+                    </div>
                     <div class="flex gap-3">
-                        <select class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:border-[#ec5c8d] focus:outline-none focus:border-[#ec5c8d]">
-                            <option>Ordenar por</option>
-                            <option>Más recientes</option>
-                            <option>Menor precio</option>
-                            <option>Mayor precio</option>
-                            <option>Más vendidos</option>
+                        <select id="sortProducts" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:border-[#ec5c8d] focus:outline-none focus:border-[#ec5c8d]">
+                            <option value="featured">Ordenar por</option>
+                            <option value="newest">Más recientes</option>
+                            <option value="price-asc">Menor precio</option>
+                            <option value="price-desc">Mayor precio</option>
+                            <option value="stock-desc">Más disponibles</option>
                         </select>
                     </div>
                 </div>
 
-                <div id="catalog" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+                <div id="catalog" class="grid gap-5 w-full [grid-auto-flow:row_dense]" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
 
             <!-- Producto genérico (se repite) -->
             <template id="product-card-template">
                 <div class="bg-white rounded-2xl shadow-lg p-6 text-gray-900 border-2 border-[#ec5c8d] transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-[#ff8c91]"
                     data-aos="zoom-in">
                     <div class="relative mb-4 overflow-hidden rounded-xl bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] h-48 flex items-center justify-center group">
-                        <img src="/skcglow/assets/placeholder-product.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                        <img src="./assets/placeholder-product.jpg" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
                         <div class="absolute top-4 right-4 bg-[#ec5c8d] text-white px-3 py-1 rounded-full text-xs font-bold">NUEVO</div>
                     </div>
                     <h4 class="font-bold text-lg text-[#6d165a] mb-2">Producto</h4>
@@ -257,7 +259,7 @@
     <!-- -------------------------------------- -->
     <!-- DESTACADOS / BESTSELLERS -->
     <!-- -------------------------------------- -->
-    <section class="bg-gray-50 py-20">
+    <section id="destacados" class="bg-gray-50 py-20">
         <div class="max-w-7xl mx-auto px-3">
             <div class="text-center mb-16" data-aos="fade-up">
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">⭐ Más Vendidos</h2>
@@ -357,7 +359,7 @@
         </div>
 
         <div class="max-w-5xl mx-auto text-center">
-            <img src="/skcglow/assets/no-stock.png"
+            <img src="./assets/no-stock.png"
                 class="mx-auto w-64 rounded-3xl shadow-2xl border-4 border-[#ffc4a6]" data-aos="zoom-in">
         </div>
     </section>
@@ -370,8 +372,8 @@
 
         <div class="grid md:grid-cols-2 gap-16 items-center">
 
-            <img src="/skcglow/assets/logo-full-transp.png"
-                class="rounded-3xl shadow-2xl border-4 border-[#ec5c8d] w-full h-80 object-contain bg-white p-4" data-aos="fade-right">
+            <img src="./assets/logo-discordia.png" alt="DISCORDIA"
+                class="rounded-3xl shadow-2xl border-4 border-[#ec5c8d] w-full h-80 object-contain bg-gradient-to-br from-white to-[#faf8f7] p-4" data-aos="fade-right">
 
             <div data-aos="fade-left">
                 <p class="text-gray-700 leading-relaxed text-lg space-y-4">
@@ -423,7 +425,7 @@
     <!-- -------------------------------------- -->
     <!-- TESTIMONIOS -->
     <!-- -------------------------------------- -->
-    <section class="bg-gradient-to-r from-[#6d165a] to-[#a0346e] py-20">
+    <section id="testimonios" class="bg-gradient-to-r from-[#6d165a] to-[#a0346e] py-20">
         <div class="max-w-7xl mx-auto px-3">
             <div class="text-center mb-16" data-aos="fade-up">
                 <h2 class="text-4xl font-bold text-white mb-4">💬 Lo Que Nuestras Clientas Dicen</h2>
@@ -509,7 +511,7 @@
                                 <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.1 1.82 2.89 2.89 0 0 1 2.31-4.64 2.86 2.86 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-.54-.05z"/>
                             </svg>
                         </a>
-                        <a href="https://whatsapp.com" target="_blank" class="hover:text-[#ec5c8d] transition transform hover:scale-110" title="WhatsApp">
+                        <a href="https://wa.me/573508311346" target="_blank" class="contact-whatsapp hover:text-[#ec5c8d] transition transform hover:scale-110" title="WhatsApp">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-9.746 9.798c0 2.649.738 5.195 2.141 7.432L2.1 21.9l7.973-2.087a9.82 9.82 0 004.756 1.207h.005c5.368 0 9.746-4.355 9.746-9.799 0-2.611-.738-5.067-2.141-7.46a9.87 9.87 0 00-7.604-3.769m0-2.04C6.444 2.904 2 7.349 2 12.85c0 2.929.755 5.729 2.208 8.148L2 22l8.221-2.141C13.966 21.88 17.772 20.271 20.52 17.463c2.75-2.808 4.047-6.596 4.047-10.613 0-5.5-4.444-9.944-9.968-9.944z"/>
                             </svg>
@@ -534,11 +536,11 @@
                     <ul class="space-y-3 text-sm">
                         <li class="flex items-start gap-2">
                             <span class="text-[#ec5c8d] mt-1">📧</span>
-                            <span>info@discordia.com</span>
+                            <span data-contact-email>info@discordia.com</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <span class="text-[#ec5c8d] mt-1">📱</span>
-                            <a href="https://wa.me/573508311346" class="hover:text-[#ec5c8d] transition">+57 350 831 1346</a>
+                            <a href="https://wa.me/573508311346" class="contact-whatsapp hover:text-[#ec5c8d] transition">+57 350 831 1346</a>
                         </li>
                         <li class="flex items-start gap-2">
                             <span class="text-[#ec5c8d] mt-1">🕒</span>
@@ -577,7 +579,7 @@
             <!-- Footer Bottom -->
             <div class="flex flex-col md:flex-row justify-between items-center text-sm">
                 <p class="text-gray-400">
-                    &copy; 2025 <span class="text-[#ec5c8d] font-bold">DISCORDIA</span> — Todos los derechos reservados.
+                    &copy; 2026 <span class="text-[#ec5c8d] font-bold">DISCORDIA</span> — Todos los derechos reservados.
                 </p>
                 <div class="flex gap-6 mt-4 md:mt-0">
                     <a href="#" class="hover:text-[#ec5c8d] transition">Política de Privacidad</a>
@@ -593,7 +595,7 @@
     <!-- -------------------------------------- -->
     <!-- WHATSAPP BUTTON -->
      <a href="https://wa.me/573508311346"
-         class="fixed z-40 transition hover:scale-110 flex items-center justify-center animate-pulse"
+         class="contact-whatsapp fixed z-40 transition hover:scale-110 flex items-center justify-center animate-pulse"
          style="bottom:6rem;right:1rem;width:80px;height:80px;"
          target="_blank"
          title="Contáctanos por WhatsApp">
@@ -603,57 +605,54 @@
     </a>
 
     <!-- CART BUTTON  -->
-    <button id="openCart"
-        class="fixed bottom-6 right-6 bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] hover:from-[#ff8c91] hover:to-[#ffc4a6] text-white p-4 rounded-full shadow-xl text-xl z-50 transition transform hover:scale-110">
+    <button id="openCartFloating"
+        class="open-cart-btn fixed bottom-6 right-6 bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] hover:from-[#ff8c91] hover:to-[#ffc4a6] text-white p-4 rounded-full shadow-xl text-xl z-50 transition transform hover:scale-110">
         <img width="35" height="35" src="https://img.icons8.com/stickers/100/fast-cart.png" alt="fast-cart"/>
-        <span id="cartCount" class="absolute -top-3 -right-3 bg-[#ffc4a6] text-[#6d165a] text-sm font-bold rounded-full w-7 h-7 flex items-center justify-center">0</span>
+        <span class="cart-count-badge absolute -top-3 -right-3 bg-[#ffc4a6] text-[#6d165a] text-sm font-bold rounded-full w-7 h-7 flex items-center justify-center">0</span>
     </button>
 
     <!-- Carrito Sidebar -->
     <div id="cartSidebar"
-        class="fixed top-0 right-0 w-96 h-full bg-white text-gray-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col overflow-hidden">
-        <div class="p-6 flex justify-between items-center border-b border-gray-200 bg-gradient-to-r from-[#ffc4a6] to-[#ff8c91]">
-            <h2 class="text-2xl font-bold text-white">🛒 Tu Carrito</h2>
-            <button id="closeCart" class="text-white text-3xl hover:text-gray-200 font-light">&times;</button>
+        class="fixed top-0 right-0 w-full sm:w-96 h-full bg-gradient-to-br from-white to-[#faf8f7] text-gray-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col overflow-hidden">
+        <div class="p-6 flex justify-between items-center border-b border-gray-100 bg-white">
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent" style="font-family: 'Playfair Display', serif; font-weight: 700;">🛒 Tu Carrito</h2>
+            <button id="closeCart" class="text-gray-400 text-3xl hover:text-gray-600 font-light">&times;</button>
         </div>
 
         <div id="cartItems" class="flex-1 p-6 space-y-4 overflow-y-auto"></div>
 
-        <div class="p-6 border-t border-gray-200 bg-gray-50">
+        <div class="p-6 border-t border-gray-100 bg-gradient-to-br from-white to-[#faf8f7]">
             <div class="mb-6">
-                <div class="flex justify-between mb-3">
-                    <span class="text-gray-700">Subtotal:</span>
-                    <span class="font-semibold text-gray-900">$0</span>
+                <div class="flex justify-between mb-3 text-sm">
+                    <span class="text-gray-600 font-medium">Subtotal:</span>
+                    <span class="font-bold text-gray-900">$0</span>
                 </div>
-                <div class="flex justify-between mb-4">
-                    <span class="text-gray-700">Envío:</span>
-                    <span class="font-semibold text-gray-900">Gratis</span>
+                <div class="flex justify-between mb-4 text-sm">
+                    <span class="text-gray-600 font-medium">Envío:</span>
+                    <span class="font-bold text-[#a0346e]">Gratis</span>
                 </div>
-                <div class="border-t border-gray-300 pt-3 flex justify-between">
-                    <span class="font-bold text-lg text-gray-900">Total:</span>
-                    <span id="cartTotal" class="font-bold text-2xl bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent">$0</span>
+                <div class="border-t border-gray-200 pt-3 flex justify-between items-end">
+                    <span class="font-bold text-[16px] text-gray-900">Total:</span>
+                    <span id="cartTotal" class="font-extrabold text-3xl bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent">$0</span>
                 </div>
             </div>
 
             <button id="checkoutBtn"
-                class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-3 rounded-xl transition hover:shadow-lg mb-3">
-                ✅ Finalizar Compra
+                class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-3 rounded-2xl transition hover:shadow-lg hover:scale-[1.02] mb-3">
+                ✅ Finalizar por WhatsApp
             </button>
 
             <button id="clearCart"
-                class="w-full bg-gray-200 hover:bg-gray-300 text-gray-900 font-bold py-2 rounded-xl transition">
+                class="w-full bg-gray-200 hover:bg-gray-300 text-gray-900 font-bold py-2 rounded-2xl transition">
                 🗑️ Vaciar Carrito
             </button>
         </div>
     </div>
 
     <!-- Cargamos la app como módulo: inicializa AOS/Typed y renderiza el catálogo -->
-    <script type="module" src="/skcglow/app.js"></script>
-
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="/skcglow/app.js"></script>
+    <script type="module" src="./app.js"></script>
 
 </body>
 

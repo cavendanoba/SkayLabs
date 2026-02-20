@@ -12,6 +12,7 @@ Proyecto frontend estático para catálogo y carrito de compras de SkayLabs (SKC
 
 - `index.html` — entrada principal del sitio; contiene estilos esenciales y referencias a los scripts.
 - `app.js` — inicialización / bootstrap (si existe en el proyecto).
+- `config.js` — configuración centralizada (teléfono de WhatsApp, email de contacto y claves de localStorage).
 - `products.js` — array con productos por defecto.
 - `catalog.js` — renderizado del catálogo, lazy-loading, blur-up placeholder, modal de producto.
 - `cart.js` — lógica del carrito (añadir/quitar/actualizar), persistencia en `localStorage`.
@@ -40,6 +41,7 @@ python3 -m http.server 8000
 - **Productos:** editar `products.js` para cambiar nombre, precio, stock y `image`.
 - **Catálogo:** `renderCatalog(containerId)` en `catalog.js` genera las tarjetas; conserva `data-lazy-src` para lazy-loading.
 - **Carrito:** funciones principales en `cart.js`. Estado persistente en `localStorage` bajo la clave `skcCart`.
+- **Configuración:** editar `config.js` para cambiar `WHATSAPP_PHONE`, `ADMIN_EMAIL`, `CATALOG_STORAGE_KEY` y `CART_STORAGE_KEY`.
 
 ## Características clave
 
