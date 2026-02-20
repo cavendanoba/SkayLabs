@@ -177,17 +177,17 @@ if (checkoutBtn) {
     checkoutBtn.addEventListener("click", () => {
         const phone = CONFIG.WHATSAPP_PHONE;
 
-        let message = "Hola! Quisiera comprar estos productos:%0A%0A";
+            let message = "Hola! Quisiera comprar estos productos:%0A%0A";
 
-        cart.forEach((p) => {
-            message += `• ${p.name} (x${p.quantity}) - $${p.price.toLocaleString()}%0A`;
+            cart.forEach((p) => {
+                message += `• ${p.name} (x${p.quantity}) - $${p.price.toLocaleString()}%0A`;
+            });
+
+            message += `%0ATotal: $${cartTotal().toLocaleString()}`;
+
+            window.open(`https://wa.me/${phone}?text=${message}`);
         });
-
-        message += `%0ATotal: $${cartTotal().toLocaleString()}`;
-
-        window.open(`https://wa.me/${phone}?text=${message}`);
-    });
-}
+    }
 
 const sidebar = document.getElementById("cartSidebar");
 const openCartBtns = document.querySelectorAll('.open-cart-btn');
@@ -202,8 +202,9 @@ if (sidebar) {
 if (closeCartBtn && sidebar) closeCartBtn.onclick = () => sidebar.classList.add("translate-x-full");
 if (clearCartBtn) clearCartBtn.onclick = clearCart;
 
-// Render inicial
-renderCart();
+    // Render inicial
+    renderCart();
+});
 
 // Función de comodidad para abrir el carrito desde el menú u otros lugares
 export function carrito() {

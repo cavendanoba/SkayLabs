@@ -1,5 +1,5 @@
 // catalog.js
-import { products } from "./products.js";
+import { products as fallbackProducts } from "./products.js";
 import { addToCart } from "./cart.js";
 import { CONFIG } from "./config.js";
 
@@ -228,7 +228,7 @@ export function showProductModal(productId, cartCallback) {
 }
 
 // Renderiza los productos en un contenedor (grid)
-export function renderCatalog(containerId) {
+export function renderCatalog(containerId, options = {}) {
     const container = document.getElementById(containerId);
     lastContainerId = containerId;
     bindCatalogControls();
@@ -341,3 +341,6 @@ function onCatalogClick(e) {
         }
     }
 }
+
+// Utilidades para UI de filtros
+// setupFilters moved to components/filters.js to keep catalog rendering focused

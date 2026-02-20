@@ -1,0 +1,21 @@
+{
+  "name": "DISCORDIA - Maquillaje Profesional",
+  "short_name": "DISCORDIA",
+  "description": "Tienda online de maquillaje profesional con productos de alta calidad.",
+  "start_url": "/skcglow/index.html",
+  "display": "standalone",
+  "background_color": "#faf8f7",
+  "theme_color": "#ec5c8d",
+  "icons": [
+    {
+      "src": "/skcglow/assets/logo-ico.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/skcglow/assets/logo-ico.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
