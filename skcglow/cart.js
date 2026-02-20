@@ -202,9 +202,8 @@ if (sidebar) {
 if (closeCartBtn && sidebar) closeCartBtn.onclick = () => sidebar.classList.add("translate-x-full");
 if (clearCartBtn) clearCartBtn.onclick = clearCart;
 
-    // Render inicial
-    renderCart();
-});
+// Render inicial
+renderCart();
 
 // Función de comodidad para abrir el carrito desde el menú u otros lugares
 export function carrito() {
