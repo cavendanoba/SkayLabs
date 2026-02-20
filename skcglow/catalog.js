@@ -204,7 +204,7 @@ export function showProductModal(productId, cartCallback) {
                      style="max-width: 100%; max-height: 400px; border-radius: 10px; margin: 10px auto; display: block;"
                      onerror="this.src='./assets/default.png'">
                 <p style="margin: 15px 0; font-size: 14px; color: #666;">${product.description || 'Sin descripción disponible'}</p>
-                <p style="font-weight: bold; color: #EC407A; margin: 10px 0; font-size: 1.125rem;">Precio: $${product.price.toLocaleString()}</p>
+                <p style="font-weight: bold; color: #a0346e; margin: 10px 0; font-size: 1.125rem;">Precio: $${product.price.toLocaleString()}</p>
                 <p style="margin: 5px 0; font-size: 13px;">Stock disponible: ${product.stock}</p>
             </div>
         `,
@@ -212,7 +212,7 @@ export function showProductModal(productId, cartCallback) {
         confirmButtonText: 'Agregar al carrito',
         cancelButtonText: 'Cerrar',
         showCancelButton: true,
-        confirmButtonColor: '#EC407A',
+        confirmButtonColor: '#ec5c8d',
         cancelButtonColor: '#999',
     }).then((result) => {
         if (result.isConfirmed) {
@@ -221,7 +221,8 @@ export function showProductModal(productId, cartCallback) {
                 icon: 'success',
                 title: '¡Agregado!',
                 text: `${product.name} fue agregado al carrito`,
-                timer: 2000
+                timer: 2000,
+                confirmButtonColor: '#ec5c8d'
             });
         }
     });

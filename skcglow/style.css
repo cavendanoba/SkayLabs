@@ -3,6 +3,11 @@
     --secondary-color: #EBA2A4;
 }
 
+/* Smooth scrolling for anchor links */
+html {
+    scroll-behavior: smooth;
+}
+
 /* Base font for the site (Tailwind utilities still handle most spacing/colors) */
 body {
     font-family: 'Space Grotesk', sans-serif;

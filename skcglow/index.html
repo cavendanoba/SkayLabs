@@ -38,7 +38,7 @@
     <header class="fixed top-0 left-0 w-full bg-white backdrop-blur-md z-50 shadow-lg border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-3 py-4 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <h1 class="text-3xl font-bold bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent" style="font-family: 'Playfair Display', serif; font-weight: 700;">DISCORDIA</h1>
+                <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent" style="font-family: 'Playfair Display', serif; font-weight: 700;">DISCORDIA</h1>
             </div>
 
             <!-- Search Bar -->
@@ -49,20 +49,39 @@
                 <input id="catalogSearch" type="text" placeholder="Buscar productos..." class="bg-transparent ml-2 outline-none w-full text-sm text-gray-700">
             </div>
 
-            <nav class="hidden md:flex gap-6 text-gray-700 font-medium">
+            <nav class="hidden md:flex gap-4 lg:gap-6 text-gray-700 font-medium text-sm lg:text-base">
                 <a href="#productos" class="hover:text-[#6d165a] transition">Catálogo</a>
                 <a href="#categorias" class="hover:text-[#6d165a] transition">Categorías</a>
                 <a href="#cajas" class="hover:text-[#6d165a] transition">Combos</a>
                 <a href="#valores" class="hover:text-[#6d165a] transition">Nosotros</a>
             </nav>
 
-            <button id="openCartHeader" class="open-cart-btn relative flex items-center justify-center bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white p-3 rounded-full hover:shadow-lg transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                <span class="cart-count-badge absolute -top-2 -right-2 bg-[#ffc4a6] text-[#6d165a] text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">0</span>
-            </button>
+            <div class="flex items-center gap-3">
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="md:hidden text-[#6d165a] p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+
+                <button id="openCartHeader" class="open-cart-btn relative flex items-center justify-center bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white p-2 md:p-3 rounded-full hover:shadow-lg transition">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <span class="cart-count-badge absolute -top-2 -right-2 bg-[#ffc4a6] text-[#6d165a] text-xs font-bold rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">0</span>
+                </button>
+            </div>
         </div>
+
+        <!-- Mobile Navigation Menu -->
+        <nav id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-100 px-4 py-3">
+            <div class="flex flex-col gap-3">
+                <a href="#productos" class="py-2 text-gray-700 hover:text-[#6d165a] transition border-b border-gray-100">Catálogo</a>
+                <a href="#categorias" class="py-2 text-gray-700 hover:text-[#6d165a] transition border-b border-gray-100">Categorías</a>
+                <a href="#cajas" class="py-2 text-gray-700 hover:text-[#6d165a] transition border-b border-gray-100">Combos</a>
+                <a href="#valores" class="py-2 text-gray-700 hover:text-[#6d165a] transition">Nosotros</a>
+            </div>
+        </nav>
     </header>
 
     <div class="h-20"></div>
@@ -102,40 +121,40 @@
         
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6" data-aos="fade-up">
             <!-- Categoría 1 -->
-            <div class="group cursor-pointer">
+            <a href="#productos" class="group cursor-pointer block">
                 <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
                     <span class="text-5xl">💄</span>
                 </div>
                 <h3 class="text-center font-bold text-gray-900 mt-4">Labiales</h3>
                 <p class="text-center text-sm text-gray-600">12 productos</p>
-            </div>
+            </a>
 
             <!-- Categoría 2 -->
-            <div class="group cursor-pointer">
+            <a href="#productos" class="group cursor-pointer block">
                 <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
                     <span class="text-5xl">👁️</span>
                 </div>
                 <h3 class="text-center font-bold text-gray-900 mt-4">Ojos</h3>
                 <p class="text-center text-sm text-gray-600">18 productos</p>
-            </div>
+            </a>
 
             <!-- Categoría 3 -->
-            <div class="group cursor-pointer">
+            <a href="#productos" class="group cursor-pointer block">
                 <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#a0346e] to-[#6d165a] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
                     <span class="text-5xl">🧴</span>
                 </div>
                 <h3 class="text-center font-bold text-gray-900 mt-4">Bases</h3>
                 <p class="text-center text-sm text-gray-600">8 productos</p>
-            </div>
+            </a>
 
             <!-- Categoría 4 -->
-            <div class="group cursor-pointer">
+            <a href="#productos" class="group cursor-pointer block">
                 <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#6d165a] to-[#ec5c8d] h-48 flex items-center justify-center hover:scale-105 transition duration-300">
                     <span class="text-5xl">✨</span>
                 </div>
                 <h3 class="text-center font-bold text-gray-900 mt-4">Destacados</h3>
                 <p class="text-center text-sm text-gray-600">15 productos</p>
-            </div>
+            </a>
         </div>
     </section>
 
@@ -218,7 +237,7 @@
                     </div>
                 </div>
 
-                <div id="catalog" class="grid gap-5 w-full [grid-auto-flow:row_dense]" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+                <div id="catalog" class="grid gap-4 md:gap-5 w-full [grid-auto-flow:row_dense]" style="grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));">
 
             <!-- Producto genérico (se repite) -->
             <template id="product-card-template">
@@ -613,7 +632,7 @@
 
     <!-- Carrito Sidebar -->
     <div id="cartSidebar"
-        class="fixed top-0 right-0 w-96 h-full bg-white text-gray-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col overflow-hidden">
+        class="fixed top-0 right-0 w-full sm:w-96 h-full bg-white text-gray-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col overflow-hidden">
         <div class="p-6 flex justify-between items-center border-b border-gray-200 bg-gradient-to-r from-[#ffc4a6] to-[#ff8c91]">
             <h2 class="text-2xl font-bold text-white">🛒 Tu Carrito</h2>
             <button id="closeCart" class="text-white text-3xl hover:text-gray-200 font-light">&times;</button>
