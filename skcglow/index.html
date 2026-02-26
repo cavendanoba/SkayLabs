@@ -30,7 +30,7 @@
 
 </head>
 
-<body class="bg-gradient-to-br from-[#faf8f7] to-[#f5ede8] text-gray-900" style="font-family: 'Playfair Display', serif;">
+<body class="bg-gradient-to-br from-[#faf8f7] to-[#f5ede8] text-gray-900">
 
     <!-- -------------------------------------- -->
     <!-- HEADER -->
@@ -97,19 +97,36 @@
             <div class="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
         </div>
 
-        <div class="relative z-10">
-            <h2 class="text-6xl font-extrabold mb-6" data-aos="zoom-in">
+        <div class="relative z-10 max-w-5xl mx-auto px-4">
+            <p class="uppercase tracking-[0.25em] text-xs md:text-sm text-[#ffc4a6] mb-4" data-aos="fade-down">Beauty Studio • Bogotá</p>
+
+            <h2 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight" data-aos="zoom-in">
                 <span id="typed"></span>
             </h2>
 
-            <p class="text-xl max-w-2xl mx-auto mb-4 text-[#ffc4a6]" data-aos="fade-up">
-                Marcas originales, precios increíbles, estilo que te acompaña.
+            <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8 text-[#ffc4a6]" data-aos="fade-up">
+                Maquillaje auténtico, curado con criterio y pensado para tu rutina real.
+                En DISCORDIA encuentras productos que sí funcionan, con atención cercana y entrega confiable.
             </p>
 
-            <a href="#productos"
-                class="inline-block mt-8 bg-[#ffc4a6] text-[#6d165a] px-10 py-4 rounded-full text-lg font-bold transition hover:bg-[#ff8c91] hover:text-white hover:shadow-lg transform hover:scale-105 hidden">
-                ✨ Ver Catálogo
-            </a>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4" data-aos="fade-up" data-aos-delay="100">
+                <a href="#productos"
+                    class="inline-block bg-[#ffc4a6] text-[#6d165a] px-10 py-4 rounded-full text-lg font-bold transition hover:bg-[#ff8c91] hover:text-white hover:shadow-lg transform hover:scale-105">
+                    ✨ Ver Catálogo
+                </a>
+                <a href="#valores"
+                    class="inline-block bg-white/15 border border-white/50 text-white px-8 py-4 rounded-full text-base font-semibold transition hover:bg-white/25">
+                    Conocer la marca
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-3 -mt-8 relative z-20">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" data-aos="fade-up">
+            <div class="brand-chip">💎 Originales verificados</div>
+            <div class="brand-chip">🚚 Entregas ágiles en Bogotá</div>
+            <div class="brand-chip">🤝 Acompañamiento por WhatsApp</div>
         </div>
     </section>
 
@@ -117,7 +134,8 @@
     <!-- CATEGORÍAS -->
     <!-- -------------------------------------- -->
     <section id="categorias" class="max-w-7xl mx-auto px-3 py-16">
-        <h2 class="text-3xl font-bold text-gray-900 mb-12" data-aos="fade-up">Explora por Categoría</h2>
+        <h2 class="text-3xl font-bold text-gray-900 mb-2" data-aos="fade-up">Explora por Categoría</h2>
+        <p class="text-gray-600 mb-10 max-w-2xl" data-aos="fade-up" data-aos-delay="50">Encuentra más rápido lo que necesitas con una selección pensada para looks de diario, eventos y contenido.</p>
         
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6" data-aos="fade-up">
             <!-- Categoría 1 -->
@@ -162,6 +180,12 @@
     <!-- FILTROS Y CATÁLOGO -->
     <!-- -------------------------------------- -->
     <section id="productos" class="max-w-[1800px] mx-auto px-4 lg:px-6 py-12">
+        <div class="mb-8 bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm" data-aos="fade-up">
+            <p class="text-xs uppercase tracking-[0.2em] text-[#a0346e] font-semibold mb-2">Nuestra promesa</p>
+            <h3 class="text-2xl md:text-3xl font-bold text-[#6d165a] mb-2">Menos ruido, más productos que sí cumplen</h3>
+            <p class="text-gray-700 max-w-4xl">Curamos el catálogo con foco en rendimiento, duración y relación calidad-precio para que compres con claridad, no por impulso.</p>
+        </div>
+
         <div class="flex gap-8">
             <!-- Panel de Filtros -->
             <aside class="hidden lg:block w-64 flex-shrink-0">
@@ -282,7 +306,7 @@
         <div class="max-w-7xl mx-auto px-3">
             <div class="text-center mb-16" data-aos="fade-up">
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">⭐ Más Vendidos</h2>
-                <p class="text-gray-600 text-lg">Los favoritos de nuestras clientas</p>
+                <p class="text-gray-600 text-lg">Lo más pedido por rendimiento, duración y acabado</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -515,7 +539,7 @@
                 <div data-aos="fade-up">
                     <h3 class="text-2xl font-bold text-white mb-4">✨ DISCORDIA</h3>
                     <p class="text-sm leading-relaxed mb-6">
-                        Tu tienda online de maquillaje profesional. Productos de alta calidad con las mejores marcas internacionales.
+                        Belleza con criterio: productos auténticos, selección inteligente y atención cercana para que compres con seguridad.
                     </p>
                     <div class="flex gap-4">
                         <a href="https://instagram.com" target="_blank" class="hover:text-[#ec5c8d] transition transform hover:scale-110" title="Instagram">

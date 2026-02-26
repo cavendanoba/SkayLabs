@@ -9,9 +9,9 @@ AOS.init({
 // Typed.js hero text
 new Typed("#typed", {
     strings: [
-        "Traemos los productos que más buscas",
-        "A los mejores precios de Bogotá",
-        "Belleza, estilo y calidad ✨"
+        "Belleza auténtica para tu rutina real",
+        "Productos curados, precio justo y resultado visible",
+        "DISCORDIA: maquillaje con identidad ✨"
     ],
     typeSpeed: 50,
     backSpeed: 30,

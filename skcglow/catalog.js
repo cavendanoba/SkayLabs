@@ -167,7 +167,7 @@ function getCardLayout(index) {
             imageHeight: '360px',
             titleClass: 'text-[17px]',
             priceClass: 'text-[30px]',
-            badge: 'Editor\'s Pick'
+            badge: 'Selección DISCORDIA'
         };
     }
 
@@ -177,7 +177,7 @@ function getCardLayout(index) {
             imageHeight: '330px',
             titleClass: 'text-[16px]',
             priceClass: 'text-[27px]',
-            badge: 'Trending'
+            badge: 'Tendencia'
         };
     }
 
@@ -186,7 +186,7 @@ function getCardLayout(index) {
         imageHeight: '280px',
         titleClass: 'text-[15px]',
         priceClass: 'text-2xl',
-        badge: 'Top'
+        badge: 'Favorito'
     };
 }
 

@@ -10,15 +10,30 @@ html {
 
 /* Base font for the site (Tailwind utilities still handle most spacing/colors) */
 body {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Use Playfair for header/title and navigation to keep the brand look */
 header h1,
+h2,
+h3,
+h4,
 #mainNav,
 #mainNav a,
 #mobileNav {
     font-family: 'Playfair Display', serif;
+}
+
+.brand-chip {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(160, 52, 110, 0.18);
+    border-radius: 1rem;
+    padding: 0.9rem 1rem;
+    text-align: center;
+    font-weight: 600;
+    color: #6d165a;
+    box-shadow: 0 8px 20px rgba(109, 22, 90, 0.08);
+    backdrop-filter: blur(6px);
 }
 
 /* Blur-up effect used by lazy-loading images */
