@@ -15,6 +15,8 @@ const STORAGE_KEYS = {
     customers: CONFIG.CUSTOMERS_STORAGE_KEY || 'skcCustomers'
 };
 
+const API_ENDPOINT = CONFIG.ADMIN_API_PATH || '/api/skc-data';
+
 let activeTab = 'catalog';
 const uiState = {
     catalogQuery: '',
@@ -28,6 +30,10 @@ const state = {
     sales: loadCollection(STORAGE_KEYS.sales, []),
     customers: loadCollection(STORAGE_KEYS.customers, [])
 };
+
+let storageMode = 'local';
+let remoteSyncTimer = null;
+let pendingRemotePayload = {};
 
 function loadCollection(key, fallback) {
     try {
@@ -54,14 +60,79 @@ function saveCollection(key, value) {
 
 function saveCatalog() {
     saveCollection(STORAGE_KEYS.catalog, state.catalog);
+    queueRemoteSync({ catalog: state.catalog });
 }
 
 function saveSales() {
     saveCollection(STORAGE_KEYS.sales, state.sales);
+    queueRemoteSync({ sales: state.sales });
 }
 
 function saveCustomers() {
     saveCollection(STORAGE_KEYS.customers, state.customers);
+    queueRemoteSync({ customers: state.customers });
+}
+
+async function requestApi(method, payload) {
+    const response = await fetch(API_ENDPOINT, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: payload ? JSON.stringify(payload) : undefined
+    });
+
+    if (!response.ok) {
+        throw new Error(`API ${method} ${response.status}`);
+    }
+
+    return response.json();
+}
+
+function applyRemoteData(data) {
+    if (!data) return;
+    if (Array.isArray(data.catalog)) state.catalog = data.catalog;
+    if (Array.isArray(data.sales)) state.sales = data.sales;
+    if (Array.isArray(data.customers)) state.customers = data.customers;
+}
+
+async function hydrateFromApi() {
+    try {
+        const response = await requestApi('GET');
+        if (response?.ok && response?.data) {
+            applyRemoteData(response.data);
+            storageMode = response.storage === 'vercel-kv' ? 'remoto' : 'local';
+            saveCollection(STORAGE_KEYS.catalog, state.catalog);
+            saveCollection(STORAGE_KEYS.sales, state.sales);
+            saveCollection(STORAGE_KEYS.customers, state.customers);
+            refreshUI();
+        }
+    } catch (error) {
+        storageMode = 'local';
+        console.info('API remota no disponible, se mantiene modo local.');
+    }
+}
+
+function queueRemoteSync(partial) {
+    pendingRemotePayload = { ...pendingRemotePayload, ...partial };
+
+    if (remoteSyncTimer) {
+        clearTimeout(remoteSyncTimer);
+    }
+
+    remoteSyncTimer = setTimeout(async () => {
+        const payload = pendingRemotePayload;
+        pendingRemotePayload = {};
+
+        try {
+            const response = await requestApi('POST', payload);
+            storageMode = response?.storage === 'vercel-kv' ? 'remoto' : 'local';
+            if (response?.data) {
+                applyRemoteData(response.data);
+            }
+            refreshUI();
+        } catch (error) {
+            storageMode = 'local';
+        }
+    }, 250);
 }
 
 function bindTabActions() {
@@ -104,7 +175,7 @@ function renderSummary() {
         { label: 'Productos', value: totalProducts, note: 'Items activos en catálogo' },
         { label: 'Stock total', value: totalStock, note: 'Unidades disponibles' },
         { label: 'Ventas', value: totalSales, note: 'Registros acumulados' },
-        { label: 'Ingresos', value: `$${totalRevenue.toLocaleString()}`, note: 'Total ventas registradas' }
+        { label: 'Ingresos', value: `$${totalRevenue.toLocaleString()}`, note: `Total ventas registradas · Modo ${storageMode}` }
     ];
 
     summaryContainer.innerHTML = cards.map((card) => `
@@ -733,3 +804,4 @@ function resetAdminData() {
 bindTabActions();
 bindGlobalActions();
 refreshUI();
+hydrateFromApi();
