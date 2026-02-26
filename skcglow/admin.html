@@ -3,17 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de administración - SKC Glow</title>
+    <title>Panel de administración - DISCORDIA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <style>body { font-family: 'Poppins', sans-serif; }</style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+        h1, h2, h3, h4, .brand-font { font-family: 'Playfair Display', serif; }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
-    <div class="max-w-3xl mx-auto py-10">
-        <h1 class="text-3xl font-bold mb-6 text-[#EC407A]">Administrar Catálogo</h1>
-        <div id="admin-panel"></div>
-    </div>
+<body class="bg-gradient-to-br from-[#faf8f7] to-[#f5ede8] text-gray-900 min-h-screen">
+    <header class="sticky top-0 left-0 w-full bg-white/95 backdrop-blur-md z-50 shadow-lg border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <img src="./assets/logo-discordia.png" alt="DISCORDIA" class="h-10 w-10 rounded-full object-contain bg-white">
+                <div>
+                    <p class="brand-font text-xl md:text-2xl font-bold bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent">DISCORDIA Admin</p>
+                    <p class="text-xs text-gray-500">Panel interno de operación</p>
+                </div>
+            </div>
+            <a href="./index.html" class="px-4 py-2 rounded-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-semibold text-sm hover:shadow-lg transition">Volver al sitio</a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 md:py-10">
+        <section class="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm mb-6">
+            <p class="text-xs uppercase tracking-[0.2em] text-[#a0346e] font-semibold mb-2">Backoffice</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-[#6d165a]">Control de catálogo, ventas y clientes</h1>
+            <p class="text-gray-600 mt-2 max-w-3xl">Gestiona productos, registra ventas rápidas y conserva un historial básico de clientes sin depender de base de datos externa.</p>
+        </section>
+
+        <section id="admin-summary" class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6"></section>
+
+        <section class="bg-white border border-gray-100 rounded-2xl p-3 md:p-4 shadow-sm mb-6">
+            <div class="grid grid-cols-3 gap-2">
+                <button data-admin-tab="catalog" class="admin-tab-btn px-3 py-2 rounded-xl font-semibold text-sm md:text-base bg-[#6d165a] text-white">Catálogo</button>
+                <button data-admin-tab="sales" class="admin-tab-btn px-3 py-2 rounded-xl font-semibold text-sm md:text-base bg-gray-100 text-gray-700">Ventas</button>
+                <button data-admin-tab="customers" class="admin-tab-btn px-3 py-2 rounded-xl font-semibold text-sm md:text-base bg-gray-100 text-gray-700">Clientes</button>
+            </div>
+        </section>
+
+        <section id="admin-panel" class="space-y-6"></section>
+    </main>
+
+    <template id="admin-card-template">
+        <article class="bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm">
+            <p class="text-xs uppercase tracking-[0.15em] text-gray-500"></p>
+            <p class="text-2xl md:text-3xl font-bold text-[#6d165a] mt-2"></p>
+            <p class="text-sm text-gray-500 mt-1"></p>
+        </article>
+    </template>
+
+    <template id="admin-table-wrapper-template">
+        <article class="bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm overflow-hidden">
+            <div class="flex items-center justify-between gap-3 mb-4">
+                <h3 class="text-2xl font-bold text-[#6d165a]"></h3>
+                <div></div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-[#fdf2f7]"></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </article>
+    </template>
+
     <script type="module" src="admin.js"></script>
 </body>
 </html>

@@ -16,6 +16,12 @@ export const CONFIG = {
   
   // Clave para localStorage del carrito
   CART_STORAGE_KEY: 'skcCart',
+
+  // Clave para localStorage de ventas
+  SALES_STORAGE_KEY: 'skcSales',
+
+  // Clave para localStorage de clientes
+  CUSTOMERS_STORAGE_KEY: 'skcCustomers',
   
   // Ruta del archivo de productos por defecto
   DEFAULT_PRODUCTS_PATH: './products.js',
