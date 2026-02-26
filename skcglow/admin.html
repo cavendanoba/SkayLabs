@@ -45,6 +45,16 @@
             </div>
         </section>
 
+        <section class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm mb-6">
+            <div class="flex flex-wrap items-center gap-2">
+                <button id="export-backup" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 font-semibold text-sm">Exportar respaldo</button>
+                <button id="import-backup" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 font-semibold text-sm">Importar respaldo</button>
+                <button id="reset-admin-data" class="px-4 py-2 rounded-xl bg-rose-100 text-rose-700 font-semibold text-sm">Reiniciar datos</button>
+                <p class="text-xs text-gray-500 ml-auto">Respaldo incluye catálogo, ventas y clientes.</p>
+            </div>
+            <input id="backup-file-input" type="file" accept="application/json" class="hidden">
+        </section>
+
         <section id="admin-panel" class="space-y-6"></section>
     </main>
 
