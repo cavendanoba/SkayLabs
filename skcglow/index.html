@@ -14,8 +14,8 @@
         })();
     </script>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="./assets/logo-ico-transp.png">
-    <link rel="apple-touch-icon" href="./assets/logo-ico-transp.png">
+    <link rel="icon" type="image/png" href="./assets/logo-discordia.png?v=20260226">
+    <link rel="apple-touch-icon" href="./assets/logo-discordia.png?v=20260226">
 
     <!-- Tailwind v4 CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -46,7 +46,7 @@
     <header class="fixed top-0 left-0 w-full bg-white backdrop-blur-md z-50 shadow-lg border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-3 py-4 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#6d165a] to-[#a0346e] bg-clip-text text-transparent" style="font-family: 'Playfair Display', serif; font-weight: 700;">DISCORDIA</h1>
+                <img src="./assets/texto-discordia.png" alt="DISCORDIA" class="h-9 md:h-11 w-auto object-contain">
             </div>
 
             <!-- Search Bar -->
@@ -136,6 +136,18 @@
             <div class="brand-chip">🚚 Entregas ágiles en Bogotá</div>
             <div class="brand-chip">🤝 Acompañamiento por WhatsApp</div>
         </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-3 py-8" data-aos="fade-up">
+        <div class="flex items-end justify-between mb-4">
+            <div>
+                <p class="text-xs uppercase tracking-[0.18em] text-[#a0346e] font-semibold">Primer vistazo</p>
+                <h3 class="text-2xl font-bold text-gray-900">Productos que ya puedes pedir</h3>
+            </div>
+            <a href="#productos" class="text-sm font-semibold text-[#a0346e] hover:underline">Ver todo</a>
+        </div>
+
+        <div id="heroProductPreview" class="flex md:grid md:grid-cols-4 gap-3 md:gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none pb-2 no-scrollbar"></div>
     </section>
 
     <!-- -------------------------------------- -->
@@ -423,7 +435,7 @@
 
         <div class="grid md:grid-cols-2 gap-16 items-center">
 
-            <img src="./assets/logo-full-transp.png"
+            <img src="./assets/logo-discordia.png"
                 class="rounded-3xl shadow-2xl border-4 border-[#ec5c8d] w-full h-80 object-contain bg-white p-4" data-aos="fade-right">
 
             <div data-aos="fade-left">
@@ -662,10 +674,14 @@
         <span class="cart-count-badge absolute -top-3 -right-3 bg-[#ffc4a6] text-[#6d165a] text-sm font-bold rounded-full w-7 h-7 flex items-center justify-center">0</span>
     </button>
 
+    <div id="cartBackdrop"
+        class="fixed inset-0 bg-[#1f0e1b]/35 backdrop-blur-[2px] opacity-0 pointer-events-none transition-opacity duration-300 z-40"
+        aria-hidden="true"></div>
+
     <!-- Carrito Sidebar -->
     <div id="cartSidebar"
-        class="fixed top-0 right-0 w-full sm:w-96 h-full bg-white text-gray-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col overflow-hidden">
-        <div class="p-6 flex justify-between items-center border-b border-gray-200 bg-gradient-to-r from-[#ffc4a6] to-[#ff8c91]">
+        class="fixed top-0 right-0 w-full sm:w-96 h-full bg-white/95 backdrop-blur-md text-gray-900 shadow-2xl border-l border-[#f1d7e2] transform translate-x-full transition-transform duration-300 z-50 flex flex-col overflow-hidden">
+        <div class="p-6 flex justify-between items-center border-b border-[#f1d7e2] bg-gradient-to-r from-[#ffc4a6] to-[#ff8c91]">
             <h2 class="text-2xl font-bold text-white">🛒 Tu Carrito</h2>
             <button id="closeCart" class="text-white text-3xl hover:text-gray-200 font-light">&times;</button>
         </div>

@@ -36,6 +36,54 @@ h4,
     backdrop-filter: blur(6px);
 }
 
+.button {
+    --bg: linear-gradient(90deg, #ec5c8d, #ff8c91);
+    --bg-hover: linear-gradient(90deg, #ff8c91, #ffc4a6);
+    appearance: none;
+    border: none;
+    border-radius: 0.65rem;
+    background: var(--bg);
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    padding: 0.62rem 0.95rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-shadow: 0 10px 24px rgba(236, 92, 141, 0.24);
+}
+
+.button:hover {
+    background: var(--bg-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 26px rgba(236, 92, 141, 0.3);
+}
+
+.button:active {
+    transform: translateY(0);
+}
+
+.button.small {
+    font-size: 0.95rem;
+    padding-top: 0.58rem;
+    padding-bottom: 0.58rem;
+}
+
+.button:disabled,
+.button[disabled] {
+    opacity: 0.62;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
 /* Blur-up effect used by lazy-loading images */
 .blur-image {
     filter: blur(10px);

@@ -190,24 +190,67 @@ if (checkoutBtn) {
     }
 
 const sidebar = document.getElementById("cartSidebar");
+const cartBackdrop = document.getElementById("cartBackdrop");
 const openCartBtns = document.querySelectorAll('.open-cart-btn');
 const closeCartBtn = document.getElementById("closeCart");
 const clearCartBtn = document.getElementById("clearCart");
 
+function isSidebarOpen() {
+    return !!(sidebar && !sidebar.classList.contains("translate-x-full"));
+}
+
+function openSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.remove("translate-x-full");
+    if (cartBackdrop) {
+        cartBackdrop.classList.remove("opacity-0", "pointer-events-none");
+        cartBackdrop.classList.add("opacity-100");
+        cartBackdrop.setAttribute('aria-hidden', 'false');
+    }
+}
+
+function closeSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.add("translate-x-full");
+    if (cartBackdrop) {
+        cartBackdrop.classList.add("opacity-0", "pointer-events-none");
+        cartBackdrop.classList.remove("opacity-100");
+        cartBackdrop.setAttribute('aria-hidden', 'true');
+    }
+}
+
 if (sidebar) {
     openCartBtns.forEach((btn) => {
-        btn.onclick = () => sidebar.classList.remove("translate-x-full");
+        btn.addEventListener('click', () => {
+            openSidebar();
+        });
     });
 }
-if (closeCartBtn && sidebar) closeCartBtn.onclick = () => sidebar.classList.add("translate-x-full");
-if (clearCartBtn) clearCartBtn.onclick = clearCart;
+if (closeCartBtn && sidebar) closeCartBtn.addEventListener('click', closeSidebar);
+if (clearCartBtn) clearCartBtn.addEventListener('click', clearCart);
+if (cartBackdrop) cartBackdrop.addEventListener('click', closeSidebar);
+
+document.addEventListener('click', (e) => {
+    if (!isSidebarOpen() || !sidebar) return;
+    const clickedInsideSidebar = sidebar.contains(e.target);
+    const clickedOpenButton = e.target.closest('.open-cart-btn');
+    if (!clickedInsideSidebar && !clickedOpenButton) {
+        closeSidebar();
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isSidebarOpen()) {
+        closeSidebar();
+    }
+});
 
 // Render inicial
 renderCart();
 
 // Función de comodidad para abrir el carrito desde el menú u otros lugares
 export function carrito() {
-    if (sidebar) sidebar.classList.remove("translate-x-full");
+    if (sidebar) openSidebar();
     else if (openCartBtns.length > 0) openCartBtns[0].click();
 }
 
