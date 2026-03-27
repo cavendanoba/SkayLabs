@@ -25,10 +25,10 @@ export function createProductCard(product, placeholderSrc, imgPath) {
 
     card.innerHTML = `
         <img src="${placeholderSrc}" 
-            data-lazy-src="/skcglow/${imgPath}" 
+            data-lazy-src="./${imgPath}" 
             class="w-full object-cover rounded-xl mb-4 cursor-pointer hover:opacity-80 transition blur-image h-72 md:h-80" 
             alt="${alt}" 
-            onerror="this.src='/skcglow/assets/default.png'; this.onerror=null;" 
+            onerror="this.src='./assets/default.png'; this.onerror=null;" 
             data-product-id="${product.id}" 
             loading="lazy">
         <div class="flex-1 flex flex-col justify-between">

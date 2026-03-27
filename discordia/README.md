@@ -1,10 +1,10 @@
-# SkayLabs — SKC Glow
+# SkayLabs — Discordia
 
-Proyecto frontend estático para catálogo y carrito de compras de SkayLabs (SKC Glow).
+Proyecto frontend estático para catálogo y carrito de compras de SkayLabs (Discordia).
 
 ## Resumen
 
-- **Nombre del proyecto:** SkayLabs (SKC Glow)
+- **Nombre del proyecto:** SkayLabs (Discordia)
 - **Tecnologías:** HTML estático + ES Modules (vanilla JS), Tailwind CDN, AOS, SweetAlert2
 - **Objetivo:** catálogo de productos, carrito simple, panel de administración ligero (edición de catálogo en localStorage), optimizaciones de imágenes (lazy-loading + blur-up)
 
@@ -61,7 +61,7 @@ python3 -m http.server 8000
 
 ### Opción recomendada: Vercel con subdominio/ruta
 
-Para desplegar en `skaylabs.site/skcglow` usando Vercel:
+Para desplegar en `skaylabs.site/discordia` usando Vercel:
 
 1. **Crear `vercel.json`** en la raíz del proyecto:
 
@@ -81,10 +81,10 @@ Para desplegar en `skaylabs.site/skcglow` usando Vercel:
 2. **Pasos en Vercel:**
    - Conecta tu repositorio (GitHub/GitLab/Bitbucket) a Vercel.
    - En **Project Settings → Domains**, añade `skaylabs.site` como dominio personalizado.
-   - Configura una ruta: si quieres servir desde `/skcglow`, usa un proyecto separado en Vercel o configura rewrites en tu sitio principal.
+  - Configura una ruta: si quieres servir desde `/discordia`, usa un proyecto separado en Vercel o configura rewrites en tu sitio principal.
 
-3. **Alternativa: Monorepo (recomendado para `/skcglow`):**
-   - En tu sitio principal (`skaylabs.site`), crea la carpeta `apps/skcglow/`.
+3. **Alternativa: Monorepo (recomendado para `/discordia`):**
+  - En tu sitio principal (`skaylabs.site`), crea la carpeta `apps/discordia/`.
    - Mueve el contenido de este proyecto a esa carpeta.
    - En `vercel.json` del sitio principal, configura:
 
@@ -92,21 +92,21 @@ Para desplegar en `skaylabs.site/skcglow` usando Vercel:
 {
   "rewrites": [
     {
-      "source": "/skcglow/:path*",
-      "destination": "/apps/skcglow/:path*"
+      "source": "/discordia/:path*",
+      "destination": "/apps/discordia/:path*"
     }
   ]
 }
 ```
 
-4. **Para servir localmente con la ruta `/skcglow`:**
+4. **Para servir localmente con la ruta `/discordia`:**
 
 ```bash
 # Usa un servidor que soporte rewrites
 npx vercel dev
 # O configura un simple-http-server con proxy
 python3 -m http.server 8000
-# Accede a http://localhost:8000/skcglow/ (requiere configuración del servidor)
+# Accede a http://localhost:8000/discordia/ (requiere configuración del servidor)
 ```
 
 ### Otras opciones
@@ -140,7 +140,7 @@ python3 -m http.server 8000
 
 ## Contacto
 
-- Marca / página principal: **SkayLabs** — SKC Glow
+- Marca / página principal: **SkayLabs** — Discordia
 - Para cambios mayores o preguntas, abre un issue en el repositorio.
 
 ---

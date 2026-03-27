@@ -1,4 +1,4 @@
-// Configuración centralizada para SKCGLOW
+// Configuración centralizada para DISCORDIA
 // Actualiza estos valores según tu entorno
 
 export const CONFIG = {
@@ -8,7 +8,7 @@ export const CONFIG = {
   // Email de contacto
   ADMIN_EMAIL: 'info@discordia.com',
   
-  // Base path para despliegue (usar '/' para raíz, '/skcglow/' para subdirectorio)
+  // Base path para despliegue (usar '/' para raíz, '/discordia/' para subdirectorio)
   BASE_PATH: './',
   
   // Clave para localStorage del catálogo

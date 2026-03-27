@@ -8,7 +8,7 @@
     <script>
         (function () {
             const path = window.location.pathname;
-            if (path.endsWith('/skcglow')) {
+            if (path.endsWith('/discordia') || path.endsWith('/skcglow')) {
                 window.location.replace(`${path}/${window.location.search}${window.location.hash}`);
             }
         })();
