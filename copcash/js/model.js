@@ -129,12 +129,70 @@ export const Model = {
 
   ensureStructure() {
     const defaults = sampleData();
+    if (!this.data || typeof this.data !== "object" || Array.isArray(this.data)) {
+      this.data = defaults;
+      return;
+    }
+
     for (const key of Object.keys(defaults)) {
       if (typeof this.data[key] === "undefined") {
         this.data[key] = defaults[key];
       }
     }
+
+    // Normaliza tipos para evitar fallos de render por datos legacy/corruptos.
+    if (!this.data.settings || typeof this.data.settings !== "object" || Array.isArray(this.data.settings)) {
+      this.data.settings = { ...defaults.settings };
+    }
+    const arrayKeys = [
+      "categories",
+      "fixedExpenses",
+      "variableExpenses",
+      "extraIncomes",
+      "creditCards",
+      "savingsGoals",
+      "goalContributions",
+      "cashFlowAdjustments",
+      "eventOverrides",
+    ];
+    arrayKeys.forEach((key) => {
+      if (!Array.isArray(this.data[key])) {
+        this.data[key] = defaults[key];
+      }
+    });
+
+    this.data.creditCards = this.data.creditCards
+      .filter((card) => card && typeof card === "object")
+      .map((card) => ({
+        id: card.id || Utils.uid("card"),
+        name: card.name || "Tarjeta",
+        bank: card.bank || "Banco",
+        closingDay: Utils.clampDay(card.closingDay || 25),
+        paymentDay: Utils.clampDay(card.paymentDay || 5),
+        limit: Math.max(0, Utils.toNumber(card.limit)),
+        purchases: Array.isArray(card.purchases) ? card.purchases : [],
+      }));
+
+    this.data.savingsGoals = this.data.savingsGoals
+      .filter((goal) => goal && typeof goal === "object")
+      .map((goal) => ({
+        id: goal.id || Utils.uid("goal"),
+        name: goal.name || "Meta",
+        targetAmount: Math.max(1, Utils.toNumber(goal.targetAmount)),
+        currentAmount: Math.max(0, Utils.toNumber(goal.currentAmount)),
+        targetDate: goal.targetDate || "",
+        monthlyContribution: Math.max(0, Utils.toNumber(goal.monthlyContribution)),
+        autoContribution: Boolean(goal.autoContribution),
+      }));
+
+    if (this.data.categories.length === 0) {
+      this.data.categories = defaults.categories;
+    }
+
     this.data.settings.salaryDay = Utils.clampDay(this.data.settings.salaryDay || 5);
+    this.data.settings.salaryAmount = Math.max(0, Utils.toNumber(this.data.settings.salaryAmount || defaults.settings.salaryAmount));
+    this.data.settings.baseBalance = Utils.toNumber(this.data.settings.baseBalance || 0);
+    this.data.settings.theme = this.data.settings.theme === "dark" ? "dark" : "light";
     this.data.settings.flowDays = Math.max(30, Math.min(60, Utils.toNumber(this.data.settings.flowDays || 60)));
   },
 
