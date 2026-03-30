@@ -78,19 +78,6 @@ export class MetasView {
     const diasRestantes = meta.fechaObjetivo 
       ? Math.ceil((new Date(meta.fechaObjetivo) - new Date()) / (1000 * 60 * 60 * 24))
       : null;
-      </div>
-    `;
-
-    return html;
-  }
-
-  renderMeta(meta) {
-    const porcentaje = MetasCalculos.calcularPorcentajeAlcanzado(meta);
-    const restante = MetasCalculos.calcularMontoRestante(meta);
-    const ahorroRequerido = MetasCalculos.calcularAhorroMensualRequerido(meta);
-    const diasRestantes = meta.fechaObjetivo 
-      ? Math.ceil((new Date(meta.fechaObjetivo) - new Date()) / (1000 * 60 * 60 * 24))
-      : null;
 
     return `
       <div class="card border-l-4 border-purple-500">
