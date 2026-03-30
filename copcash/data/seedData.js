@@ -65,9 +65,13 @@ export const seedData = {
       nombre: "Visa Oro",
       banco: "Banco Popular",
       limiteCrediticio: 5000,
-      saldoDisponible: 3500,
-      fechaCierre: 20,
-      fechaPago: 25,
+      tasaInteresAnual: 19.32,  // TEA (%) - típico para Colombia
+      fechaCierre: 20,          // Día en que se cierra el período
+      fechaPago: 25,            // Día límite de pago (5 días después del cierre)
+      saldoPeriodosAnteriores: 0,    // Deuda no pagada de períodos anteriores (acumula intereses)
+      interesAcumulado: 0,            // Intereses a pagar del saldo anterior
+      
+      // Compras activas a cuotas - detallan qué se financió
       compras: [
         {
           id: 1,
@@ -75,7 +79,10 @@ export const seedData = {
           montoTotal: 1200,
           cuotasTotal: 6,
           cuotasPagadas: 2,
-          fechaPrimeraCompra: new Date().toISOString().split('T')[0]
+          cuotaActual: 3,           // En qué cuota estamos
+          monto_cuota_fija: 200,    // $1200/6 = $200 por cuota
+          fechaPrimeraCompra: new Date().toISOString().split('T')[0],
+          activa: true
         },
         {
           id: 2,
@@ -83,7 +90,20 @@ export const seedData = {
           montoTotal: 800,
           cuotasTotal: 4,
           cuotasPagadas: 1,
-          fechaPrimeraCompra: new Date().toISOString().split('T')[0]
+          cuotaActual: 2,
+          monto_cuota_fija: 200,    // $800/4 = $200 por cuota
+          fechaPrimeraCompra: new Date().toISOString().split('T')[0],
+          activa: true
+        }
+      ],
+      
+      // Registro de pagos anteriores (para historial)
+      pagos_realizados: [
+        {
+          id: 1,
+          fecha_pago: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          monto_pagado: 500,
+          esmontoParcial: false
         }
       ]
     }

@@ -391,14 +391,24 @@ export class Router {
           nombre: document.getElementById('tarjeta-nombre').value,
           banco: document.getElementById('tarjeta-banco').value,
           limiteCrediticio: parseFloat(document.getElementById('tarjeta-limite').value),
-          saldoDisponible: parseFloat(document.getElementById('tarjeta-saldo').value),
+          tasaInteresAnual: parseFloat(document.getElementById('tarjeta-tasa-interes').value),
           fechaCierre: parseInt(document.getElementById('tarjeta-cierre').value),
-          fechaPago: parseInt(document.getElementById('tarjeta-pago').value)
+          fechaPago: parseInt(document.getElementById('tarjeta-pago').value),
+          saldoPeriodosAnteriores: 0,
+          interesAcumulado: 0,
+          pagos_realizados: []
         };
 
         if (id) {
+          const tarjetaActual = storage.getTarjeta(parseInt(id));
+          // Preservar datos existentes
+          tarjeta.compras = tarjetaActual.compras;
+          tarjeta.saldoPeriodosAnteriores = tarjetaActual.saldoPeriodosAnteriores;
+          tarjeta.interesAcumulado = tarjetaActual.interesAcumulado;
+          tarjeta.pagos_realizados = tarjetaActual.pagos_realizados || [];
           storage.updateTarjeta(parseInt(id), tarjeta);
         } else {
+          tarjeta.compras = [];
           storage.addTarjeta(tarjeta);
         }
 
@@ -462,6 +472,19 @@ export class Router {
           fechaPrimeraCompra: document.getElementById(`compra-fecha-${tarjetaId}`).value || new Date().toISOString().split('T')[0]
         };
 
+        // Calcular montos por cuota y current
+        if (!compraId) {
+          compra.monto_cuota_fija = Math.round((compra.montoTotal / compra.cuotasTotal) * 100) / 100;
+          compra.cuotaActual = compra.cuotasPagadas + 1;
+        } else {
+          const tarjeta = storage.getTarjeta(tarjetaId);
+          const compraExistente = tarjeta.compras.find(c => c.id === parseInt(compraId));
+          if (compraExistente) {
+            compra.monto_cuota_fija = compraExistente.monto_cuota_fija;
+            compra.cuotaActual = compraExistente.cuotaActual;
+          }
+        }
+
         if (compraId) {
           storage.updateCompra(tarjetaId, parseInt(compraId), compra);
         } else {
@@ -473,20 +496,6 @@ export class Router {
       });
     });
 
-    document.querySelectorAll('.btn-pagar-cuota').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const tarjetaId = parseInt(e.currentTarget.dataset.tarjetaId);
-        const compraId = parseInt(e.currentTarget.dataset.compraId);
-        const tarjeta = storage.getTarjeta(tarjetaId);
-        
-        if (TarjetasCalculos.marcarCuotaPagada(tarjeta, compraId)) {
-          storage.updateTarjeta(tarjetaId, tarjeta);
-          this.renderTarjetas();
-          this.setupEventListeners();
-        }
-      });
-    });
-
     document.querySelectorAll('.btn-edit-compra').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const tarjetaId = parseInt(e.currentTarget.dataset.tarjetaId);
@@ -494,10 +503,16 @@ export class Router {
         const tarjeta = storage.getTarjeta(tarjetaId);
         const compra = tarjeta.compras.find(c => c.id === compraId);
         const tarjetasView = new TarjetasView();
-        const container = document.getElementById(`form-compra-container-${tarjetaId}`);
+        const container = document.getElementById('form-tarjeta-container');
         container.innerHTML = tarjetasView.renderFormularioCompra(tarjetaId, compra);
         container.classList.remove('hidden');
-        this.setupTarjetasListeners();
+        // Cambiar el ID del formulario para que sea el de compra
+        const formCompra = document.getElementById(`form-compra-${tarjetaId}`);
+        if (formCompra) {
+          container.innerHTML = tarjetasView.renderFormularioCompra(tarjetaId, compra);
+          container.classList.remove('hidden');
+          this.setupTarjetasListeners();
+        }
       });
     });
 
@@ -513,14 +528,95 @@ export class Router {
       });
     });
 
-    // Botones de cancelar compra
+    // Botón de cancelar compra
     document.querySelectorAll('[id^="btn-cancel-compra-"]').forEach(btn => {
       btn.addEventListener('click', () => {
         this.renderTarjetas();
         this.setupEventListeners();
       });
     });
+
+    // ========== NUEVO: PAGAR CUENTA COMPLETA ==========
+    document.querySelectorAll('.btn-pagar-cuenta').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tarjetaId = parseInt(e.currentTarget.dataset.tarjetaId);
+        const monto = parseFloat(e.currentTarget.dataset.monto);
+        const tarjeta = storage.getTarjeta(tarjetaId);
+
+        const mensaje = `
+💳 Pagar Cuenta Completa
+
+Tarjeta: ${tarjeta.nombre}
+Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
+
+¿Confirmar el pago completo de la cuenta?
+        `;
+
+        if (confirm(mensaje)) {
+          try {
+            const resultado = TarjetasCalculos.registrarPagoCuenta(tarjeta, monto, "completo");
+            storage.updateTarjeta(tarjetaId, tarjeta);
+            alert(`✓ ${resultado.mensaje}\n\nProxima cuota: $${resultado.proximaCuota.toLocaleString('es-ES', { maximumFractionDigits: 0 })}`);
+            this.renderTarjetas();
+            this.setupEventListeners();
+          } catch (error) {
+            alert(`❌ Error: ${error.message}`);
+          }
+        }
+      });
+    });
+
+    // ========== NUEVO: PAGO PARCIAL ==========
+    document.querySelectorAll('.btn-pagar-parcial').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tarjetaId = parseInt(e.currentTarget.dataset.tarjetaId);
+        const tarjeta = storage.getTarjeta(tarjetaId);
+        const proximaCuota = TarjetasCalculos.calcularProximaCuotaAPagar(tarjeta);
+
+        const monto = prompt(
+          `💳 Pago Parcial - ${tarjeta.nombre}\n\nCuota obligatoria: $${proximaCuota.toLocaleString('es-ES', { maximumFractionDigits: 0 })}\n\n¿Cuanto deseas pagar?`,
+          proximaCuota.toString()
+        );
+
+        if (monto !== null && monto !== '') {
+          const montoPagado = parseFloat(monto);
+          if (isNaN(montoPagado) || montoPagado <= 0) {
+            alert('❌ Cantidad inválida');
+            return;
+          }
+
+          if (montoPagado > proximaCuota) {
+            alert(`⚠️ El monto debe ser menor o igual a $${proximaCuota.toLocaleString('es-ES', { maximumFractionDigits: 0 })}`);
+            return;
+          }
+
+          try {
+            // Para pagos parciales, incrementar cuotas parcialmente
+            const diferenciaNoPageda = proximaCuota - montoPagado;
+            tarjeta.saldoPeriodosAnteriores = diferenciaNoPageda;
+            tarjeta.interesAcumulado = 0;
+
+            // Registrar el pago
+            if (!tarjeta.pagos_realizados) tarjeta.pagos_realizados = [];
+            tarjeta.pagos_realizados.push({
+              id: (tarjeta.pagos_realizados.length || 0) + 1,
+              fecha_pago: new Date().toISOString().split('T')[0],
+              monto_pagado: montoPagado,
+              es_monto_parcial: true
+            });
+
+            storage.updateTarjeta(tarjetaId, tarjeta);
+            alert(`✓ Pago parcial registrado\n\nPagado: $${montoPagado.toLocaleString('es-ES', { maximumFractionDigits: 0 })}\nDeuda restante: $${diferenciaNoPageda.toLocaleString('es-ES', { maximumFractionDigits: 0 })}\n\n⚠️ Se generarán intereses sobre el saldo no pagado`);
+            this.renderTarjetas();
+            this.setupEventListeners();
+          } catch (error) {
+            alert(`❌ Error: ${error.message}`);
+          }
+        }
+      });
+    });
   }
+
 
   setupMetasListeners() {
     const btnAddMeta = document.getElementById('btn-add-meta');

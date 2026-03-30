@@ -54,13 +54,21 @@ export class TarjetasView {
   }
 
   renderTarjeta(tarjeta) {
+    const proximaCuota = TarjetasCalculos.calcularProximaCuotaAPagar(tarjeta);
     const saldo = TarjetasCalculos.calcularSaldoTarjeta(tarjeta);
     const disponible = TarjetasCalculos.calcularLimitDisponible(tarjeta);
-    const pagaMensual = TarjetasCalculos.calcularPagaMensualTarjeta(tarjeta);
-    const porcentajeUso = Math.round((saldo / tarjeta.limiteCrediticio) * 100);
+    const porcentajeUso = TarjetasCalculos.calcularPorcentajeUtilizacion(tarjeta);
+    const diasParaPago = TarjetasCalculos.calcularDiasParaPago(tarjeta);
+    const proximaFechaPago = TarjetasCalculos.calcularProximaFechaPago(tarjeta);
+    const proximaFechaCierre = TarjetasCalculos.calcularProximaFechaCierre(tarjeta);
+    const comprasActivas = TarjetasCalculos.obtenerComprasActivas(tarjeta);
+    
+    // Colores según estado de urgencia
+    const estadoUrgencia = diasParaPago <= 3 ? 'danger' : diasParaPago <= 7 ? 'warning' : 'success';
+    const colorEstado = diasParaPago <= 3 ? '#ef4444' : diasParaPago <= 7 ? '#ffa94d' : '#51cf66';
 
     return `
-      <div class="card">
+      <div class="card border-l-4" style="border-left-color: ${colorEstado};">
         <!-- Header -->
         <div class="flex items-start justify-between mb-6 pb-4 border-b border-neutral-200 dark:border-neutral-700">
           <div>
@@ -68,117 +76,178 @@ export class TarjetasView {
             <p class="text-sm text-neutral-600 dark:text-neutral-400">${tarjeta.banco}</p>
           </div>
           <div class="flex gap-2">
-            <button class="btn-edit-tarjeta text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-lg" data-id="${tarjeta.id}">
+            <button class="btn-edit-tarjeta text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-lg" data-id="${tarjeta.id}" title="Editar tarjeta">
               ✏️
             </button>
-            <button class="btn-delete-tarjeta text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-lg" data-id="${tarjeta.id}">
+            <button class="btn-delete-tarjeta text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-lg" data-id="${tarjeta.id}" title="Eliminar tarjeta">
               🗑️
             </button>
           </div>
         </div>
 
-        <!-- KPI Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <div class="card bg-blue-50 dark:bg-blue-900/20">
-            <p class="text-xs text-blue-700 dark:text-blue-300 font-semibold uppercase">Saldo</p>
-            <p class="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              $${saldo.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
-            </p>
+        <!-- Resumen de Cuenta - Hero Section -->
+        <div class="mb-6 p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800/40">
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <p class="text-sm text-blue-700 dark:text-blue-300 font-semibold uppercase mb-2">🏦 Cuota a Pagar (Este Período)</p>
+              <div class="flex items-baseline gap-2">
+                <span class="text-4xl font-900" style="color: var(--primary);">
+                  $${proximaCuota.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+                </span>
+                <span class="text-neutral-600 dark:text-neutral-400 font-semibold">COP</span>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-sm font-bold px-3 py-1 rounded-full" style="background-color: ${colorEstado}20; color: ${colorEstado};">
+                ${diasParaPago} días para pagar
+              </span>
+            </div>
           </div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+            <div>
+              <p class="text-blue-600 dark:text-blue-300 font-semibold">Fecha Pago</p>
+              <p class="text-neutral-900 dark:text-white font-bold">${new Date(proximaFechaPago).toLocaleDateString('es-ES')}</p>
+            </div>
+            <div>
+              <p class="text-blue-600 dark:text-blue-300 font-semibold">Cierre</p>
+              <p class="text-neutral-900 dark:text-white font-bold">Día ${tarjeta.fechaCierre}</p>
+            </div>
+            <div>
+              <p class="text-blue-600 dark:text-blue-300 font-semibold">Interés Anual</p>
+              <p class="text-neutral-900 dark:text-white font-bold">${tarjeta.tasaInteresAnual}% TEA</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <!-- Uso del Crédito -->
+          <div class="card bg-warning-50 dark:bg-warning-900/20">
+            <p class="text-xs text-warning-700 dark:text-warning-300 font-semibold uppercase">Uso del Crédito</p>
+            <p class="text-2xl font-bold text-warning-900 dark:text-warning-100">
+              ${porcentajeUso}%
+            </p>
+            <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-1 mt-2">
+              <div class="bg-gradient-to-r from-warning-500 to-danger-500 h-1 rounded-full transition-all" style="width: ${Math.min(porcentajeUso, 100)}%"></div>
+            </div>
+          </div>
+
+          <!-- Disponible -->
           <div class="card bg-green-50 dark:bg-green-900/20">
             <p class="text-xs text-green-700 dark:text-green-300 font-semibold uppercase">Disponible</p>
             <p class="text-2xl font-bold text-green-900 dark:text-green-100">
               $${disponible.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
             </p>
           </div>
-          <div class="card bg-warning-50 dark:bg-warning-900/20">
-            <p class="text-xs text-warning-700 dark:text-warning-300 font-semibold uppercase">A pagar</p>
-            <p class="text-2xl font-bold text-warning-900 dark:text-warning-100">
-              $${pagaMensual.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+
+          <!-- Saldo Total -->
+          <div class="card bg-neutral-100 dark:bg-neutral-700">
+            <p class="text-xs text-neutral-700 dark:text-neutral-300 font-semibold uppercase">Saldo Total</p>
+            <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+              $${saldo.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
             </p>
           </div>
-          <div class="card bg-neutral-100 dark:bg-neutral-700">
-            <p class="text-xs text-neutral-700 dark:text-neutral-300 font-semibold uppercase">Límite</p>
-            <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+
+          <!-- Límite -->
+          <div class="card bg-blue-50 dark:bg-blue-900/20">
+            <p class="text-xs text-blue-700 dark:text-blue-300 font-semibold uppercase">Límite</p>
+            <p class="text-2xl font-bold text-blue-900 dark:text-blue-100">
               $${tarjeta.limiteCrediticio.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
             </p>
           </div>
         </div>
 
-        <!-- Utilización Progress Bar -->
-        <div class="mb-6 p-4 bg-neutral-50 dark:bg-neutral-700/30 rounded-lg">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Utilización del crédito</span>
-            <span class="text-sm font-bold text-neutral-900 dark:text-white">${porcentajeUso}%</span>
+        <!-- Alertas de Intereses si hay Deuda Anterior -->
+        ${tarjeta.saldoPeriodosAnteriores > 0 ? `
+          <div class="mb-6 p-4 bg-danger-50 dark:bg-danger-900/30 border-l-4 border-danger-500 rounded-lg">
+            <p class="text-sm font-bold text-danger-700 dark:text-danger-300 mb-3">
+              ⚠️ Deuda de Períodos Anteriores
+            </p>
+            <div class="grid grid-cols-3 gap-3 text-sm">
+              <div>
+                <p class="text-danger-600 dark:text-danger-400 font-semibold">Saldo Anterior</p>
+                <p class="text-danger-900 dark:text-danger-100 font-bold">$${tarjeta.saldoPeriodosAnteriores.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</p>
+              </div>
+              <div>
+                <p class="text-danger-600 dark:text-danger-400 font-semibold">Interés Generado</p>
+                <p class="text-danger-900 dark:text-danger-100 font-bold">$${TarjetasCalculos.calcularInteresesDelPeriodo(tarjeta).toLocaleString('es-ES', { maximumFractionDigits: 0 })}</p>
+              </div>
+              <div>
+                <p class="text-danger-600 dark:text-danger-400 font-semibold">Total a Pagar</p>
+                <p class="text-danger-900 dark:text-danger-100 font-bold">$${(tarjeta.saldoPeriodosAnteriores + TarjetasCalculos.calcularInteresesDelPeriodo(tarjeta)).toLocaleString('es-ES', { maximumFractionDigits: 0 })}</p>
+              </div>
+            </div>
+            <p class="text-xs text-danger-600 dark:text-danger-400 mt-3">
+              💡 Paga la cuota completa para evitar más intereses
+            </p>
           </div>
-          <div class="w-full bg-neutral-200 dark:bg-neutral-600 rounded-full h-3 overflow-hidden">
-            <div class="bg-gradient-to-r from-warning-500 to-danger-500 h-3 rounded-full transition-all" style="width: ${Math.min(porcentajeUso, 100)}%"></div>
-          </div>
-        </div>
+        ` : ''}
 
-        <!-- Compras a Cuotas -->
-        <div class="mb-4">
+        <!-- Desglose de Compras a Cuotas -->
+        <div class="mb-6">
           <div class="flex items-center justify-between mb-3">
-            <h4 class="font-bold text-neutral-900 dark:text-white">💳 Compras a Cuotas</h4>
-            <button id="btn-add-compra-${tarjeta.id}" class="btn-add-compra btn-primary text-sm px-3 py-1" data-tarjeta-id="${tarjeta.id}">
+            <h4 class="font-bold text-neutral-900 dark:text-white text-lg">
+              🛒 Compras a Cuotas (${comprasActivas.length})
+            </h4>
+            <button id="btn-add-compra-${tarjeta.id}" class="btn-add-compra btn-primary text-sm px-3 py-1" data-tarjeta-id="${tarjeta.id}" title="Agregar nueva compra">
               + Compra
             </button>
           </div>
 
-          ${tarjeta.compras.length === 0 ? `
-            <p class="text-neutral-500 dark:text-neutral-400 text-sm py-4 text-center">
-              No hay compras registradas
+          ${comprasActivas.length === 0 ? `
+            <p class="text-neutral-500 dark:text-neutral-400 text-sm py-6 text-center bg-neutral-50 dark:bg-neutral-700/30 rounded-lg">
+              📭 Sin compras a cuotas
             </p>
           ` : `
             <div class="space-y-3">
-              ${tarjeta.compras.map(compra => {
-                const valorCuota = TarjetasCalculos.calcularValorCuota(compra);
-                const cuotasRestantes = TarjetasCalculos.calcularCuotasRestantes(compra);
-                const montoRestante = TarjetasCalculos.calcularMontoRestante(compra);
+              ${comprasActivas.map(compra => {
                 const porcentajePagado = Math.round((compra.cuotasPagadas / compra.cuotasTotal) * 100);
+                const colorBarra = compra.cuotasRestantes === 0 ? '#51cf66' : compra.cuotasRestantes === 1 ? '#ffa94d' : '#5b7cfa';
 
                 return `
                   <div class="card bg-neutral-50 dark:bg-neutral-700/30 border border-neutral-200 dark:border-neutral-600">
-                    <div class="flex justify-between items-start mb-3">
+                    <div class="flex justify-between items-start mb-4">
                       <div class="flex-1">
-                        <p class="font-semibold text-neutral-900 dark:text-white">${compra.nombre}</p>
-                        <p class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-                          Cuota: $${valorCuota.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
-                        </p>
+                        <p class="font-semibold text-neutral-900 dark:text-white text-lg">${compra.nombre}</p>
+                        <div class="flex gap-4 mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                          <span>💰 $${compra.montoTotal.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
+                          <span>📊 Cuota: $${compra.monto_cuota_fija.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
+                        </div>
                       </div>
                       <div class="text-right">
-                        <p class="font-semibold text-neutral-900 dark:text-white">
-                          $${montoRestante.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
-                        </p>
-                        <p class="text-xs text-neutral-600 dark:text-neutral-400">
-                          ${cuotasRestantes} cuota(s)
+                        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-1">Restante</p>
+                        <p class="font-bold text-lg text-neutral-900 dark:text-white">
+                          $${compra.montoRestante.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
                         </p>
                       </div>
                     </div>
                     
-                    <div class="flex items-center gap-2 mb-3">
+                    <!-- Barra de progreso -->
+                    <div class="flex items-center gap-3 mb-3">
                       <div class="flex-1 bg-neutral-300 dark:bg-neutral-600 rounded-full h-2 overflow-hidden">
-                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all" style="width: ${porcentajePagado}%"></div>
+                        <div class="h-2 rounded-full transition-all" style="width: ${porcentajePagado}%; background-color: ${colorBarra};"></div>
                       </div>
-                      <span class="text-xs text-neutral-700 dark:text-neutral-300 font-semibold whitespace-nowrap">
+                      <div class="text-xs font-bold text-neutral-700 dark:text-neutral-300 whitespace-nowrap">
                         ${compra.cuotasPagadas}/${compra.cuotasTotal}
-                      </span>
+                      </div>
                     </div>
 
-                    <div class="flex gap-2">
-                      ${cuotasRestantes > 0 ? `
-                        <button class="btn-pagar-cuota flex-1 text-center bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white text-sm font-semibold px-2 py-1 rounded transition" data-tarjeta-id="${tarjeta.id}" data-compra-id="${compra.id}">
-                          ✓ Pagar cuota
-                        </button>
+                    <!-- Botones de acción -->
+                    <div class="flex gap-2 pt-3 border-t border-neutral-200 dark:border-neutral-600">
+                      ${compra.cuotasRestantes > 0 ? `
+                        <span class="flex-1 text-center text-xs text-neutral-600 dark:text-neutral-400 font-semibold py-2 bg-neutral-100 dark:bg-neutral-700 rounded-lg">
+                          Próxima cuota: $${compra.monto_cuota_fija.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+                        </span>
                       ` : `
-                        <span class="flex-1 text-center text-xs text-green-600 dark:text-green-400 font-semibold py-2">
+                        <span class="flex-1 text-center text-xs text-green-600 dark:text-green-400 font-bold py-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
                           ✓ Totalmente pagado
                         </span>
                       `}
-                      <button class="btn-edit-compra text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold" data-tarjeta-id="${tarjeta.id}" data-compra-id="${compra.id}">
+                      <button class="btn-edit-compra text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-2" data-tarjeta-id="${tarjeta.id}" data-compra-id="${compra.id}" title="Editar compra">
                         ✏️
                       </button>
-                      <button class="btn-delete-compra text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-bold" data-tarjeta-id="${tarjeta.id}" data-compra-id="${compra.id}">
+                      <button class="btn-delete-compra text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2" data-tarjeta-id="${tarjeta.id}" data-compra-id="${compra.id}" title="Eliminar compra">
                         🗑️
                       </button>
                     </div>
@@ -189,14 +258,40 @@ export class TarjetasView {
           `}
         </div>
 
-        <!-- Información de fechas -->
-        <div class="card bg-neutral-100 dark:bg-neutral-700/50 text-sm space-y-1 border-l-4 border-neutral-400">
-          <p class="text-neutral-700 dark:text-neutral-300"><strong>📅 Cierre:</strong> día ${tarjeta.fechaCierre}</p>
-          <p class="text-neutral-700 dark:text-neutral-300"><strong>💳 Pago:</strong> día ${tarjeta.fechaPago}</p>
+        <!-- Botón Principal de Pagar Cuenta -->
+        <div class="mb-6 flex gap-3">
+          <button class="btn-pagar-cuenta flex-1 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white text-lg font-bold px-6 py-4 rounded-xl transition transform hover:scale-105" 
+            data-tarjeta-id="${tarjeta.id}" 
+            data-monto="${proximaCuota}"
+            title="Pagar la cuenta completa de este período">
+            ✓ PAGAR CUENTA COMPLETA
+          </button>
+          <button class="btn-pagar-parcial px-6 py-4 bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-neutral-900 dark:text-white font-bold rounded-xl transition" 
+            data-tarjeta-id="${tarjeta.id}"
+            title="Realizar un pago parcial">
+            💳 Pago Parcial
+          </button>
+        </div>
+
+        <!-- Información de Fechas Compacta -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm bg-neutral-100 dark:bg-neutral-700/50 p-4 rounded-xl">
+          <div>
+            <p class="text-neutral-600 dark:text-neutral-400 font-semibold mb-1">📅 Próximo Cierre</p>
+            <p class="text-neutral-900 dark:text-white font-bold">${new Date(proximaFechaCierre).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}</p>
+          </div>
+          <div>
+            <p class="text-neutral-600 dark:text-neutral-400 font-semibold mb-1">💳 Vencimiento</p>
+            <p class="text-neutral-900 dark:text-white font-bold">${new Date(proximaFechaPago).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}</p>
+          </div>
+          <div>
+            <p class="text-neutral-600 dark:text-neutral-400 font-semibold mb-1">📊 TEA</p>
+            <p class="text-neutral-900 dark:text-white font-bold">${tarjeta.tasaInteresAnual}% anual</p>
+          </div>
         </div>
       </div>
     `;
   }
+
 
   renderFormularioTarjeta(tarjeta = null) {
     const isEdit = tarjeta !== null;
@@ -224,9 +319,9 @@ export class TarjetasView {
                 value="${tarjeta?.limiteCrediticio || ''}" step="0.01" min="0" required>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Saldo Disponible</label>
-              <input type="number" id="tarjeta-saldo" class="w-full"
-                value="${tarjeta?.saldoDisponible || ''}" step="0.01" min="0" required>
+              <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Tasa de Interés Anual (TEA %)</label>
+              <input type="number" id="tarjeta-tasa-interes" class="w-full"
+                placeholder="Ej: 19.32" value="${tarjeta?.tasaInteresAnual || '19.32'}" step="0.01" min="0" max="100" required>
             </div>
             <div>
               <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Día de Cierre</label>
@@ -239,6 +334,15 @@ export class TarjetasView {
                 value="${tarjeta?.fechaPago || ''}" min="1" max="31" required>
             </div>
           </div>
+          
+          <div class="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 p-4 rounded-lg">
+            <p class="text-sm text-blue-700 dark:text-blue-300 font-semibold mb-2">💡 Información de TEA</p>
+            <p class="text-xs text-blue-600 dark:text-blue-400">
+              La Tasa Efectiva Anual es el interés que se aplica si no pagas la cuenta completa. 
+              Valores típicos en Colombia: 18-25% anual.
+            </p>
+          </div>
+
           <div class="flex gap-2 pt-4 border-t border-neutral-200 dark:border-neutral-600">
             <button type="submit" class="btn-primary">
               ${isEdit ? '✓ Actualizar' : '✓ Guardar'}
