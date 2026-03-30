@@ -1,5 +1,5 @@
 // Vista de Navegación y Configuración
-import { storage } from '../models/storage.js';
+import { storage } from '/copcash/js/models/storage.js';
 
 export class NavbarView {
   render() {

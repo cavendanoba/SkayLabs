@@ -1,6 +1,6 @@
 // Vista de Categorías y Presupuestos
-import { storage } from '../models/storage.js';
-import { IngresosGastosCalculos } from '../models/calculos.js';
+import { storage } from '/copcash/js/models/storage.js';
+import { IngresosGastosCalculos } from '/copcash/js/models/calculos.js';
 
 export class CategoriasView {
   render(categorias = storage.getCategorias()) {

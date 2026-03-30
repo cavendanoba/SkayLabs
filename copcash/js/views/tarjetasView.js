@@ -1,6 +1,6 @@
 // Vista de Tarjetas de Crédito
-import { storage } from '../models/storage.js';
-import { TarjetasCalculos } from '../models/calculos.js';
+import { storage } from '/copcash/js/models/storage.js';
+import { TarjetasCalculos } from '/copcash/js/models/calculos.js';
 
 export class TarjetasView {
   render(tarjetas = storage.getTarjetas()) {

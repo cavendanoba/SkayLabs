@@ -1,6 +1,6 @@
 // Vista del Dashboard
-import { storage } from '../models/storage.js';
-import { IngresosGastosCalculos, MetasCalculos, TarjetasCalculos, FlujoCalculos } from '../models/calculos.js';
+import { storage } from '/copcash/js/models/storage.js';
+import { IngresosGastosCalculos, MetasCalculos, TarjetasCalculos, FlujoCalculos } from '/copcash/js/models/calculos.js';
 
 export class DashboardView {
   render() {

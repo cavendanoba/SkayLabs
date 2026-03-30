@@ -1,5 +1,5 @@
 // Vista de Gastos Fijos
-import { storage } from '../models/storage.js';
+import { storage } from '/copcash/js/models/storage.js';
 
 export class GastosFijosView {
   render(gastos = storage.getGastosFijos()) {

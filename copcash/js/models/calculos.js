@@ -1,7 +1,7 @@
 // Modelo de Cálculos para Tarjetas de Crédito
 // Maneja la lógica de cuotas y montos
 
-import { storage } from './storage.js';
+import { storage } from '/copcash/js/models/storage.js';
 
 export class TarjetasCalculos {
   static calcularValorCuota(compra) {

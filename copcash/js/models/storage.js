@@ -1,7 +1,7 @@
 // Modelo de Almacenamiento Central
 // Maneja toda la persistencia en localStorage y operaciones CRUD
 
-import { seedData } from '../../data/seedData.js';
+import { seedData } from '/copcash/data/seedData.js';
 
 class StorageModel {
   constructor() {

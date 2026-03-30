@@ -1,5 +1,5 @@
 // Vista de Ingresos Extra
-import { storage } from '../models/storage.js';
+import { storage } from '/copcash/js/models/storage.js';
 
 export class IngresosExtraView {
   render(ingresos = storage.getIngresosExtra()) {

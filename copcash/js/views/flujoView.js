@@ -1,5 +1,5 @@
 // Vista del Flujo de Caja Proyectado
-import { FlujoCalculos } from '../models/calculos.js';
+import { FlujoCalculos } from '/copcash/js/models/calculos.js';
 
 export class FlujoView {
   render(diasAdelante = 60) {

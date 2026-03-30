@@ -1,6 +1,6 @@
 // Vista de Metas de Ahorro
-import { storage } from '../models/storage.js';
-import { MetasCalculos } from '../models/calculos.js';
+import { storage } from '/copcash/js/models/storage.js';
+import { MetasCalculos } from '/copcash/js/models/calculos.js';
 
 export class MetasView {
   render(metas = storage.getMetas()) {

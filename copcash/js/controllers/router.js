@@ -1,14 +1,14 @@
 // Controlador Principal - Orquestación de la SPA
-import { storage } from '../models/storage.js';
-import { DashboardView } from '../views/dashboardView.js';
-import { GastosFijosView, GastosVariablesView } from '../views/gastosView.js';
-import { IngresosExtraView } from '../views/ingresosView.js';
-import { TarjetasView } from '../views/tarjetasView.js';
-import { MetasView } from '../views/metasView.js';
-import { FlujoView } from '../views/flujoView.js';
-import { CategoriasView } from '../views/categoriasView.js';
-import { NavbarView, ConfiguracionView } from '../views/navbarView.js';
-import { TarjetasCalculos } from '../models/calculos.js';
+import { storage } from '/copcash/js/models/storage.js';
+import { DashboardView } from '/copcash/js/views/dashboardView.js';
+import { GastosFijosView, GastosVariablesView } from '/copcash/js/views/gastosView.js';
+import { IngresosExtraView } from '/copcash/js/views/ingresosView.js';
+import { TarjetasView } from '/copcash/js/views/tarjetasView.js';
+import { MetasView } from '/copcash/js/views/metasView.js';
+import { FlujoView } from '/copcash/js/views/flujoView.js';
+import { CategoriasView } from '/copcash/js/views/categoriasView.js';
+import { NavbarView, ConfiguracionView } from '/copcash/js/views/navbarView.js';
+import { TarjetasCalculos } from '/copcash/js/models/calculos.js';
 
 export class Router {
   constructor() {

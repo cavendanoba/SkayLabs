@@ -1,7 +1,7 @@
 // Punto de entrada de la aplicación - app.js
-import { Router } from './controllers/router.js';
-import { NavbarView } from './views/navbarView.js';
-import { storage } from './models/storage.js';
+import { Router } from '/copcash/js/controllers/router.js';
+import { NavbarView } from '/copcash/js/views/navbarView.js';
+import { storage } from '/copcash/js/models/storage.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Restaurar modo oscuro
