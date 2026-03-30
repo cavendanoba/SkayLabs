@@ -1,75 +1,112 @@
-// Vista de Gastos Fijos
+// Vista de Gastos - Diseño Profesional
 import { storage } from '/copcash/js/models/storage.js';
 
 export class GastosFijosView {
   render(gastos = storage.getGastosFijos()) {
     const total = gastos.reduce((sum, g) => sum + g.monto, 0);
+    const activos = gastos.filter(g => g.activo).length;
 
     const html = `
-      <div class="space-y-6">
-        <div class="flex justify-between items-center">
-          <h1 class="text-4xl font-bold text-gray-800 dark:text-white">Gastos Fijos</h1>
-          <button id="btn-add-gastoFijo" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold">
-            + Nuevo Gasto Fijo
-          </button>
+      <div class="w-full">
+        <!-- Header -->
+        <div class="mb-8">
+          <div class="flex items-center justify-between mb-2">
+            <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">
+              🏠 Gastos Fijos
+            </h1>
+            <button id="btn-add-gastoFijo" class="btn-primary">
+              + Nuevo
+            </button>
+          </div>
+          <p class="text-neutral-600 dark:text-neutral-400">
+            Gastos recurrentes mensuales
+          </p>
         </div>
 
-        <div class="bg-gradient-to-br from-red-500 to-red-600 text-white p-6 rounded-lg shadow-lg">
-          <p class="text-sm opacity-90">Total Gastos Fijos</p>
-          <p class="text-4xl font-bold">$${total.toFixed(2)}</p>
+        <!-- KPI -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div class="kpi-card danger">
+            <div class="kpi-label">🏷️ Total Mensual</div>
+            <div class="kpi-value" style="color: #ef4444;">
+              $${total.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+            </div>
+            <div class="kpi-change">${activos} gasto(s) activo(s)</div>
+          </div>
+
+          <div class="card">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-1">Gasto Promedio</p>
+                <p class="text-2xl font-bold text-neutral-900 dark:text-white">
+                  $${gastos.length > 0 ? Math.round(total / gastos.length) : 0}
+                </p>
+              </div>
+              <span class="text-2xl">📊</span>
+            </div>
+          </div>
         </div>
 
         ${this.renderFormulario()}
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-          <table class="w-full">
-            <thead class="bg-gray-100 dark:bg-gray-700">
-              <tr>
-                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300">Nombre</th>
-                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300">Monto</th>
-                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300">Categoría</th>
-                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300">Día de Vencimiento</th>
-                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300">Estado</th>
-                <th class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${gastos.length === 0 ? `
+        <!-- Tabla -->
+        <div class="card overflow-hidden">
+          <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
+            Listado de Gastos Fijos
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
                 <tr>
-                  <td colspan="6" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                    No hay gastos fijos registrados
-                  </td>
+                  <th class="px-4 py-3 text-left">Nombre</th>
+                  <th class="px-4 py-3 text-right">Monto</th>
+                  <th class="px-4 py-3 text-left">Categoría</th>
+                  <th class="px-4 py-3 text-center">Vencimiento</th>
+                  <th class="px-4 py-3 text-center">Estado</th>
+                  <th class="px-4 py-3 text-center">Acciones</th>
                 </tr>
-              ` : gastos.map(gasto => {
-                const categoria = storage.getCategoria(gasto.categoria);
-                return `
-                  <tr class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                    <td class="px-4 py-3 text-gray-800 dark:text-white font-semibold">${gasto.nombre}</td>
-                    <td class="px-4 py-3 text-gray-800 dark:text-white">$${gasto.monto.toFixed(2)}</td>
-                    <td class="px-4 py-3">
-                      <span class="inline-block bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white px-2 py-1 rounded text-sm">
-                        ${categoria?.icon} ${categoria?.nombre}
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-gray-800 dark:text-white">Día ${gasto.diaVencimiento}</td>
-                    <td class="px-4 py-3">
-                      <span class="inline-block ${gasto.activo ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300'} px-2 py-1 rounded text-sm">
-                        ${gasto.activo ? '✓ Activo' : 'Inactivo'}
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-center space-x-2">
-                      <button class="btn-edit-gastoFijo text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" data-id="${gasto.id}">
-                        ✏️
-                      </button>
-                      <button class="btn-delete-gastoFijo text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" data-id="${gasto.id}">
-                        🗑️
-                      </button>
+              </thead>
+              <tbody>
+                ${gastos.length === 0 ? `
+                  <tr>
+                    <td colspan="6" class="px-4 py-6 text-center text-neutral-500 dark:text-neutral-400">
+                      No hay gastos fijos registrados
                     </td>
                   </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
+                ` : gastos.map(gasto => {
+                  const categoria = storage.getCategoria(gasto.categoria);
+                  return `
+                    <tr class="border-t border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition">
+                      <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-white">${gasto.nombre}</td>
+                      <td class="px-4 py-3 text-right font-bold text-neutral-900 dark:text-white">
+                        $${gasto.monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+                      </td>
+                      <td class="px-4 py-3">
+                        <span class="badge" style="background: ${categoria?.color}20; color: ${categoria?.color}; border-left: 3px solid ${categoria?.color}">
+                          ${categoria?.icon} ${categoria?.nombre}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                        Día ${gasto.diaVencimiento}
+                      </td>
+                      <td class="px-4 py-3 text-center">
+                        <span class="badge ${gasto.activo ? 'badge-success' : 'badge-danger'}">
+                          ${gasto.activo ? '✓ Activo' : '✗ Inactivo'}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-center space-x-2">
+                        <button class="btn-edit-gastoFijo text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold" data-id="${gasto.id}">
+                          ✏️
+                        </button>
+                        <button class="btn-delete-gastoFijo text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-bold" data-id="${gasto.id}">
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     `;
@@ -82,25 +119,30 @@ export class GastosFijosView {
     const isEdit = gasto !== null;
 
     return `
-      <div id="form-gastoFijo-container" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow ${!isEdit ? 'hidden' : ''}">
-        <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
-          ${isEdit ? 'Editar Gasto Fijo' : 'Nuevo Gasto Fijo'}
+      <div id="form-gastoFijo-container" class="card bg-neutral-50 dark:bg-neutral-700/30 mb-8 ${!isEdit ? 'hidden' : ''} overflow-hidden">
+        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-6">
+          ${isEdit ? '✏️ Editar Gasto Fijo' : '➕ Nuevo Gasto Fijo'}
         </h2>
         <form id="form-gastoFijo" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Nombre</label>
-              <input type="text" id="gastoFijo-nombre" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-3 py-2" 
+              <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Nombre</label>
+              <input type="text" id="gastoFijo-nombre" class="w-full" 
                 value="${gasto?.nombre || ''}" required>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Monto</label>
-              <input type="number" id="gastoFijo-monto" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-3 py-2" 
+              <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Monto</label>
+              <input type="number" id="gastoFijo-monto" class="w-full" 
                 value="${gasto?.monto || ''}" step="0.01" min="0" required>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Categoría</label>
-              <select id="gastoFijo-categoria" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-3 py-2" required>
+              <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Día Vencimiento</label>
+              <input type="number" id="gastoFijo-dia" class="w-full" 
+                value="${gasto?.diaVencimiento || ''}" min="1" max="31" required>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Categoría</label>
+              <select id="gastoFijo-categoria" class="w-full" required>
                 <option value="">Seleccionar categoría</option>
                 ${categorias.map(cat => `
                   <option value="${cat.id}" ${gasto?.categoria === cat.id ? 'selected' : ''}>
@@ -110,23 +152,18 @@ export class GastosFijosView {
               </select>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Día de Vencimiento</label>
-              <input type="number" id="gastoFijo-dia" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-3 py-2" 
-                value="${gasto?.diaVencimiento || ''}" min="1" max="31" required>
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Estado</label>
-              <select id="gastoFijo-activo" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-3 py-2">
+              <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Estado</label>
+              <select id="gastoFijo-activo" class="w-full">
                 <option value="true" ${gasto?.activo !== false ? 'selected' : ''}>Activo</option>
                 <option value="false" ${gasto?.activo === false ? 'selected' : ''}>Inactivo</option>
               </select>
             </div>
           </div>
-          <div class="flex gap-2">
-            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold">
-              ${isEdit ? 'Actualizar' : 'Guardar'}
+          <div class="flex gap-2 pt-4 border-t border-neutral-200 dark:border-neutral-600">
+            <button type="submit" class="btn-primary">
+              ${isEdit ? '✓ Actualizar' : '✓ Guardar'}
             </button>
-            <button type="button" id="btn-cancel-gastoFijo" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold">
+            <button type="button" id="btn-cancel-gastoFijo" class="bg-neutral-300 hover:bg-neutral-400 dark:bg-neutral-600 dark:hover:bg-neutral-500 text-neutral-900 dark:text-white px-4 py-2 rounded-lg font-semibold transition">
               Cancelar
             </button>
             ${isEdit ? `<input type="hidden" id="gastoFijo-id" value="${gasto.id}">` : ''}
@@ -142,85 +179,109 @@ export class GastosVariablesView {
   render(gastos = storage.getGastosVariables()) {
     const totalPagados = gastos.filter(g => g.pagado).reduce((sum, g) => sum + g.monto, 0);
     const totalPendientes = gastos.filter(g => !g.pagado).reduce((sum, g) => sum + g.monto, 0);
+    const total = totalPagados + totalPendientes;
 
     const html = `
-      <div class="space-y-6">
-        <div class="flex justify-between items-center">
-          <h1 class="text-4xl font-bold text-gray-800 dark:text-white">Gastos Variables</h1>
-          <button id="btn-add-gastoVariable" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold">
-            + Nuevo Gasto Variable
-          </button>
+      <div class="w-full">
+        <!-- Header -->
+        <div class="mb-8">
+          <div class="flex items-center justify-between mb-2">
+            <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">
+              🛒 Gastos Variables
+            </h1>
+            <button id="btn-add-gastoVariable" class="btn-primary">
+              + Nuevo
+            </button>
+          </div>
+          <p class="text-neutral-600 dark:text-neutral-400">
+            Gastos ocasionales y no planificados
+          </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="bg-green-100 dark:bg-green-900/30 p-4 rounded-lg">
-            <p class="text-sm text-green-800 dark:text-green-300">Pagados</p>
-            <p class="text-3xl font-bold text-green-700 dark:text-green-400">$${totalPagados.toFixed(2)}</p>
+        <!-- KPIs -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div class="kpi-card green">
+            <div class="kpi-label">✓ Pagados</div>
+            <div class="kpi-value" style="color: #10b981;">
+              $${totalPagados.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+            </div>
           </div>
-          <div class="bg-yellow-100 dark:bg-yellow-900/30 p-4 rounded-lg">
-            <p class="text-sm text-yellow-800 dark:text-yellow-300">Pendientes</p>
-            <p class="text-3xl font-bold text-yellow-700 dark:text-yellow-400">$${totalPendientes.toFixed(2)}</p>
+          <div class="kpi-card warning">
+            <div class="kpi-label">⏳ Pendientes</div>
+            <div class="kpi-value" style="color: #f59e0b;">
+              $${totalPendientes.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+            </div>
           </div>
-          <div class="bg-blue-100 dark:bg-blue-900/30 p-4 rounded-lg">
-            <p class="text-sm text-blue-800 dark:text-blue-300">Total</p>
-            <p class="text-3xl font-bold text-blue-700 dark:text-blue-400">$${(totalPagados + totalPendientes).toFixed(2)}</p>
+          <div class="kpi-card blue">
+            <div class="kpi-label">📊 Total</div>
+            <div class="kpi-value" style="color: #2563eb;">
+              $${total.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+            </div>
           </div>
         </div>
 
         ${this.renderFormulario()}
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-          <table class="w-full">
-            <thead class="bg-gray-100 dark:bg-gray-700">
-              <tr>
-                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300">Nombre</th>
-                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300">Monto</th>
-                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300">Fecha</th>
-                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300">Categoría</th>
-                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300">Estado</th>
-                <th class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${gastos.length === 0 ? `
+        <!-- Tabla -->
+        <div class="card overflow-hidden">
+          <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
+            Listado de Gastos Variables
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
                 <tr>
-                  <td colspan="6" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                    No hay gastos variables registrados
-                  </td>
+                  <th class="px-4 py-3 text-left">Nombre</th>
+                  <th class="px-4 py-3 text-right">Monto</th>
+                  <th class="px-4 py-3 text-left">Fecha</th>
+                  <th class="px-4 py-3 text-left">Categoría</th>
+                  <th class="px-4 py-3 text-center">Estado</th>
+                  <th class="px-4 py-3 text-center">Acciones</th>
                 </tr>
-              ` : gastos.map(gasto => {
-                const categoria = storage.getCategoria(gasto.categoria);
-                return `
-                  <tr class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                    <td class="px-4 py-3 text-gray-800 dark:text-white font-semibold">${gasto.nombre}</td>
-                    <td class="px-4 py-3 text-gray-800 dark:text-white">$${gasto.monto.toFixed(2)}</td>
-                    <td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-sm">${gasto.fecha}</td>
-                    <td class="px-4 py-3">
-                      <span class="inline-block bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white px-2 py-1 rounded text-sm">
-                        ${categoria?.icon} ${categoria?.nombre}
-                      </span>
-                    </td>
-                    <td class="px-4 py-3">
-                      <span class="inline-block ${gasto.pagado ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'} px-2 py-1 rounded text-sm">
-                        ${gasto.pagado ? '✓ Pagado' : '✗ Pendiente'}
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-center space-x-2">
-                      <button class="btn-toggle-gastoVariable text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300" data-id="${gasto.id}">
-                        ${gasto.pagado ? '↩️' : '✓'}
-                      </button>
-                      <button class="btn-edit-gastoVariable text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" data-id="${gasto.id}">
-                        ✏️
-                      </button>
-                      <button class="btn-delete-gastoVariable text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" data-id="${gasto.id}">
-                        🗑️
-                      </button>
+              </thead>
+              <tbody>
+                ${gastos.length === 0 ? `
+                  <tr>
+                    <td colspan="6" class="px-4 py-6 text-center text-neutral-500 dark:text-neutral-400">
+                      No hay gastos variables registrados
                     </td>
                   </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
+                ` : gastos.map(gasto => {
+                  const categoria = storage.getCategoria(gasto.categoria);
+                  return `
+                    <tr class="border-t border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition">
+                      <td class="px-4 py-3 font-semibold text-neutral-900 dark:text-white">${gasto.nombre}</td>
+                      <td class="px-4 py-3 text-right font-bold text-neutral-900 dark:text-white">
+                        $${gasto.monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+                      </td>
+                      <td class="px-4 py-3 text-sm text-neutral-600 dark:text-neutral-400">${gasto.fecha}</td>
+                      <td class="px-4 py-3">
+                        <span class="badge" style="background: ${categoria?.color}20; color: ${categoria?.color}; border-left: 3px solid ${categoria?.color}">
+                          ${categoria?.icon} ${categoria?.nombre}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-center">
+                        <span class="badge ${gasto.pagado ? 'badge-success' : 'badge-warning'}">
+                          ${gasto.pagado ? '✓ Pagado' : '⏳ Pendiente'}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-center space-x-2">
+                        <button class="btn-toggle-gastoVariable ${gasto.pagado ? 'text-gray-600 dark:text-gray-400' : 'text-green-600 dark:text-green-400'} hover:opacity-70 font-bold" data-id="${gasto.id}">
+                          ${gasto.pagado ? '↩️' : '✓'}
+                        </button>
+                        <button class="btn-edit-gastoVariable text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold" data-id="${gasto.id}">
+                          ✏️
+                        </button>
+                        <button class="btn-delete-gastoVariable text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-bold" data-id="${gasto.id}">
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     `;
@@ -233,30 +294,30 @@ export class GastosVariablesView {
     const isEdit = gasto !== null;
 
     return `
-      <div id="form-gastoVariable-container" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow ${!isEdit ? 'hidden' : ''}">
-        <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
-          ${isEdit ? 'Editar Gasto Variable' : 'Nuevo Gasto Variable'}
+      <div id="form-gastoVariable-container" class="card bg-neutral-50 dark:bg-neutral-700/30 mb-8 ${!isEdit ? 'hidden' : ''} overflow-hidden">
+        <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-6">
+          ${isEdit ? '✏️ Editar Gasto Variable' : '➕ Nuevo Gasto Variable'}
         </h2>
         <form id="form-gastoVariable" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Nombre</label>
-              <input type="text" id="gastoVariable-nombre" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-3 py-2" 
+              <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Nombre</label>
+              <input type="text" id="gastoVariable-nombre" class="w-full" 
                 value="${gasto?.nombre || ''}" required>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Monto</label>
-              <input type="number" id="gastoVariable-monto" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-3 py-2" 
+              <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Monto</label>
+              <input type="number" id="gastoVariable-monto" class="w-full" 
                 value="${gasto?.monto || ''}" step="0.01" min="0" required>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Fecha</label>
-              <input type="date" id="gastoVariable-fecha" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-3 py-2" 
+              <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Fecha</label>
+              <input type="date" id="gastoVariable-fecha" class="w-full" 
                 value="${gasto?.fecha || ''}" required>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Categoría</label>
-              <select id="gastoVariable-categoria" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded px-3 py-2" required>
+              <label class="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Categoría</label>
+              <select id="gastoVariable-categoria" class="w-full" required>
                 <option value="">Seleccionar categoría</option>
                 ${categorias.map(cat => `
                   <option value="${cat.id}" ${gasto?.categoria === cat.id ? 'selected' : ''}>
@@ -266,11 +327,11 @@ export class GastosVariablesView {
               </select>
             </div>
           </div>
-          <div class="flex gap-2">
-            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold">
-              ${isEdit ? 'Actualizar' : 'Guardar'}
+          <div class="flex gap-2 pt-4 border-t border-neutral-200 dark:border-neutral-600">
+            <button type="submit" class="btn-primary">
+              ${isEdit ? '✓ Actualizar' : '✓ Guardar'}
             </button>
-            <button type="button" id="btn-cancel-gastoVariable" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold">
+            <button type="button" id="btn-cancel-gastoVariable" class="bg-neutral-300 hover:bg-neutral-400 dark:bg-neutral-600 dark:hover:bg-neutral-500 text-neutral-900 dark:text-white px-4 py-2 rounded-lg font-semibold transition">
               Cancelar
             </button>
             ${isEdit ? `<input type="hidden" id="gastoVariable-id" value="${gasto.id}">` : ''}

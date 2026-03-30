@@ -1,4 +1,4 @@
-// Vista del Dashboard
+// Vista del Dashboard - Diseño Profesional y Minimalista
 import { storage } from '/copcash/js/models/storage.js';
 import { IngresosGastosCalculos, MetasCalculos, TarjetasCalculos, FlujoCalculos } from '/copcash/js/models/calculos.js';
 
@@ -13,135 +13,241 @@ export class DashboardView {
     const alertasSaldo = FlujoCalculos.verificarAlertasSaldoNegativo(flujoCaja);
 
     const html = `
-      <div class="space-y-6">
-        <h1 class="text-4xl font-bold text-gray-800 dark:text-white">Dashboard Financiero</h1>
+      <div class="w-full">
+        <!-- Header profesional -->
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
+            📊 Dashboard Financiero
+          </h1>
+          <p class="text-neutral-600 dark:text-neutral-400">
+            Resumen de tu situación financiera actual
+          </p>
+        </div>
 
-        <!-- Cards de Resumen Principal -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 rounded-lg shadow-lg">
-            <p class="text-sm opacity-90">Dinero Libre</p>
-            <p class="text-3xl font-bold">$${dineroLibre.toFixed(2)}</p>
-            <p class="text-xs opacity-75 mt-2">Después de gastos fijos y variables</p>
+        <!-- KPI Principal - Dinero Libre -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
+          <div class="lg:col-span-2 kpi-card blue">
+            <div class="kpi-label">💰 Saldo Disponible</div>
+            <div class="kpi-value" style="color: #2563eb;">
+              $${dineroLibre.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+            </div>
+            <div class="kpi-change">
+              Después de gastos fijos, variables y tarjetas
+            </div>
           </div>
 
-          <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-lg shadow-lg">
-            <p class="text-sm opacity-90">Salario Mensual</p>
-            <p class="text-3xl font-bold">$${salario.monto.toFixed(2)}</p>
-            <p class="text-xs opacity-75 mt-2">Día de cobro: ${salario.diaCobro}</p>
+          <div class="kpi-card green">
+            <div class="kpi-label">💵 Salario Mensual</div>
+            <div class="kpi-value" style="color: #10b981;">
+              $${salario.monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+            </div>
+            <div class="kpi-change">Día de cobro: ${salario.diaCobro}</div>
           </div>
 
-          <div class="bg-gradient-to-br from-purple-500 to-pink-600 text-white p-6 rounded-lg shadow-lg">
-            <p class="text-sm opacity-90">Deuda Tarjetas</p>
-            <p class="text-3xl font-bold">$${tarjetas.reduce((sum, t) => sum + TarjetasCalculos.calcularSaldoTarjeta(t), 0).toFixed(2)}</p>
-            <p class="text-xs opacity-75 mt-2">${tarjetas.length} tarjeta(s)</p>
+          <div class="kpi-card warning">
+            <div class="kpi-label">💳 Deuda Tarjetas</div>
+            <div class="kpi-value" style="color: #f59e0b;">
+              $${tarjetas.reduce((sum, t) => sum + TarjetasCalculos.calcularSaldoTarjeta(t), 0).toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+            </div>
+            <div class="kpi-change">${tarjetas.length} tarjeta(s) activa(s)</div>
           </div>
 
-          <div class="bg-gradient-to-br from-amber-500 to-orange-600 text-white p-6 rounded-lg shadow-lg">
-            <p class="text-sm opacity-90">Metas Activas</p>
-            <p class="text-3xl font-bold">${metas.length}</p>
-            <p class="text-xs opacity-75 mt-2">Total: $${metas.reduce((sum, m) => sum + m.montoActual, 0).toFixed(2)}</p>
+          <div class="kpi-card">
+            <div class="kpi-label">🎯 Metas Activas</div>
+            <div class="kpi-value" style="color: #8b5cf6;">
+              $${metas.reduce((sum, m) => sum + m.montoActual, 0).toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+            </div>
+            <div class="kpi-change">${metas.length} meta(s) en progreso</div>
           </div>
         </div>
 
-        <!-- Alertas de Presupuesto -->
-        ${alertas.length > 0 ? `
-          <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded">
-            <h3 class="text-red-800 dark:text-red-200 font-bold flex items-center gap-2">
+        <!-- Alertas críticas -->
+        ${
+          alertas.length > 0
+            ? \`
+          <div class="mb-8">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
               ⚠️ Alertas de Presupuesto
             </h3>
-            <div class="mt-3 space-y-2">
-              ${alertas.map(a => `
-                <p class="text-red-700 dark:text-red-300 text-sm">
-                  <strong>${a.categoria}:</strong> Gaston $${a.gasto.toFixed(2)} de $${a.presupuesto.toFixed(2)} 
-                  <span class="text-red-600">+$${a.exceso.toFixed(2)} exceso</span>
-                </p>
-              `).join('')}
+            <div class="space-y-3">
+              \${alertas
+                .map(
+                  (a) => \`
+                <div class="alert alert-warning">
+                  <strong>\${a.categoria}:</strong> Gastaste $\${a.gasto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} de $\${a.presupuesto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} 
+                  <span class="text-red-600 font-semibold">+$\${a.exceso.toLocaleString('es-ES', { maximumFractionDigits: 0 })} exceso</span>
+                </div>
+              \`
+                )
+                .join('')}
             </div>
           </div>
-        ` : ''}
+        \`
+            : ''
+        }
 
-        <!-- Alertas de Saldo Negativo -->
-        ${alertasSaldo.length > 0 ? `
-          <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded">
-            <h3 class="text-yellow-800 dark:text-yellow-200 font-bold flex items-center gap-2">
+        <!-- Alertas de saldo negativo -->
+        ${
+          alertasSaldo.length > 0
+            ? \`
+          <div class="mb-8">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
               ⚠️ Proyección: Saldo Negativo
             </h3>
-            <div class="mt-3 space-y-1 text-sm">
-              ${alertasSaldo.slice(0, 5).map(a => `
-                <p class="text-yellow-700 dark:text-yellow-300">
-                  ${a.fecha}: <strong>$${a.saldo.toFixed(2)}</strong>
-                </p>
-              `).join('')}
-              ${alertasSaldo.length > 5 ? `<p class="text-yellow-700 dark:text-yellow-300 text-xs">... y ${alertasSaldo.length - 5} días más</p>` : ''}
+            <div class="card bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500">
+              <div class="space-y-2 text-sm">
+                \${alertasSaldo
+                  .slice(0, 5)
+                  .map(
+                    (a) => \`
+                  <div class="flex justify-between">
+                    <span class="text-red-700 dark:text-red-300">\${a.fecha}:</span>
+                    <strong class="text-red-600 dark:text-red-400">$\${a.saldo.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</strong>
+                  </div>
+                \`
+                  )
+                  .join('')}
+                \${
+                  alertasSaldo.length > 5
+                    ? \`<p class="text-xs text-red-600 dark:text-red-400 pt-2">... y \${alertasSaldo.length - 5} días más con saldo negativo</p>\`
+                    : ''
+                }
+              </div>
             </div>
           </div>
-        ` : ''}
+        \`
+            : ''
+        }
 
-        <!-- Resumen de Metas -->
-        ${metas.length > 0 ? `
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Metas de Ahorro</h3>
+        <!-- Resumen de Tarjetas -->
+        ${
+          tarjetas.length > 0
+            ? \`
+          <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
+                💳 Estado de Tarjetas
+              </h3>
+              <span class="badge badge-danger">\${tarjetas.length} activas</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              \${tarjetas
+                .map((tarjeta) => {
+                  const saldo = TarjetasCalculos.calcularSaldoTarjeta(tarjeta);
+                  const disponible = TarjetasCalculos.calcularLimitDisponible(tarjeta);
+                  const pago = TarjetasCalculos.calcularPagaMensualTarjeta(tarjeta);
+
+                  return \`
+                <div class="card border-l-4 border-blue-500">
+                  <div class="flex items-start justify-between mb-4">
+                    <div>
+                      <p class="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-1">
+                        \${tarjeta.nombre}
+                      </p>
+                      <p class="text-xs text-neutral-500 dark:text-neutral-500">\${tarjeta.banco || ''}</p>
+                    </div>
+                    <span class="text-2xl">💳</span>
+                  </div>
+                  <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm text-neutral-600 dark:text-neutral-400">Saldo:</span>
+                      <span class="font-bold text-red-600">$\${saldo.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm text-neutral-600 dark:text-neutral-400">Disponible:</span>
+                      <span class="font-bold text-green-600">$\${disponible.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-neutral-200 dark:border-neutral-700">
+                      <span class="text-sm text-neutral-600 dark:text-neutral-400">A pagar:</span>
+                      <span class="font-bold text-neutral-900 dark:text-white">$\${pago.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
+                    </div>
+                  </div>
+                </div>
+              \`;
+                })
+                .join('')}
+            </div>
+          </div>
+        \`
+            : ''
+        }
+
+        <!-- Metas de Ahorro -->
+        ${
+          metas.length > 0
+            ? \`
+          <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
+                🎯 Metas de Ahorro
+              </h3>
+              <span class="text-sm text-neutral-600 dark:text-neutral-400">
+                \${metas.length} meta(s)
+              </span>
+            </div>
             <div class="space-y-4">
-              ${metas.slice(0, 3).map(meta => {
-                const porcentaje = MetasCalculos.calcularPorcentajeAlcanzado(meta);
-                const restante = MetasCalculos.calcularMontoRestante(meta);
-                return `
-                  <div>
-                    <div class="flex justify-between mb-2">
-                      <span class="text-gray-700 dark:text-gray-300 font-semibold">${meta.nombre}</span>
-                      <span class="text-gray-600 dark:text-gray-400 text-sm">$${meta.montoActual.toFixed(2)} / $${meta.montoObjetivo.toFixed(2)}</span>
-                    </div>
-                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full" style="width: ${porcentaje}%"></div>
-                    </div>
-                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      ${porcentaje}% - Falta: $${restante.toFixed(2)}
-                    </p>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        ` : ''}
+              \${metas
+                .map((meta) => {
+                  const porcentaje = MetasCalculos.calcularPorcentajeAlcanzado(meta);
+                  const restante = MetasCalculos.calcularMontoRestante(meta);
 
-        <!-- Resumen Tarjetas de Crédito -->
-        ${tarjetas.length > 0 ? `
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Tarjetas de Crédito</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              ${tarjetas.map(tarjeta => {
-                const saldo = TarjetasCalculos.calcularSaldoTarjeta(tarjeta);
-                const disponible = TarjetasCalculos.calcularLimitDisponible(tarjeta);
-                const pago = TarjetasCalculos.calcularPagaMensualTarjeta(tarjeta);
-                return `
-                  <div class="border border-gray-300 dark:border-gray-600 rounded p-4">
-                    <div class="flex justify-between items-start mb-3">
-                      <div>
-                        <p class="font-bold text-gray-800 dark:text-white">${tarjeta.nombre}</p>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">${tarjeta.banco}</p>
-                      </div>
-                      <span class="text-lg">💳</span>
+                  return \`
+                <div class="card">
+                  <div class="flex items-start justify-between mb-4">
+                    <div>
+                      <p class="font-semibold text-neutral-900 dark:text-white mb-1">
+                        \${meta.nombre}
+                      </p>
+                      <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                        $\${meta.montoActual.toLocaleString('es-ES', { maximumFractionDigits: 0 })} / $\${meta.montoObjetivo.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+                      </p>
                     </div>
-                    <div class="space-y-2 text-sm">
-                      <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Saldo:</span>
-                        <span class="font-semibold text-red-600">$${saldo.toFixed(2)}</span>
-                      </div>
-                      <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Disponible:</span>
-                        <span class="font-semibold text-green-600">$${disponible.toFixed(2)}</span>
-                      </div>
-                      <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">A pagar este mes:</span>
-                        <span class="font-semibold">$${pago.toFixed(2)}</span>
-                      </div>
-                    </div>
+                    <span class="text-2xl">🎯</span>
                   </div>
-                `;
-              }).join('')}
+                  <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2 mb-3">
+                    <div
+                      class="progress-bar"
+                      style="width: \${porcentaje}%; background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%);"
+                    ></div>
+                  </div>
+                  <div class="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400">
+                    <span>\${porcentaje}% completado</span>
+                    <span>Falta: $\${restante.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
+                  </div>
+                </div>
+              \`;
+                })
+                .join('')}
             </div>
           </div>
-        ` : ''}
+        \`
+            : ''
+        }
+
+        <!-- Resumen y Recomendaciones -->
+        <div class="card bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-none">
+          <div class="flex items-start justify-between">
+            <div>
+              <h4 class="font-semibold text-neutral-900 dark:text-white mb-3">
+                💡 Resumen del Mes
+              </h4>
+              <ul class="text-sm text-neutral-700 dark:text-neutral-300 space-y-1">
+                <li>✓ Salario: $${salario.monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</li>
+                <li>✓ Tarjetas Pendientes: $${tarjetas.reduce((sum, t) => sum + TarjetasCalculos.calcularSaldoTarjeta(t), 0).toLocaleString('es-ES', { maximumFractionDigits: 0 })}</li>
+                <li>✓ Metas: $${metas.reduce((sum, m) => sum + m.montoActual, 0).toLocaleString('es-ES', { maximumFractionDigits: 0 })}</li>
+                <li>✓ Disponible: $${dineroLibre.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</li>
+              </ul>
+            </div>
+            <div class="text-right">
+              <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+                Actualización
+              </p>
+              <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     `;
 

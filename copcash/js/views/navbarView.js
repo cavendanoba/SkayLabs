@@ -4,81 +4,64 @@ import { storage } from '/copcash/js/models/storage.js';
 export class NavbarView {
   render() {
     return `
-      <nav class="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-900 dark:to-blue-800 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-          <div class="flex justify-between items-center h-16">
-            <div class="flex items-center gap-2">
-              <span class="text-2xl">💰</span>
-              <span class="font-bold text-xl">CopCash</span>
-            </div>
-            
-            <div class="hidden md:flex items-center gap-6">
-              <button class="nav-link hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="dashboard">
-                📊 Dashboard
-              </button>
-              <button class="nav-link hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="gastos">
-                💸 Gastos
-              </button>
-              <button class="nav-link hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="ingresos">
-                💵 Ingresos
-              </button>
-              <button class="nav-link hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="tarjetas">
-                💳 Tarjetas
-              </button>
-              <button class="nav-link hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="metas">
-                🎯 Metas
-              </button>
-              <button class="nav-link hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="flujo">
-                📈 Flujo
-              </button>
-              <button class="nav-link hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="categorias">
-                🏷️ Categorías
-              </button>
-              <button class="nav-link hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="config">
-                ⚙️ Config
-              </button>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <button id="btn-dark-mode" class="p-2 hover:bg-blue-500 dark:hover:bg-blue-700 rounded transition">
-                🌙
-              </button>
-              <button id="btn-menu-mobile" class="md:hidden p-2 hover:bg-blue-500 dark:hover:bg-blue-700 rounded transition">
-                ☰
-              </button>
-            </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex justify-between items-center">
+          <!-- Logo -->
+          <div class="flex items-center gap-3 font-bold">
+            <span class="text-2xl">💰</span>
+            <span class="text-xl font-bold text-neutral-900 dark:text-white tracking-tight">CopCash</span>
+            <span class="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full font-semibold">v1.0</span>
           </div>
 
-          <!-- Menú móvil -->
-          <div id="mobile-menu" class="md:hidden hidden pb-4 space-y-2">
-            <button class="nav-link-mobile block w-full text-left hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="dashboard">
-              📊 Dashboard
+          <!-- Navegación Desktop -->
+          <div class="hidden lg:flex items-center gap-1">
+            ${this.renderNavLinks()}
+          </div>
+
+          <!-- Controles Derecha -->
+          <div class="flex items-center gap-3">
+            <button id="btn-dark-mode" class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition" title="Cambiar tema">
+              🌙
             </button>
-            <button class="nav-link-mobile block w-full text-left hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="gastos">
-              💸 Gastos
-            </button>
-            <button class="nav-link-mobile block w-full text-left hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="ingresos">
-              💵 Ingresos
-            </button>
-            <button class="nav-link-mobile block w-full text-left hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="tarjetas">
-              💳 Tarjetas
-            </button>
-            <button class="nav-link-mobile block w-full text-left hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="metas">
-              🎯 Metas
-            </button>
-            <button class="nav-link-mobile block w-full text-left hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="flujo">
-              📈 Flujo
-            </button>
-            <button class="nav-link-mobile block w-full text-left hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="categorias">
-              🏷️ Categorías
-            </button>
-            <button class="nav-link-mobile block w-full text-left hover:bg-blue-500 dark:hover:bg-blue-700 px-3 py-2 rounded transition" data-view="config">
-              ⚙️ Config
+            <button id="btn-menu-mobile" class="lg:hidden p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition" title="Menú">
+              ☰
             </button>
           </div>
         </div>
-      </nav>
+
+        <!-- Menú Móvil -->
+        <div id="mobile-menu" class="lg:hidden hidden mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700 space-y-2">
+          ${this.renderNavLinks('mobile')}
+        </div>
+      </div>
     `;
+  }
+
+  renderNavLinks(mode = 'desktop') {
+    const links = [
+      { view: 'dashboard', label: '📊 Dashboard' },
+      { view: 'gastos', label: '💸 Gastos' },
+      { view: 'ingresos', label: '💵 Ingresos' },
+      { view: 'tarjetas', label: '💳 Tarjetas' },
+      { view: 'metas', label: '🎯 Metas' },
+      { view: 'flujo', label: '📈 Flujo' },
+      { view: 'categorias', label: '🏷️ Categorías' },
+      { view: 'config', label: '⚙️ Config' }
+    ];
+
+    if (mode === 'mobile') {
+      return links.map(link => `
+        <button class="nav-link-mobile block w-full text-left px-4 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-medium transition text-sm" data-view="${link.view}">
+          ${link.label}
+        </button>
+      `).join('');
+    }
+
+    return links.map(link => `
+      <button class="nav-link px-3 py-2 rounded-lg text-neutral-700 dark:text-neutral-300 font-medium hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-sm" data-view="${link.view}">
+        ${link.label}
+      </button>
+    `).join('');
   }
 }
 
