@@ -11,246 +11,333 @@ export class DashboardView {
     const alertas = IngresosGastosCalculos.verificarAlertasPresupuesto();
     const flujoCaja = FlujoCalculos.generarFlujoCaja(30);
     const alertasSaldo = FlujoCalculos.verificarAlertasSaldoNegativo(flujoCaja);
+    const gastosFijos = storage.getGastosFijos();
+    const gastosVariables = storage.getGastosVariables();
+    const categorias = storage.getCategorias();
+
+    const totalGastos = gastosFijos.reduce((sum, g) => sum + g.monto, 0) + 
+                       gastosVariables.reduce((sum, g) => sum + g.monto, 0);
+    const deudaTarjetas = tarjetas.reduce((sum, t) => sum + TarjetasCalculos.calcularSaldoTarjeta(t), 0);
+    const ahorroMetas = metas.reduce((sum, m) => sum + m.montoActual, 0);
 
     const html = `
-      <div class="w-full">
-        <!-- Header profesional -->
+      <div class="w-full max-w-7xl mx-auto px-4 py-6">
+        <!-- Hero Section -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
-            📊 Dashboard Financiero
+          <h1 class="text-4xl md:text-5xl font-800 text-neutral-900 dark:text-white mb-2 tracking-tight">
+            Bienvenido a CopCash
           </h1>
-          <p class="text-neutral-600 dark:text-neutral-400">
-            Resumen de tu situación financiera actual
+          <p class="text-lg text-neutral-500 dark:text-neutral-400">
+            ${new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
 
-        <!-- KPI Principal - Dinero Libre -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
-          <div class="lg:col-span-2 kpi-card blue">
-            <div class="kpi-label">💰 Saldo Disponible</div>
-            <div class="kpi-value" style="color: #2563eb;">
-              $${dineroLibre.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
-            </div>
-            <div class="kpi-change">
-              Después de gastos fijos, variables y tarjetas
+        <!-- Primary KPI - Saldo Disponible -->
+        <div class="mb-8">
+          <div class="card bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-neutral-700 dark:to-neutral-800 border-none">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div>
+                <p class="text-neutral-600 dark:text-neutral-400 text-lg mb-2">Saldo Disponible</p>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-5xl font-800 text-primary" style="color: var(--primary);">
+                    $${dineroLibre.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+                  </span>
+                  <span class="text-neutral-500 dark:text-neutral-400">COP</span>
+                </div>
+                <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-4">
+                  Después de gastos, deudas y metas
+                </p>
+              </div>
+              <div class="hidden md:flex justify-center">
+                <div class="text-6xl">💰</div>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div class="kpi-card green">
-            <div class="kpi-label">💵 Salario Mensual</div>
-            <div class="kpi-value" style="color: #10b981;">
+        <!-- KPI Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div class="kpi-card blue">
+            <div class="kpi-label">💵 Salario</div>
+            <div class="kpi-value" style="color: #5b7cfa;">
               $${salario.monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
             </div>
-            <div class="kpi-change">Día de cobro: ${salario.diaCobro}</div>
+            <div class="kpi-change">Día ${salario.diaCobro}</div>
           </div>
 
           <div class="kpi-card warning">
             <div class="kpi-label">💳 Deuda Tarjetas</div>
-            <div class="kpi-value" style="color: #f59e0b;">
-              $${tarjetas.reduce((sum, t) => sum + TarjetasCalculos.calcularSaldoTarjeta(t), 0).toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+            <div class="kpi-value" style="color: #ffa94d;">
+              $${deudaTarjetas.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
             </div>
-            <div class="kpi-change">${tarjetas.length} tarjeta(s) activa(s)</div>
+            <div class="kpi-change">${tarjetas.length} tarjeta(s)</div>
           </div>
 
-          <div class="kpi-card">
-            <div class="kpi-label">🎯 Metas Activas</div>
-            <div class="kpi-value" style="color: #8b5cf6;">
-              $${metas.reduce((sum, m) => sum + m.montoActual, 0).toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+          <div class="kpi-card green">
+            <div class="kpi-label">🎯 Ahorro en Metas</div>
+            <div class="kpi-value" style="color: #51cf66;">
+              $${ahorroMetas.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
             </div>
-            <div class="kpi-change">${metas.length} meta(s) en progreso</div>
+            <div class="kpi-change">${metas.length} meta(s)</div>
+          </div>
+
+          <div class="kpi-card" style="background: linear-gradient(135deg, #ffe8a3 0%, #ffcc99 100%);">
+            <div class="kpi-label">📊 Gastos Mes</div>
+            <div class="kpi-value" style="color: #d97706;">
+              $${totalGastos.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+            </div>
+            <div class="kpi-change">Total gastado</div>
           </div>
         </div>
 
-        <!-- Alertas críticas -->
-        ${
-          alertas.length > 0
-            ? `
+        <!-- Alerts Section -->
+        ${alertas.length > 0 || alertasSaldo.length > 0 ? `
+          <div class="mb-8 space-y-4">
+            ${alertasSaldo.length > 0 ? `
+              <div class="alert alert-danger">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-xl">⚠️</span>
+                  <strong>Proyección: Saldo Negativo en ${alertasSaldo.length} día(s)</strong>
+                </div>
+                <p class="text-sm mt-2">Los primeros días con saldo negativo:</p>
+                <div class="mt-2 space-y-1">
+                  ${alertasSaldo.slice(0, 3).map(a => `
+                    <div class="text-sm">• ${a.fecha}: $${a.saldo.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+            
+            ${alertas.length > 0 ? `
+              <div class="alert alert-warning">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-xl">⚠️</span>
+                  <strong>Categorías Sobrepasadas: ${alertas.length}</strong>
+                </div>
+                ${alertas.map(a => `
+                  <div class="text-sm mt-1">
+                    • <strong>${a.categoria}:</strong> $${a.gasto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} de $${a.presupuesto.toLocaleString('es-ES', { maximumFractionDigits: 0 })}, 
+                    <span class="text-danger">+$${a.exceso.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        ` : `
+          <div class="alert alert-success mb-8">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">✓</span>
+              <strong>Excelente: Todo bajo control</strong>
+            </div>
+          </div>
+        `}
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Gasto por Categoría -->
+          <div class="card">
+            <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-6">
+              📊 Gastos por Categoría
+            </h3>
+            <div style="position: relative; height: 300px;">
+              <canvas id="categoriasChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Flujo de Dinero -->
+          <div class="card">
+            <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-6">
+              📈 Proyección 30 Días
+            </h3>
+            <div style="position: relative; height: 300px;">
+              <canvas id="flujoChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen Tarjetas -->
+        ${tarjetas.length > 0 ? `
           <div class="mb-8">
-            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
-              ⚠️ Alertas de Presupuesto
+            <h3 class="text-xl font-bold text-neutral-900 dark:text-white mb-4">
+              💳 Estado de Tarjetas
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              ${tarjetas.map(tarjeta => {
+                const saldo = TarjetasCalculos.calcularSaldoTarjeta(tarjeta);
+                const disponible = TarjetasCalculos.calcularLimitDisponible(tarjeta);
+                const porcentaje = Math.min((saldo / tarjeta.limiteCrediticio) * 100, 100);
+                
+                return `
+                  <div class="card">
+                    <div class="mb-4">
+                      <p class="font-bold text-neutral-900 dark:text-white">${tarjeta.nombre}</p>
+                      <p class="text-sm text-neutral-600 dark:text-neutral-400">${tarjeta.banco || 'Banco'}</p>
+                    </div>
+                    <div class="mb-4 space-y-2">
+                      <div class="flex justify-between text-sm">
+                        <span class="text-neutral-600 dark:text-neutral-400">Saldo:</span>
+                        <span class="font-bold text-danger">$${saldo.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
+                      </div>
+                      <div class="flex justify-between text-sm">
+                        <span class="text-neutral-600 dark:text-neutral-400">Disponible:</span>
+                        <span class="font-bold text-success">$${disponible.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
+                      </div>
+                    </div>
+                    <div class="h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+                      <div class="h-full bg-gradient-to-r from-warning to-danger" style="width: ${porcentaje}%"></div>
+                    </div>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-2">${Math.round(porcentaje)}% utilizado</p>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Resumen Metas -->
+        ${metas.length > 0 ? `
+          <div>
+            <h3 class="text-xl font-bold text-neutral-900 dark:text-white mb-4">
+              🎯 Metas de Ahorro
             </h3>
             <div class="space-y-3">
-              ${alertas
-                .map(
-                  (a) => `
-                <div class="alert alert-warning">
-                  <strong>${a.categoria}:</strong> Gastaste $${a.gasto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} de $${a.presupuesto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} 
-                  <span class="text-red-600 font-semibold">+$${a.exceso.toLocaleString('es-ES', { maximumFractionDigits: 0 })} exceso</span>
-                </div>
-              `
-                )
-                .join('')}
-            </div>
-          </div>
-        `
-            : ''
-        }
-
-        <!-- Alertas de saldo negativo -->
-        ${
-          alertasSaldo.length > 0
-            ? `
-          <div class="mb-8">
-            <h3 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">
-              ⚠️ Proyección: Saldo Negativo
-            </h3>
-            <div class="card bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500">
-              <div class="space-y-2 text-sm">
-                ${alertasSaldo
-                  .slice(0, 5)
-                  .map(
-                    (a) => `
-                  <div class="flex justify-between">
-                    <span class="text-red-700 dark:text-red-300">${a.fecha}:</span>
-                    <strong class="text-red-600 dark:text-red-400">$${a.saldo.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</strong>
-                  </div>
-                `
-                  )
-                  .join('')}
-                ${
-                  alertasSaldo.length > 5
-                    ? `<p class="text-xs text-red-600 dark:text-red-400 pt-2">... y ${alertasSaldo.length - 5} días más con saldo negativo</p>`
-                    : ''
-                }
-              </div>
-            </div>
-          </div>
-        `
-            : ''
-        }
-
-        <!-- Resumen de Tarjetas -->
-        ${
-          tarjetas.length > 0
-            ? `
-          <div class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
-                💳 Estado de Tarjetas
-              </h3>
-              <span class="badge badge-danger">${tarjetas.length} activas</span>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              ${tarjetas
-                .map((tarjeta) => {
-                  const saldo = TarjetasCalculos.calcularSaldoTarjeta(tarjeta);
-                  const disponible = TarjetasCalculos.calcularLimitDisponible(tarjeta);
-                  const pago = TarjetasCalculos.calcularPagaMensualTarjeta(tarjeta);
-
-                  return `
-                <div class="card border-l-4 border-blue-500">
-                  <div class="flex items-start justify-between mb-4">
-                    <div>
-                      <p class="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-1">
-                        ${tarjeta.nombre}
-                      </p>
-                      <p class="text-xs text-neutral-500 dark:text-neutral-500">${tarjeta.banco || ''}</p>
+              ${metas.slice(0, 3).map(meta => {
+                const porcentaje = MetasCalculos.calcularPorcentajeAlcanzado(meta);
+                const restante = MetasCalculos.calcularMontoRestante(meta);
+                
+                return `
+                  <div class="card">
+                    <div class="flex justify-between items-start mb-2">
+                      <div>
+                        <p class="font-semibold text-neutral-900 dark:text-white">${meta.nombre}</p>
+                        <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                          $${meta.montoActual.toLocaleString('es-ES', { maximumFractionDigits: 0 })} / $${meta.montoObjetivo.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+                        </p>
+                      </div>
+                      <span class="text-sm font-bold text-primary">${porcentaje}%</span>
                     </div>
-                    <span class="text-2xl">💳</span>
-                  </div>
-                  <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                      <span class="text-sm text-neutral-600 dark:text-neutral-400">Saldo:</span>
-                      <span class="font-bold text-red-600">$${saldo.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                      <span class="text-sm text-neutral-600 dark:text-neutral-400">Disponible:</span>
-                      <span class="font-bold text-green-600">$${disponible.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-neutral-200 dark:border-neutral-700">
-                      <span class="text-sm text-neutral-600 dark:text-neutral-400">A pagar:</span>
-                      <span class="font-bold text-neutral-900 dark:text-white">$${pago.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
+                    <div class="h-2.5 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+                      <div class="h-full bg-gradient-to-r from-primary to-blue-500" style="width: ${porcentaje}%"></div>
                     </div>
                   </div>
-                </div>
-              `;
-                })
-                .join('')}
+                `;
+              }).join('')}
             </div>
           </div>
-        `
-            : ''
-        }
-
-        <!-- Metas de Ahorro -->
-        ${
-          metas.length > 0
-            ? `
-          <div class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
-                🎯 Metas de Ahorro
-              </h3>
-              <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                ${metas.length} meta(s)
-              </span>
-            </div>
-            <div class="space-y-4">
-              ${metas
-                .map((meta) => {
-                  const porcentaje = MetasCalculos.calcularPorcentajeAlcanzado(meta);
-                  const restante = MetasCalculos.calcularMontoRestante(meta);
-
-                  return `
-                <div class="card">
-                  <div class="flex items-start justify-between mb-4">
-                    <div>
-                      <p class="font-semibold text-neutral-900 dark:text-white mb-1">
-                        ${meta.nombre}
-                      </p>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                        $${meta.montoActual.toLocaleString('es-ES', { maximumFractionDigits: 0 })} / $${meta.montoObjetivo.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
-                      </p>
-                    </div>
-                    <span class="text-2xl">🎯</span>
-                  </div>
-                  <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2 mb-3">
-                    <div
-                      class="progress-bar"
-                      style="width: ${porcentaje}%; background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%);"
-                    ></div>
-                  </div>
-                  <div class="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400">
-                    <span>${porcentaje}% completado</span>
-                    <span>Falta: $${restante.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</span>
-                  </div>
-                </div>
-              `;
-                })
-                .join('')}
-            </div>
-          </div>
-        `
-            : ''
-        }
-
-        <!-- Resumen y Recomendaciones -->
-        <div class="card bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-none">
-          <div class="flex items-start justify-between">
-            <div>
-              <h4 class="font-semibold text-neutral-900 dark:text-white mb-3">
-                💡 Resumen del Mes
-              </h4>
-              <ul class="text-sm text-neutral-700 dark:text-neutral-300 space-y-1">
-                <li>✓ Salario: $${salario.monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</li>
-                <li>✓ Tarjetas Pendientes: $${tarjetas.reduce((sum, t) => sum + TarjetasCalculos.calcularSaldoTarjeta(t), 0).toLocaleString('es-ES', { maximumFractionDigits: 0 })}</li>
-                <li>✓ Metas: $${metas.reduce((sum, m) => sum + m.montoActual, 0).toLocaleString('es-ES', { maximumFractionDigits: 0 })}</li>
-                <li>✓ Disponible: $${dineroLibre.toLocaleString('es-ES', { maximumFractionDigits: 0 })}</li>
-              </ul>
-            </div>
-            <div class="text-right">
-              <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
-                Actualización
-              </p>
-              <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
-              </p>
-            </div>
-          </div>
-        </div>
+        ` : ''}
       </div>
+
+      <script>
+        // Gráfico de Categorías
+        const categoriasData = ${JSON.stringify(this.getCategoriesData(categorias, gastosFijos, gastosVariables))};
+        if (document.getElementById('categoriasChart') && categoriasData.labels.length > 0) {
+          new Chart(document.getElementById('categoriasChart'), {
+            type: 'doughnut',
+            data: {
+              labels: categoriasData.labels,
+              datasets: [{
+                data: categoriasData.data,
+                backgroundColor: categoriasData.colors,
+                borderColor: 'white',
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: { font: { size: 11 }, padding: 15 }
+                }
+              }
+            }
+          });
+        }
+
+        // Gráfico de Flujo
+        const flujoData = ${JSON.stringify(this.getFlujoCajaData(flujoCaja))};
+        if (document.getElementById('flujoChart')) {
+          new Chart(document.getElementById('flujoChart'), {
+            type: 'line',
+            data: {
+              labels: flujoData.fechas,
+              datasets: [{
+                label: 'Saldo Proyectado',
+                data: flujoData.saldos,
+                borderColor: '#5b7cfa',
+                backgroundColor: 'rgba(91, 124, 250, 0.05)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true,
+                pointRadius: 0,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#5b7cfa'
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                y: {
+                  beginAtZero: false,
+                  grid: { drawBorder: false }
+                },
+                x: {
+                  grid: { display: false }
+                }
+              }
+            }
+          });
+        }
+      </script>
     `;
 
     return html;
+  }
+
+  getCategoriesData(categorias, gastosFijos, gastosVariables) {
+    const gastosPorCategoria = {};
+    const coloresPorCategoria = {};
+    
+    gastosFijos.forEach(g => {
+      const cat = categorias.find(c => c.id === g.categoria);
+      if (cat) {
+        gastosPorCategoria[cat.nombre] = (gastosPorCategoria[cat.nombre] || 0) + g.monto;
+        coloresPorCategoria[cat.nombre] = cat.color + '80';
+      }
+    });
+    
+    gastosVariables.forEach(g => {
+      const cat = categorias.find(c => c.id === g.categoria);
+      if (cat) {
+        gastosPorCategoria[cat.nombre] = (gastosPorCategoria[cat.nombre] || 0) + g.monto;
+        coloresPorCategoria[cat.nombre] = cat.color + '80';
+      }
+    });
+
+    const labels = Object.keys(gastosPorCategoria);
+    return {
+      labels,
+      data: labels.map(l => gastosPorCategoria[l]),
+      colors: labels.map(l => coloresPorCategoria[l] || '#5b7cfa')
+    };
+  }
+
+  getFlujoCajaData(flujoCaja) {
+    const fechas = [];
+    const saldos = [];
+    
+    flujoCaja.forEach((dia, idx) => {
+      if (idx % 5 === 0) {
+        fechas.push(dia.fecha);
+        saldos.push(dia.saldoFinal);
+      }
+    });
+
+    return { fechas, saldos };
   }
 }
