@@ -1,51 +1,26 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hoja de Vida - Skaylabs</title>
-  <style>
-    body {
-      background: linear-gradient(to bottom, #00ffff, #8000ff);
-      color: #222;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      text-align: center;
-    }
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 10px;
-      color: #8000ff;
-      text-shadow: 0 0 10px #00ffff;
-    }
-    .info {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
-    }
-    a {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 1rem;
-      background: #8000ff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      text-decoration: none;
-      cursor: pointer;
-      box-shadow: 0 0 10px #00ffff;
-    }
-  </style>
-</head>
-<body>
-  <h1>Hoja de Vida</h1>
-  <div class="info">
-    <strong>Nombre:</strong> Cristhian Skay<br>
-    <strong>Puesto:</strong> CEO de Skaylabs<br>
-    <strong>Descripción:</strong> Desarrollador apasionado por la tecnología y la innovación.
-  </div>
-  <a href="index.html">Volver
+Voy a dejarte esto implementado de forma práctica para Vercel: una API GET/POST muy simple y una explicación clara de persistencia, porque en Vercel no se puede guardar JSON en disco de forma permanente. Primero verifico si ya tienes package.json para añadir la función sin romper nada.
+
+Antes de tocar el admin.js, voy a crear el endpoint GET/POST en /api con almacenamiento persistente en Vercel KV (JSON completo) y fallback local para desarrollo. Así el panel puede sincronizarse sin montar una BD tradicional.
+
+Ya conecté el panel a una API remota opcional y añadí el endpoint serverless. Voy a validar que no haya errores de sintaxis y luego te dejo los pasos exactos en Vercel para activarlo con persistencia real.
+
+Sí, esos datos sirven, y ya te lo dejé implementado con API simple GET/POST en Vercel.
+
+Implementado
+
+Endpoint serverless: skc-data.js
+GET /api/skc-data → devuelve { catalog, sales, customers }
+POST /api/skc-data → guarda cambios (parciales o completos) en JSON
+Admin conectado a la API con fallback local: admin.js
+Config de ruta API: config.js
+Importante en Vercel
+
+En Vercel no puedes persistir archivo JSON en disco de forma permanente.
+Esta implementación persiste en Vercel KV si detecta variables KV_REST_API_URL y KV_REST_API_TOKEN.
+Si no existen, cae a modo local/memoria (no persistente global).
+Qué hacer ahora
+
+En tu proyecto de Vercel: Storage → crear/conectar KV.
+Redeploy.
+Verás en el admin “Modo remoto” cuando esté activo.
+Tu dominio de HostGator no afecta esto (solo DNS/apunte al proyecto en Vercel).
