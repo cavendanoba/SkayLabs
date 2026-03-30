@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Organizador de Nomina Personal</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = {
+			darkMode: "class",
+			theme: {
+				extend: {
+					fontFamily: {
+						display: ["Poppins", "sans-serif"],
+						body: ["Nunito", "sans-serif"],
+					},
+					colors: {
+						brand: {
+							50: "#f0f9ff",
+							100: "#e0f2fe",
+							500: "#0ea5e9",
+							600: "#0284c7",
+							700: "#0369a1",
+						},
+					},
+				},
+			},
+		};
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@500;700;800&display=swap" rel="stylesheet" />
+	<style>
+		.glass {
+			background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.75));
+			backdrop-filter: blur(8px);
+		}
+		.dark .glass {
+			background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
+		}
+	</style>
+</head>
+<body class="font-body min-h-screen bg-gradient-to-br from-sky-50 via-teal-50 to-cyan-100 text-slate-800 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 dark:text-slate-100 transition-colors duration-300">
+	<div class="max-w-7xl mx-auto p-4 md:p-6">
+		<header class="mb-6">
+			<div class="glass rounded-2xl p-5 shadow-lg border border-white/40 dark:border-slate-700/60">
+				<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+					<div>
+						<h1 class="font-display text-2xl md:text-3xl font-extrabold">Organizador de Nomina Personal Avanzado</h1>
+						<p class="text-sm md:text-base text-slate-600 dark:text-slate-300">Tarjetas, metas de ahorro y flujo de caja proyectado en una sola app.</p>
+					</div>
+					<div class="flex gap-2">
+						<button id="toggleThemeBtn" class="px-4 py-2 rounded-lg bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900 text-sm font-semibold">Modo oscuro/claro</button>
+						<button id="exportBtn" class="px-4 py-2 rounded-lg bg-brand-600 text-white text-sm font-semibold">Exportar JSON</button>
+						<label class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold cursor-pointer">
+							Importar JSON
+							<input id="importInput" type="file" accept="application/json" class="hidden" />
+						</label>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<nav class="mb-6 overflow-x-auto">
+			<div id="navbar" class="glass rounded-xl border border-white/40 dark:border-slate-700/60 shadow p-2 flex flex-nowrap gap-2 min-w-max">
+				<button data-view="dashboard" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold">Dashboard</button>
+				<button data-view="fixed" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold">Gastos fijos</button>
+				<button data-view="variable" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold">Gastos variables</button>
+				<button data-view="extra" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold">Ingresos extra</button>
+				<button data-view="cards" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold">Tarjetas</button>
+				<button data-view="goals" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold">Metas</button>
+				<button data-view="cashflow" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold">Flujo de caja</button>
+				<button data-view="settings" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold">Configuracion</button>
+			</div>
+		</nav>
+
+		<main id="appViews" class="space-y-6">
+			<section id="view-dashboard" class="view-section space-y-4"></section>
+			<section id="view-fixed" class="view-section hidden space-y-4"></section>
+			<section id="view-variable" class="view-section hidden space-y-4"></section>
+			<section id="view-extra" class="view-section hidden space-y-4"></section>
+			<section id="view-cards" class="view-section hidden space-y-4"></section>
+			<section id="view-goals" class="view-section hidden space-y-4"></section>
+			<section id="view-cashflow" class="view-section hidden space-y-4"></section>
+			<section id="view-settings" class="view-section hidden space-y-4"></section>
+		</main>
+	</div>
+
+	<!-- ES Modules -->
+	<script type="module" src="./js/app.js"></script>
+</body>
+</html>
