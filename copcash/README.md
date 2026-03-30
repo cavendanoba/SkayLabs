@@ -6,7 +6,7 @@ Aplicación web completa para gestión de nómina personal con módulos de tarje
 ## Estructura MVC Simplificada
 
 ```
-monetizador/
+copcash/
 ├── index.html                 # Punto de entrada (estructura HTML + Tailwind)
 ├── js/
 │   ├── app.js                 # Inicialización principal
@@ -117,7 +117,7 @@ monetizador/
 
 ## Instalación y Uso
 
-1. Abre `/proyectos/monetizador/index.html` en tu navegador
+1. Abre `/copcash/index.html` en tu navegador
 2. Los datos se cargan automáticamente de localStorage o se inicializan con datos de ejemplo
 3. Navega entre secciones usando el navbar
 4. Exporta/importa datos JSON usando los botones en la esquina superior
@@ -148,4 +148,4 @@ Puedes exportar a JSON para backup y reimportar en el futuro.
 
 ---
 
-**Nota**: La aplicación está completamente autocontenida en la carpeta `monetizador/`. No requiere build step ni servidor de desarrollo; funciona con un simple servidor estático (Python, Node, Live Server, etc.).
+**Nota**: La aplicación está completamente autocontenida en la carpeta `copcash/`. No requiere build step ni servidor de desarrollo; funciona con un simple servidor estático (Python, Node, Live Server, etc.).
