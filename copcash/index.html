@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CopCash - Organizador de Nómina Personal</title>
+    
+    <!-- Tailwind CSS desde CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: {} }
+        }
+    </script>
+    
+    <!-- Detectar modo oscuro -->
+    <script>
+        if (localStorage.getItem('darkMode') === 'true' || 
+            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+    </script>
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Navbar -->
+    <div id="navbar-container"></div>
+
+    <!-- Contenedor principal -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <div id="app-container"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-600 dark:text-gray-400 text-sm">
+            <p>💰 CopCash v1.0.0 | Organizador de Nómina Personal | Todos los datos se guardan localmente</p>
+            <p class="mt-2 text-xs">Realiza backups regulares desde la sección de Configuración</p>
+        </div>
+    </footer>
+
+    <!-- Punto de entrada de la aplicación -->
+    <script type="module" src="js/app.js"></script>
+
+    <script>
+        // Manejo de errores global
+        window.addEventListener('error', (event) => {
+            console.error('Error global:', event.error);
+        });
+    </script>
+</body>
+</html>
