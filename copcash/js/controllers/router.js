@@ -31,7 +31,8 @@ export class Router {
   render() {
     switch (this.currentView) {
       case 'dashboard':
-        this.container.innerHTML = new DashboardView().render();
+        this.dashboardView = new DashboardView();
+        this.container.innerHTML = this.dashboardView.render();
         break;
       case 'gastos':
         this.renderGastos();
@@ -107,6 +108,9 @@ export class Router {
     this.setupNavbar();
     
     switch (this.currentView) {
+      case 'dashboard':
+        this.setupDashboardListeners();
+        break;
       case 'gastos':
         this.setupGastosListeners();
         break;
@@ -125,6 +129,18 @@ export class Router {
       case 'config':
         this.setupConfigListeners();
         break;
+    }
+  }
+
+  setupDashboardListeners() {
+    // Inicializar gráficos del dashboard
+    if (this.dashboardView) {
+      this.dashboardView.initializeCharts(
+        storage.getCategorias(),
+        storage.getGastosFijos(),
+        storage.getGastosVariables(),
+        FlujoCalculos.generarFlujoCaja(30)
+      );
     }
   }
 

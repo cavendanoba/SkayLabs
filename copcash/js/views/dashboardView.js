@@ -227,73 +227,7 @@ export class DashboardView {
         ` : ''}
       </div>
 
-      <script>
-        // Gráfico de Categorías
-        const categoriasData = ${JSON.stringify(this.getCategoriesData(categorias, gastosFijos, gastosVariables))};
-        if (document.getElementById('categoriasChart') && categoriasData.labels.length > 0) {
-          new Chart(document.getElementById('categoriasChart'), {
-            type: 'doughnut',
-            data: {
-              labels: categoriasData.labels,
-              datasets: [{
-                data: categoriasData.data,
-                backgroundColor: categoriasData.colors,
-                borderColor: 'white',
-                borderWidth: 2
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  position: 'bottom',
-                  labels: { font: { size: 11 }, padding: 15 }
-                }
-              }
-            }
-          });
-        }
 
-        // Gráfico de Flujo
-        const flujoData = ${JSON.stringify(this.getFlujoCajaData(flujoCaja))};
-        if (document.getElementById('flujoChart')) {
-          new Chart(document.getElementById('flujoChart'), {
-            type: 'line',
-            data: {
-              labels: flujoData.fechas,
-              datasets: [{
-                label: 'Saldo Proyectado',
-                data: flujoData.saldos,
-                borderColor: '#5b7cfa',
-                backgroundColor: 'rgba(91, 124, 250, 0.05)',
-                borderWidth: 2,
-                tension: 0.4,
-                fill: true,
-                pointRadius: 0,
-                pointHoverRadius: 6,
-                pointBackgroundColor: '#5b7cfa'
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: false }
-              },
-              scales: {
-                y: {
-                  beginAtZero: false,
-                  grid: { drawBorder: false }
-                },
-                x: {
-                  grid: { display: false }
-                }
-              }
-            }
-          });
-        }
-      </script>
     `;
 
     return html;
@@ -339,5 +273,93 @@ export class DashboardView {
     });
 
     return { fechas, saldos };
+  }
+
+  // Inicializar gráficos después de renderizar el HTML
+  initializeCharts(categorias, gastosFijos, gastosVariables, flujoCaja) {
+    // Esperar un frame para asegurar que el DOM esté listo
+    setTimeout(() => {
+      // Gráfico de Categorías
+      const categoriasData = this.getCategoriesData(categorias, gastosFijos, gastosVariables);
+      const categoriasChartEl = document.getElementById('categoriasChart');
+      
+      if (categoriasChartEl && categoriasData.labels.length > 0) {
+        try {
+          new Chart(categoriasChartEl, {
+            type: 'doughnut',
+            data: {
+              labels: categoriasData.labels,
+              datasets: [{
+                data: categoriasData.data,
+                backgroundColor: categoriasData.colors,
+                borderColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: { 
+                    font: { size: 11 }, 
+                    padding: 15,
+                    color: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#374151'
+                  }
+                }
+              }
+            }
+          });
+        } catch (e) {
+          console.error('Error al crear gráfico de categorías:', e);
+        }
+      }
+
+      // Gráfico de Flujo
+      const flujoData = this.getFlujoCajaData(flujoCaja);
+      const flujoChartEl = document.getElementById('flujoChart');
+      
+      if (flujoChartEl && flujoData.fechas.length > 0) {
+        try {
+          new Chart(flujoChartEl, {
+            type: 'line',
+            data: {
+              labels: flujoData.fechas,
+              datasets: [{
+                label: 'Saldo Proyectado',
+                data: flujoData.saldos,
+                borderColor: '#5b7cfa',
+                backgroundColor: 'rgba(91, 124, 250, 0.05)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true,
+                pointRadius: 0,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#5b7cfa'
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                y: {
+                  beginAtZero: false,
+                  grid: { drawBorder: false }
+                },
+                x: {
+                  grid: { display: false }
+                }
+              }
+            }
+          });
+        } catch (e) {
+          console.error('Error al crear gráfico de flujo:', e);
+        }
+      }
+    }, 100);
   }
 }
