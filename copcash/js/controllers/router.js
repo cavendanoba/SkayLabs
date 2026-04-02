@@ -33,6 +33,8 @@ export class Router {
       case 'dashboard':
         this.dashboardView = new DashboardView();
         this.container.innerHTML = this.dashboardView.render();
+        // Inicializar gráficos y listeners después de renderizar
+        this.dashboardView.initChartsAndListeners((view) => this.navigate(view));
         break;
       case 'gastos':
         this.renderGastos();

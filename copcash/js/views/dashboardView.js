@@ -3,17 +3,23 @@ import { storage } from '/copcash/js/models/storage.js';
 import { IngresosGastosCalculos, MetasCalculos, TarjetasCalculos, FlujoCalculos } from '/copcash/js/models/calculos.js';
 
 export class DashboardView {
+  constructor() {
+    this.salario = storage.getSalario();
+    this.gastosFijos = storage.getGastosFijos();
+    this.gastosVariables = storage.getGastosVariables();
+    this.flujoCaja = FlujoCalculos.generarFlujoCaja(30);
+    this.categorias = storage.getCategorias();
+  }
+
   render() {
-    const salario = storage.getSalario();
     const dineroLibre = IngresosGastosCalculos.calcularDineroLibre();
     const tarjetas = storage.getTarjetas();
     const metas = storage.getMetas();
     const alertas = IngresosGastosCalculos.verificarAlertasPresupuesto();
-    const flujoCaja = FlujoCalculos.generarFlujoCaja(30);
-    const alertasSaldo = FlujoCalculos.verificarAlertasSaldoNegativo(flujoCaja);
-    const gastosFijos = storage.getGastosFijos();
-    const gastosVariables = storage.getGastosVariables();
-    const categorias = storage.getCategorias();
+    const alertasSaldo = FlujoCalculos.verificarAlertasSaldoNegativo(this.flujoCaja);
+    const gastosFijos = this.gastosFijos;
+    const gastosVariables = this.gastosVariables;
+    const categorias = this.categorias;
 
     const totalGastos = gastosFijos.reduce((sum, g) => sum + g.monto, 0) + 
                        gastosVariables.reduce((sum, g) => sum + g.monto, 0);
@@ -88,6 +94,26 @@ export class DashboardView {
             </div>
             <div class="kpi-change">Total gastado</div>
           </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mb-8 grid grid-cols-2 md:grid-cols-4 gap-3">
+          <button id="dashboard-btn-add-gasto" class="card hover:shadow-lg transition cursor-pointer text-center py-6 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 hover:border-blue-400">
+            <div class="text-3xl mb-2">🏠</div>
+            <div class="text-sm font-semibold text-neutral-900 dark:text-white">Agregar Gasto</div>
+          </button>
+          <button id="dashboard-btn-add-ingreso" class="card hover:shadow-lg transition cursor-pointer text-center py-6 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 hover:border-green-400">
+            <div class="text-3xl mb-2">💰</div>
+            <div class="text-sm font-semibold text-neutral-900 dark:text-white">Agregar Ingreso</div>
+          </button>
+          <button id="dashboard-btn-add-tarjeta" class="card hover:shadow-lg transition cursor-pointer text-center py-6 bg-warning-50 dark:bg-warning-900/20 border-2 border-warning-200 dark:border-warning-800 hover:border-warning-400">
+            <div class="text-3xl mb-2">💳</div>
+            <div class="text-sm font-semibold text-neutral-900 dark:text-white">Nueva Tarjeta</div>
+          </button>
+          <button id="dashboard-btn-add-meta" class="card hover:shadow-lg transition cursor-pointer text-center py-6 bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-200 dark:border-purple-800 hover:border-purple-400">
+            <div class="text-3xl mb-2">🎯</div>
+            <div class="text-sm font-semibold text-neutral-900 dark:text-white">Nueva Meta</div>
+          </button>
         </div>
 
         <!-- Alerts Section -->
@@ -361,5 +387,29 @@ export class DashboardView {
         }
       }
     }, 100);
+  }
+
+  // Método público para inicializar gráficos y listeners
+  initChartsAndListeners(routerCallback) {
+    this.initializeCharts(this.categorias, this.gastosFijos, this.gastosVariables, this.flujoCaja);
+    
+    // Listeners para botones de acceso rápido
+    const btnAddGasto = document.getElementById('dashboard-btn-add-gasto');
+    const btnAddIngreso = document.getElementById('dashboard-btn-add-ingreso');
+    const btnAddTarjeta = document.getElementById('dashboard-btn-add-tarjeta');
+    const btnAddMeta = document.getElementById('dashboard-btn-add-meta');
+
+    if (btnAddGasto) {
+      btnAddGasto.addEventListener('click', () => routerCallback('gastos'));
+    }
+    if (btnAddIngreso) {
+      btnAddIngreso.addEventListener('click', () => routerCallback('ingresos'));
+    }
+    if (btnAddTarjeta) {
+      btnAddTarjeta.addEventListener('click', () => routerCallback('tarjetas'));
+    }
+    if (btnAddMeta) {
+      btnAddMeta.addEventListener('click', () => routerCallback('metas'));
+    }
   }
 }
