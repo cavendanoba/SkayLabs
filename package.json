@@ -13,12 +13,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/cavendanoba/SkayLabs/issues"
   },
   "homepage": "https://github.com/cavendanoba/SkayLabs#readme",
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2"
+    "@neondatabase/serverless": "^1.0.2",
+    "dotenv": "^17.4.0"
   }
 }
