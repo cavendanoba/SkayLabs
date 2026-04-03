@@ -1,4 +1,4 @@
-import { getCatalog, renderCatalog } from './catalog.js';
+import { getCatalog, renderCatalog, initCatalog } from './catalog.js';
 import { CONFIG } from './config.js';
 
 function ensureAosVisibilityFallback() {
