@@ -1,0 +1,24 @@
+{
+  "name": "skaylabs",
+  "version": "1.0.0",
+  "description": "**Creative Coding & Futuristic Design** — Portafolio de proyectos frontend modernos y aplicaciones web de alta performance.",
+  "main": "404.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cavendanoba/SkayLabs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/cavendanoba/SkayLabs/issues"
+  },
+  "homepage": "https://github.com/cavendanoba/SkayLabs#readme",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2"
+  }
+}
