@@ -1,5 +1,5 @@
 // catalog.js
-import { products } from "./products.js";
+import { fetchProducts } from "./products.js"; // Importamos la función para obtener productos desde la API
 import { addToCart } from "./cart.js";
 import { CONFIG } from "./config.js";
 
@@ -20,7 +20,20 @@ export function getCatalog() {
     } catch (e) {
         console.warn('No se pudo leer skcCatalog desde localStorage', e);
     }
-    return products;
+    return [];
+}
+
+// Carga productos desde la API y los guarda en localStorage
+// Se llama una vez al iniciar la app para tener datos frescos
+export async function initCatalog() {
+    try {
+        const products = await fetchProducts();
+        if (products.length > 0) {
+            localStorage.setItem(CONFIG.CATALOG_STORAGE_KEY, JSON.stringify(products));
+        }
+    } catch (e) {
+        console.warn('No se pudo inicializar el catálogo desde la API:', e);
+    }
 }
 
 function getFilteredCatalog() {

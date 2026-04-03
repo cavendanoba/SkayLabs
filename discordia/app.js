@@ -100,8 +100,11 @@ function renderHeroProductPreview() {
     });
 }
 
-renderHeroProductPreview();
-
-// Render del catálogo principal
-renderCatalog('catalog');
+// Inicializar catálogo desde la API antes de renderizar
+// initCatalog() trae los productos frescos de PostgreSQL y los guarda en localStorage
+// Solo después de tener los datos renderizamos la UI
+initCatalog().then(() => {
+    renderHeroProductPreview();
+    renderCatalog('catalog');
+});
 
