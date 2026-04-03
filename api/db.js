@@ -3,6 +3,7 @@ import { neon } from '@neondatabase/serverless';
 // Creamos la función sql una sola vez
 // process.env.DATABASE_URL viene de las variables de Vercel
 export const sql = neon(process.env.DATABASE_URL);
+// Cualquier otro archivo de la API solo hace import { sql } from './db.js' y ya tiene conexión a la BD.
 
 //Si en algún momento quiero cambiar la BD solo debo modificar esta función y el resto del código seguirá funcionando
 
