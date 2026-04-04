@@ -6,7 +6,10 @@ import { CONFIG } from "./config.js";
 const catalogUiState = {
     search: '',
     onlyInStock: false,
-    sort: 'featured'
+    sort: 'featured',
+    category: 'all',
+    priceMin: 0,
+    priceMax: Infinity
 };
 
 let lastContainerId = null;
@@ -51,6 +54,18 @@ function getFilteredCatalog() {
         items = items.filter((product) => product.stock > 0);
     }
 
+    if (catalogUiState.category && catalogUiState.category !== 'all') {
+        items = items.filter((p) => p.category === catalogUiState.category);
+    }
+
+    if (catalogUiState.priceMin > 0) {
+        items = items.filter((p) => p.price >= catalogUiState.priceMin);
+    }
+
+    if (catalogUiState.priceMax < Infinity) {
+        items = items.filter((p) => p.price <= catalogUiState.priceMax);
+    }
+
     if (catalogUiState.sort === 'price-asc') {
         items.sort((a, b) => a.price - b.price);
     } else if (catalogUiState.sort === 'price-desc') {
@@ -76,6 +91,9 @@ if (typeof window !== 'undefined') {
         img.src = './assets/default.png';
         img.onerror = null;
     };
+    // Exponer getCatalog y setFilters para componentes externos
+    window.getCatalog = getCatalog;
+    window.setFilters = setFilters;
 }
 
 // Crear un placeholder borroso (blur-up effect)
@@ -239,6 +257,16 @@ export function showProductModal(productId, cartCallback) {
             });
         }
     });
+}
+
+// Aplica filtros externos (desde filters.js) y re-renderiza
+export function setFilters(opts = {}, containerId) {
+    if ('search' in opts) catalogUiState.search = opts.search;
+    if ('category' in opts) catalogUiState.category = opts.category;
+    if ('priceMin' in opts) catalogUiState.priceMin = opts.priceMin;
+    if ('priceMax' in opts) catalogUiState.priceMax = opts.priceMax;
+    const id = containerId || lastContainerId;
+    if (id) renderCatalog(id);
 }
 
 // Renderiza los productos en un contenedor (grid)

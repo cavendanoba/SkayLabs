@@ -1,5 +1,6 @@
 import { getCatalog, renderCatalog, initCatalog } from './catalog.js';
 import { CONFIG } from './config.js';
+import { setupFilters } from './components/filters.js';
 
 function ensureAosVisibilityFallback() {
     document.querySelectorAll('[data-aos]').forEach((el) => {
@@ -106,5 +107,6 @@ function renderHeroProductPreview() {
 initCatalog().then(() => {
     renderHeroProductPreview();
     renderCatalog('catalog');
+    setupFilters();
 });
 

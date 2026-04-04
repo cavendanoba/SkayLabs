@@ -1,4 +1,6 @@
-import { products } from './products.js';
+import { requireAuth, logout } from './auth.js';
+requireAuth();
+import { fetchProducts } from './products.js';
 import { CONFIG } from './config.js';
 
 const panel = document.getElementById('admin-panel');
@@ -26,7 +28,7 @@ const uiState = {
 };
 
 const state = {
-    catalog: loadCollection(STORAGE_KEYS.catalog, products),
+    catalog: loadCollection(STORAGE_KEYS.catalog, []),
     sales: loadCollection(STORAGE_KEYS.sales, []),
     customers: loadCollection(STORAGE_KEYS.customers, [])
 };

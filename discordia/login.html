@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Discordia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { overflow: hidden; }
+
+    .parallax-bg {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #6d165a 0%, #a0346e 45%, #ec5c8d 100%);
+      z-index: 0;
+    }
+
+    .parallax-layer {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      will-change: transform;
+      transition: transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* Tarjeta con efecto de profundidad */
+    .login-card {
+      position: relative;
+      z-index: 10;
+      will-change: transform;
+      transition: transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+
+  <!-- Fondo parallax -->
+  <div class="parallax-bg"></div>
+
+  <!-- Capas decorativas flotantes -->
+  <div class="parallax-layer" id="orb1"
+    style="width:420px;height:420px;top:-100px;left:-120px;
+           background:radial-gradient(circle,rgba(255,196,166,0.25) 0%,transparent 70%);">
+  </div>
+  <div class="parallax-layer" id="orb2"
+    style="width:320px;height:320px;bottom:-80px;right:-80px;
+           background:radial-gradient(circle,rgba(255,140,145,0.2) 0%,transparent 70%);">
+  </div>
+  <div class="parallax-layer" id="orb3"
+    style="width:180px;height:180px;top:30%;right:15%;
+           background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%);">
+  </div>
+  <div class="parallax-layer" id="orb4"
+    style="width:100px;height:100px;bottom:20%;left:10%;
+           background:radial-gradient(circle,rgba(255,196,166,0.18) 0%,transparent 70%);">
+  </div>
+
+  <!-- Partículas decorativas pequeñas -->
+  <div class="parallax-layer" id="dot1"
+    style="width:12px;height:12px;top:20%;left:25%;
+           background:rgba(255,196,166,0.5);border-radius:50%;">
+  </div>
+  <div class="parallax-layer" id="dot2"
+    style="width:8px;height:8px;top:70%;right:30%;
+           background:rgba(255,255,255,0.4);border-radius:50%;">
+  </div>
+  <div class="parallax-layer" id="dot3"
+    style="width:6px;height:6px;top:40%;left:60%;
+           background:rgba(255,196,166,0.6);border-radius:50%;">
+  </div>
+
+  <!-- Tarjeta de login -->
+  <div class="login-card bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-sm border border-white/30">
+    <div class="text-center mb-6">
+      <div class="text-4xl mb-3">✨</div>
+      <h1 class="text-2xl font-bold text-[#6d165a]">Panel Admin</h1>
+      <p class="text-sm text-gray-500 mt-1">Discordia · Acceso restringido</p>
+    </div>
+
+    <div id="error-msg" class="hidden bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-xl px-4 py-3 mb-4"></div>
+
+    <div class="flex flex-col gap-4">
+      <input
+        id="username"
+        type="text"
+        placeholder="Usuario"
+        class="px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ec5c8d]"
+      >
+      <input
+        id="password"
+        type="password"
+        placeholder="Contraseña"
+        class="px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ec5c8d]"
+      >
+      <button
+        id="login-btn"
+        class="bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-semibold py-3 rounded-xl hover:opacity-90 transition"
+      >
+        Ingresar
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+    const loginBtn = document.getElementById('login-btn');
+    const errorMsg = document.getElementById('error-msg');
+
+    // Si ya hay sesión válida, redirigir directo al admin
+    if (localStorage.getItem('discordia_admin_token')) {
+      window.location.href = './admin.html';
+    }
+
+    loginBtn.addEventListener('click', async () => {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (!username || !password) {
+        showError('Completa usuario y contraseña.');
+        return;
+      }
+
+      loginBtn.textContent = 'Verificando...';
+      loginBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/admin-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+          // Guardar token en localStorage y redirigir
+          localStorage.setItem('discordia_admin_token', data.token);
+          localStorage.setItem('discordia_admin_user', data.username);
+          window.location.href = './admin.html';
+        } else {
+          showError(data.message || 'Credenciales inválidas.');
+        }
+      } catch (error) {
+        showError('Error de conexión. Intenta de nuevo.');
+      } finally {
+        loginBtn.textContent = 'Ingresar';
+        loginBtn.disabled = false;
+      }
+    });
+
+    // Permitir login con Enter
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loginBtn.click();
+    });
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.classList.remove('hidden');
+    }
+  </script>
+
+  <!-- Parallax mouse-move -->
+  <script>
+    const layers = [
+      { el: document.getElementById('orb1'),  depth: 0.015 },
+      { el: document.getElementById('orb2'),  depth: 0.025 },
+      { el: document.getElementById('orb3'),  depth: 0.04  },
+      { el: document.getElementById('orb4'),  depth: 0.035 },
+      { el: document.getElementById('dot1'),  depth: 0.06  },
+      { el: document.getElementById('dot2'),  depth: 0.08  },
+      { el: document.getElementById('dot3'),  depth: 0.07  },
+    ];
+
+    const card = document.querySelector('.login-card');
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+
+    document.addEventListener('mousemove', (e) => {
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+
+      layers.forEach(({ el, depth }) => {
+        const x = dx * depth;
+        const y = dy * depth;
+        el.style.transform = `translate(${x}px, ${y}px)`;
+      });
+
+      // Leve inclinación 3D en la tarjeta
+      const rx =  (dy / cy) * 4;
+      const ry = -(dx / cx) * 4;
+      card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    });
+
+    document.addEventListener('mouseleave', () => {
+      layers.forEach(({ el }) => el.style.transform = 'translate(0,0)');
+      card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg)';
+    });
+  </script>
+
+</body>
+</html>

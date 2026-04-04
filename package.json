@@ -20,6 +20,7 @@
   "homepage": "https://github.com/cavendanoba/SkayLabs#readme",
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.0"
   }
 }

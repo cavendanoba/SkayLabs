@@ -1,4 +1,4 @@
-import { renderCatalog } from '../catalog.js';
+import { getCatalog, setFilters } from '../catalog.js';
 
 // Filters component: reads catalog via window.getCatalog() (catalog exposes it)
 export function setupFilters() {
@@ -17,8 +17,8 @@ export function setupFilters() {
     const priceRange2Mobile = document.getElementById('priceRange2Mobile');
     const priceRange3Mobile = document.getElementById('priceRange3Mobile');
 
-    // Crear lista de categorías únicas usando window.getCatalog()
-    const catalog = (typeof window.getCatalog === 'function') ? window.getCatalog() : (window.__SKC_CATALOG__ || []);
+    // Crear lista de categorías únicas
+    const catalog = getCatalog();
     const categories = Array.from(new Set(catalog.map(p => p.category).filter(Boolean)));
 
     if (categoryContainer) {
@@ -108,7 +108,7 @@ export function setupFilters() {
         const minVal = (priceMin && priceMin.value !== '') ? parseFloat(priceMin.value) : ((priceMinMobile && priceMinMobile.value !== '') ? parseFloat(priceMinMobile.value) : 0);
         const maxVal = (priceMax && priceMax.value !== '') ? parseFloat(priceMax.value) : ((priceMaxMobile && priceMaxMobile.value !== '') ? parseFloat(priceMaxMobile.value) : Infinity);
 
-        renderCatalog('catalog', { search, category, priceMin: minVal, priceMax: maxVal });
+        setFilters({ search, category, priceMin: minVal, priceMax: maxVal }, 'catalog');
         if (searchSpinner) searchSpinner.classList.add('hidden');
     }
 }

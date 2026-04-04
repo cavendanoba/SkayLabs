@@ -36,6 +36,10 @@
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
     </style>
 
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#ec5c8d">
+
     <!-- Style-->
      <link rel="stylesheet" href="./style.css">
 
@@ -87,6 +91,14 @@
         <!-- Mobile Navigation Menu -->
         <nav id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-100 px-4 py-3">
             <div class="flex flex-col gap-3">
+                <!-- Búsqueda mobile -->
+                <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-4 py-2">
+                    <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input id="mobileSearchInput" type="search" placeholder="Buscar productos..." class="bg-transparent outline-none w-full text-sm text-gray-700">
+                    <a href="#productos" id="mobileSearchBtn" class="flex-shrink-0 text-xs font-semibold text-[#ec5c8d] hover:text-[#a0346e] transition">Ir</a>
+                </div>
                 <a href="#productos" class="py-2 text-gray-700 hover:text-[#6d165a] transition border-b border-gray-100">Catálogo</a>
                 <a href="#categorias" class="py-2 text-gray-700 hover:text-[#6d165a] transition border-b border-gray-100">Categorías</a>
                 <a href="#cajas" class="py-2 text-gray-700 hover:text-[#6d165a] transition border-b border-gray-100">Combos</a>
@@ -100,12 +112,15 @@
     <!-- -------------------------------------- -->
     <!-- HERO -->
     <!-- -------------------------------------- -->
-    <section
-        class="bg-gradient-to-br from-[#6d165a] via-[#a0346e] to-[#ec5c8d] text-white py-24 text-center relative overflow-hidden">
+    <section id="hero"
+        class="bg-gradient-to-br from-[#6d165a] via-[#a0346e] to-[#ec5c8d] text-white py-16 md:py-24 text-center relative overflow-hidden">
         
-        <div class="absolute inset-0 opacity-10">
-            <div class="absolute top-10 left-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
-            <div class="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
+        <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+            <div id="heroOrb1" class="absolute -top-16 -left-16 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+            <div id="heroOrb2" class="absolute -bottom-16 -right-16 w-72 h-72 bg-[#ffc4a6]/10 rounded-full blur-3xl"></div>
+            <div id="heroOrb3" class="absolute top-1/2 left-1/4 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+            <div id="heroOrb4" class="absolute top-1/4 right-1/3 w-48 h-48 bg-[#ff8c91]/10 rounded-full blur-2xl"></div>
+            <div id="heroOrb5" class="absolute bottom-1/4 left-1/2 w-32 h-32 bg-[#ffc4a6]/8 rounded-full blur-2xl"></div>
         </div>
 
         <div class="relative z-10 max-w-5xl mx-auto px-4">
@@ -266,6 +281,27 @@
 
             <!-- Catálogo Principal -->
             <div class="flex-1">
+
+                <!-- Filtros rápidos: solo mobile/tablet (lg:hidden) -->
+                <div class="lg:hidden mb-5 flex flex-wrap gap-2 items-center">
+                    <label class="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 text-sm cursor-pointer hover:border-[#ec5c8d] transition select-none">
+                        <input id="mobileFilterInStock" type="checkbox" class="w-3.5 h-3.5 accent-[#ec5c8d]">
+                        <span class="text-gray-700 font-medium">En Stock</span>
+                    </label>
+                    <button data-price-min="0" data-price-max="20000"
+                        class="mobile-price-pill bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-700 hover:border-[#ec5c8d] transition">
+                        Hasta $20.000
+                    </button>
+                    <button data-price-min="20000" data-price-max="30000"
+                        class="mobile-price-pill bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-700 hover:border-[#ec5c8d] transition">
+                        $20.000 – $30.000
+                    </button>
+                    <button data-price-min="30000" data-price-max="999999"
+                        class="mobile-price-pill bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-700 hover:border-[#ec5c8d] transition">
+                        $30.000+
+                    </button>
+                </div>
+
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-bold text-gray-900">
@@ -739,6 +775,105 @@
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script type="module" src="./app.js"></script>
+
+    <!-- Parallax hero + sincronización mobile -->
+    <script>
+      (function () {
+        // === PARALLAX HERO (scroll-based) ===
+        var orbs = [
+          { el: document.getElementById('heroOrb1'), speed: 0.25 },
+          { el: document.getElementById('heroOrb2'), speed: 0.40 },
+          { el: document.getElementById('heroOrb3'), speed: 0.15 },
+          { el: document.getElementById('heroOrb4'), speed: 0.35 },
+          { el: document.getElementById('heroOrb5'), speed: 0.20 },
+        ].filter(function (o) { return o.el; });
+
+        var hero = document.getElementById('hero');
+        var ticking = false;
+
+        window.addEventListener('scroll', function () {
+          if (!ticking) {
+            requestAnimationFrame(function () {
+              var scrollY = window.scrollY;
+              if (hero && scrollY < hero.offsetHeight * 1.5) {
+                orbs.forEach(function (o) {
+                  o.el.style.transform = 'translateY(' + (scrollY * o.speed) + 'px)';
+                });
+              }
+              ticking = false;
+            });
+            ticking = true;
+          }
+        }, { passive: true });
+
+        // === BÚSQUEDA MOBILE ===
+        var mobileSearch  = document.getElementById('mobileSearchInput');
+        var desktopSearch = document.getElementById('catalogSearch');
+
+        if (mobileSearch && desktopSearch) {
+          mobileSearch.addEventListener('input', function () {
+            desktopSearch.value = mobileSearch.value;
+            desktopSearch.dispatchEvent(new Event('input', { bubbles: true }));
+          });
+          var mobileSearchBtn = document.getElementById('mobileSearchBtn');
+          if (mobileSearchBtn) {
+            mobileSearchBtn.addEventListener('click', function () {
+              desktopSearch.value = mobileSearch.value;
+              desktopSearch.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+          }
+        }
+
+        // === FILTRO EN STOCK MOBILE ===
+        var mobileStock  = document.getElementById('mobileFilterInStock');
+        var desktopStock = document.getElementById('filterInStock');
+
+        if (mobileStock && desktopStock) {
+          mobileStock.addEventListener('change', function () {
+            desktopStock.checked = mobileStock.checked;
+            desktopStock.dispatchEvent(new Event('change', { bubbles: true }));
+          });
+        }
+
+        // === FILTROS DE PRECIO MOBILE (pills) ===
+        var activePill = null;
+        var pills = document.querySelectorAll('.mobile-price-pill');
+
+        pills.forEach(function (pill) {
+          pill.addEventListener('click', function () {
+            var isActive = pill === activePill;
+
+            pills.forEach(function (p) {
+              p.style.background = '';
+              p.style.color = '';
+              p.style.borderColor = '';
+            });
+
+            if (isActive) {
+              activePill = null;
+              if (window.setFilters) window.setFilters({ priceMin: 0, priceMax: Infinity }, 'catalog');
+            } else {
+              activePill = pill;
+              pill.style.background = '#ec5c8d';
+              pill.style.color = '#fff';
+              pill.style.borderColor = '#ec5c8d';
+              var min = parseFloat(pill.dataset.priceMin) || 0;
+              var max = parseFloat(pill.dataset.priceMax) || Infinity;
+              if (window.setFilters) window.setFilters({ priceMin: min, priceMax: max }, 'catalog');
+            }
+          });
+        });
+      })();
+    </script>
+
+    <!-- Registro del Service Worker para PWA / caché offline -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+      }
+    </script>
 
 </body>
 
