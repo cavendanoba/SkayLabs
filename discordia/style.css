@@ -94,3 +94,27 @@ h4,
     filter: blur(0);
     opacity: 1;
 }
+
+/* WhatsApp floating button — pulse ring */
+@keyframes wa-ping {
+    0%   { transform: scale(1);    opacity: 0.75; }
+    70%  { transform: scale(1.55); opacity: 0;    }
+    100% { transform: scale(1.55); opacity: 0;    }
+}
+
+.wa-pulse-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid #40c351;
+    animation: wa-ping 2.2s ease-out infinite;
+    pointer-events: none;
+}
+
+/* Parallax impact section — shared layer base */
+.par-layer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    will-change: transform;
+}

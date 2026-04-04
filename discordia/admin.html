@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
@@ -55,14 +56,28 @@
 
         <section id="admin-summary" class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6"></section>
 
-        <section class="bg-white border border-gray-100 rounded-2xl p-3 md:p-4 shadow-sm mb-6">
-            <div class="grid grid-cols-3 gap-2">
-                <button data-admin-tab="catalog"
-                    class="admin-tab-btn px-3 py-2 rounded-xl font-semibold text-sm md:text-base bg-[#6d165a] text-white">Catálogo</button>
+        <section class="bg-white border border-gray-100 rounded-2xl p-3 md:p-4 shadow-sm mb-6 overflow-x-auto" style="-ms-overflow-style:none;scrollbar-width:none">
+            <div class="flex gap-2 min-w-max">
+                <button data-admin-tab="dashboard"
+                    class="admin-tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition bg-[#6d165a] text-white">
+                    <i class="fa-solid fa-chart-line mr-1.5"></i>Dashboard
+                </button>
+                <button data-admin-tab="debts"
+                    class="admin-tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition bg-gray-100 text-gray-700">
+                    <i class="fa-solid fa-file-invoice-dollar mr-1.5"></i>Deudas
+                </button>
                 <button data-admin-tab="sales"
-                    class="admin-tab-btn px-3 py-2 rounded-xl font-semibold text-sm md:text-base bg-gray-100 text-gray-700">Ventas</button>
+                    class="admin-tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition bg-gray-100 text-gray-700">
+                    <i class="fa-solid fa-cart-shopping mr-1.5"></i>Ventas
+                </button>
+                <button data-admin-tab="catalog"
+                    class="admin-tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition bg-gray-100 text-gray-700">
+                    <i class="fa-solid fa-tag mr-1.5"></i>Catálogo
+                </button>
                 <button data-admin-tab="customers"
-                    class="admin-tab-btn px-3 py-2 rounded-xl font-semibold text-sm md:text-base bg-gray-100 text-gray-700">Clientes</button>
+                    class="admin-tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition bg-gray-100 text-gray-700">
+                    <i class="fa-solid fa-users mr-1.5"></i>Clientes
+                </button>
             </div>
         </section>
 
