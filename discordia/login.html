@@ -3,10 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin · Discordia</title>
+  <title>Admin — DISCORDIA</title>
+  <link rel="icon" type="image/png" href="./assets/logo-discordia.png">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap">
   <style>
-    body { overflow: hidden; }
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
 
     .parallax-bg {
       position: fixed;
@@ -23,21 +35,30 @@
       transition: transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
-    /* Tarjeta con efecto de profundidad */
     .login-card {
       position: relative;
       z-index: 10;
       will-change: transform;
       transition: transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
+
+    .login-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+      position: relative;
+      z-index: 5;
+    }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center">
+<body>
 
-  <!-- Fondo parallax -->
+  <!-- Fondo parallax gradiente -->
   <div class="parallax-bg"></div>
 
-  <!-- Capas decorativas flotantes -->
+  <!-- Capas decorativas flotantes (parallax) -->
   <div class="parallax-layer" id="orb1"
     style="width:420px;height:420px;top:-100px;left:-120px;
            background:radial-gradient(circle,rgba(255,196,166,0.25) 0%,transparent 70%);">
@@ -55,7 +76,7 @@
            background:radial-gradient(circle,rgba(255,196,166,0.18) 0%,transparent 70%);">
   </div>
 
-  <!-- Partículas decorativas pequeñas -->
+  <!-- Partículas decorativas -->
   <div class="parallax-layer" id="dot1"
     style="width:12px;height:12px;top:20%;left:25%;
            background:rgba(255,196,166,0.5);border-radius:50%;">
@@ -69,96 +90,144 @@
            background:rgba(255,196,166,0.6);border-radius:50%;">
   </div>
 
-  <!-- Tarjeta de login -->
-  <div class="login-card bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-sm border border-white/30">
-    <div class="text-center mb-6">
-      <div class="text-4xl mb-3">✨</div>
-      <h1 class="text-2xl font-bold text-[#6d165a]">Panel Admin</h1>
-      <p class="text-sm text-gray-500 mt-1">Discordia · Acceso restringido</p>
-    </div>
+  <!-- Contenedor principal -->
+  <div class="login-container">
+    <div class="w-full max-w-sm">
 
-    <div id="error-msg" class="hidden bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-xl px-4 py-3 mb-4"></div>
+      <!-- Card -->
+      <div class="login-card bg-white rounded-3xl shadow-2xl overflow-hidden">
 
-    <div class="flex flex-col gap-4">
-      <input
-        id="username"
-        type="text"
-        placeholder="Usuario"
-        class="px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ec5c8d]"
-      >
-      <input
-        id="password"
-        type="password"
-        placeholder="Contraseña"
-        class="px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ec5c8d]"
-      >
-      <button
-        id="login-btn"
-        class="bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-semibold py-3 rounded-xl hover:opacity-90 transition"
-      >
-        Ingresar
-      </button>
+        <!-- Header con gradiente -->
+        <div class="bg-gradient-to-r from-[#6d165a] to-[#a0346e] px-8 py-8 text-center">
+          <img src="./assets/logo-discordia.png" alt="DISCORDIA" class="w-16 h-16 object-contain mx-auto mb-3 rounded-full bg-white/20 p-2">
+          <h1 class="text-white font-bold text-2xl" style="font-family:'Playfair Display',serif;">Panel Admin</h1>
+          <p class="text-white/70 text-sm mt-1">Acceso restringido · DISCORDIA</p>
+        </div>
+
+        <!-- Form -->
+        <div class="px-8 py-8">
+
+          <!-- Error message -->
+          <div id="error-msg" class="hidden bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-xl px-4 py-3 mb-5 flex items-center gap-2">
+            <span class="text-base">⚠️</span>
+            <span id="error-text">Credenciales inválidas</span>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="text-xs uppercase tracking-[0.15em] text-[#6d165a] font-semibold block mb-1.5">Usuario</label>
+              <input id="username" type="text" autocomplete="username"
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ec5c8d] focus:ring-2 focus:ring-[#ec5c8d]/20 transition"
+                placeholder="admin">
+            </div>
+            <div>
+              <label class="text-xs uppercase tracking-[0.15em] text-[#6d165a] font-semibold block mb-1.5">Contraseña</label>
+              <div class="relative">
+                <input id="password" type="password" autocomplete="current-password"
+                  class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ec5c8d] focus:ring-2 focus:ring-[#ec5c8d]/20 transition pr-12"
+                  placeholder="••••••••">
+                <button id="toggle-pwd" type="button"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#6d165a] transition text-sm">
+                  👁
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button id="login-btn"
+            class="mt-6 w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] hover:from-[#ff8c91] hover:to-[#ffc4a6] text-white font-bold py-3.5 rounded-xl transition hover:shadow-lg flex items-center justify-center gap-2 text-sm">
+            <span id="btn-text">Ingresar al panel</span>
+            <span id="btn-spinner" class="hidden">
+              <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
+                <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </button>
+
+          <p class="text-center mt-5 text-xs text-gray-400">
+            <a href="./index.html" class="hover:text-[#6d165a] transition">← Volver a la tienda</a>
+          </p>
+        </div>
+      </div>
+
+      <p class="text-center mt-4 text-white/40 text-xs">DISCORDIA · Panel interno</p>
     </div>
   </div>
 
   <script type="module">
-    const loginBtn = document.getElementById('login-btn');
-    const errorMsg = document.getElementById('error-msg');
-
-    // Si ya hay sesión válida, redirigir directo al admin
+    // Redirigir si ya hay sesión
     if (localStorage.getItem('discordia_admin_token')) {
       window.location.href = './admin.html';
     }
 
+    const loginBtn  = document.getElementById('login-btn');
+    const errorMsg  = document.getElementById('error-msg');
+    const errorText = document.getElementById('error-text');
+    const btnText   = document.getElementById('btn-text');
+    const btnSpinner= document.getElementById('btn-spinner');
+    const togglePwd = document.getElementById('toggle-pwd');
+    const pwdInput  = document.getElementById('password');
+
+    // Toggle password visibility
+    togglePwd.addEventListener('click', () => {
+      const isText = pwdInput.type === 'text';
+      pwdInput.type = isText ? 'password' : 'text';
+      togglePwd.textContent = isText ? '👁' : '🙈';
+    });
+
+    // Login on Enter
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') loginBtn.click();
+    });
+
+    function showError(msg) {
+      errorText.textContent = msg;
+      errorMsg.classList.remove('hidden');
+    }
+
+    function setLoading(loading) {
+      loginBtn.disabled = loading;
+      btnText.textContent   = loading ? 'Verificando...' : 'Ingresar al panel';
+      btnSpinner.classList.toggle('hidden', !loading);
+    }
+
     loginBtn.addEventListener('click', async () => {
+      errorMsg.classList.add('hidden');
       const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
+      const password = pwdInput.value.trim();
 
       if (!username || !password) {
         showError('Completa usuario y contraseña.');
         return;
       }
 
-      loginBtn.textContent = 'Verificando...';
-      loginBtn.disabled = true;
+      setLoading(true);
 
       try {
-        const res = await fetch('/api/admin-login', {
+        const res  = await fetch('/api/discordia/admin-login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
         });
-
         const data = await res.json();
 
         if (data.ok) {
-          // Guardar token en localStorage y redirigir
           localStorage.setItem('discordia_admin_token', data.token);
           localStorage.setItem('discordia_admin_user', data.username);
           window.location.href = './admin.html';
         } else {
           showError(data.message || 'Credenciales inválidas.');
         }
-      } catch (error) {
+      } catch {
         showError('Error de conexión. Intenta de nuevo.');
       } finally {
-        loginBtn.textContent = 'Ingresar';
-        loginBtn.disabled = false;
+        setLoading(false);
       }
     });
-
-    // Permitir login con Enter
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') loginBtn.click();
-    });
-
-    function showError(msg) {
-      errorMsg.textContent = msg;
-      errorMsg.classList.remove('hidden');
-    }
   </script>
 
-  <!-- Parallax mouse-move -->
+  <!-- Parallax mouse-move effect -->
   <script>
     const layers = [
       { el: document.getElementById('orb1'),  depth: 0.015 },

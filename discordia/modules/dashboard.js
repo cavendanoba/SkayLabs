@@ -1,6 +1,6 @@
-// discordia/dashboard.js
+// discordia/modules/dashboard.js
 // ─────────────────────────────────────────────────────────────
-// Módulo visual del Dashboard. Consulta /api/dashboard y
+// Módulo visual del Dashboard. Consulta /api/discordia/dashboard y
 // renderiza KPIs, deudas activas, top productos, ventas
 // recientes y alertas de stock bajo.
 // ─────────────────────────────────────────────────────────────
@@ -10,7 +10,7 @@ export async function renderDashboard(container) {
 
   let data;
   try {
-    const res  = await fetch('/api/dashboard');
+    const res  = await fetch('/api/discordia/dashboard');
     const json = await res.json();
     if (!json.ok) throw new Error('API error');
     data = json.data;
