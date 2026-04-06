@@ -3,6 +3,7 @@ import { storage } from '/copcash/js/models/storage.js';
 
 export class NavbarView {
   render() {
+    const user = storage.getUser();
     return `
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div class="flex justify-between items-center">
@@ -20,6 +21,10 @@ export class NavbarView {
 
           <!-- Controles Derecha -->
           <div class="flex items-center gap-3">
+            <span class="hidden md:inline text-xs text-neutral-600 dark:text-neutral-400">${user?.email || ''}</span>
+            <button id="btn-logout" class="px-3 py-2 text-xs font-semibold rounded-lg bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-300" title="Cerrar sesion">
+              Salir
+            </button>
             <button id="btn-dark-mode" class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition" title="Cambiar tema">
               🌙
             </button>
@@ -123,11 +128,10 @@ export class ConfiguracionView {
           <div class="text-blue-800 dark:text-blue-200 space-y-2 text-sm">
             <p><strong>Versión:</strong> 1.0.0</p>
             <p><strong>Tipo:</strong> Aplicación Web SPA (Single Page Application)</p>
-            <p><strong>Almacenamiento:</strong> LocalStorage (navegador)</p>
+            <p><strong>Almacenamiento:</strong> Neon PostgreSQL (nube)</p>
             <p><strong>Tecnología:</strong> HTML5, CSS3 (Tailwind), JavaScript ES6+</p>
             <p>
-              <strong>Todos los datos se guardan localmente en tu navegador</strong> y nunca se envían a servidores externos.
-              Realiza backups regulares exportando tus datos.
+              <strong>Tus datos se guardan en la nube por usuario</strong> y puedes exportar backups en JSON cuando quieras.
             </p>
           </div>
         </div>

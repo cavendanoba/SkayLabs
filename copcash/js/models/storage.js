@@ -1,30 +1,98 @@
-// Modelo de Almacenamiento Central
-// Maneja toda la persistencia en localStorage y operaciones CRUD
+// Modelo de Almacenamiento — CopCash
+// Usa cache en memoria + API REST en Neon (Vercel serverless).
+// Getters: sincronicos (leen del cache).
+// Escrituras: async (llaman a la API y actualizan el cache).
 
-import { seedData } from '/copcash/data/seedData.js';
+const BASE = '/api/copcash';
 
 class StorageModel {
   constructor() {
-    this.storageKey = 'copcash_app_data';
+    this.cache = null;
     this.listeners = [];
-    this.initializeStorage();
   }
 
-  initializeStorage() {
-    const stored = localStorage.getItem(this.storageKey);
-    if (!stored) {
-      localStorage.setItem(this.storageKey, JSON.stringify(seedData));
-    }
+  // Auth
+  get token() {
+    return localStorage.getItem('copcash_token');
   }
 
-  getData() {
-    const stored = localStorage.getItem(this.storageKey);
-    return stored ? JSON.parse(stored) : seedData;
+  isAuthenticated() {
+    return !!this.token;
   }
 
-  saveData(data) {
-    localStorage.setItem(this.storageKey, JSON.stringify(data));
-    this.notifyListeners();
+  getUser() {
+    const raw = localStorage.getItem('copcash_user');
+    return raw ? JSON.parse(raw) : null;
+  }
+
+  async login(email, password) {
+    const res = await fetch(`${BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error al iniciar sesion');
+    localStorage.setItem('copcash_token', data.token);
+    localStorage.setItem('copcash_user', JSON.stringify(data.user));
+    return data.user;
+  }
+
+  async register(email, password, nombre) {
+    const res = await fetch(`${BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, nombre })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error al registrarse');
+    localStorage.setItem('copcash_token', data.token);
+    localStorage.setItem('copcash_user', JSON.stringify(data.user));
+    return data.user;
+  }
+
+  logout() {
+    localStorage.removeItem('copcash_token');
+    localStorage.removeItem('copcash_user');
+    this.cache = null;
+  }
+
+  async _req(path, options = {}) {
+    const res = await fetch(BASE + path, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`
+      },
+      ...options
+    });
+    if (res.status === 204) return null;
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error del servidor');
+    return data;
+  }
+
+  // Carga inicial
+  async refresh() {
+    const [salario, categorias, gastosFijos, gastosVariables, ingresosExtra, tarjetas, metas] =
+      await Promise.all([
+        this._req('/salario'),
+        this._req('/categorias'),
+        this._req('/gastos-fijos'),
+        this._req('/gastos-variables'),
+        this._req('/ingresos-extra'),
+        this._req('/tarjetas'),
+        this._req('/metas')
+      ]);
+
+    this.cache = {
+      salario,
+      categorias,
+      gastosFijos,
+      gastosVariables,
+      ingresosExtra,
+      tarjetas,
+      metas
+    };
   }
 
   subscribe(listener) {
@@ -32,244 +100,275 @@ class StorageModel {
   }
 
   notifyListeners() {
-    this.listeners.forEach(listener => listener(this.getData()));
+    this.listeners.forEach((listener) => listener(this.cache));
   }
 
   // SALARIO
-  setSalario(salario) {
-    const data = this.getData();
-    data.salario = salario;
-    this.saveData(data);
-  }
-
   getSalario() {
-    return this.getData().salario;
+    return this.cache?.salario ?? null;
   }
 
-  // CATEGORÍAS
+  async setSalario(salario) {
+    const updated = await this._req('/salario', {
+      method: 'PUT',
+      body: JSON.stringify(salario)
+    });
+    this.cache.salario = updated;
+    this.notifyListeners();
+  }
+
+  // CATEGORIAS
   getCategorias() {
-    return this.getData().categorias;
+    return this.cache?.categorias ?? [];
   }
 
   getCategoria(id) {
-    return this.getCategorias().find(c => c.id === id);
+    return this.getCategorias().find((c) => c.id === id);
   }
 
-  addCategoria(categoria) {
-    const data = this.getData();
-    categoria.id = Math.max(...data.categorias.map(c => c.id), 0) + 1;
-    data.categorias.push(categoria);
-    this.saveData(data);
-    return categoria;
+  async addCategoria(categoria) {
+    const created = await this._req('/categorias', {
+      method: 'POST',
+      body: JSON.stringify(categoria)
+    });
+    this.cache.categorias.push(created);
+    this.notifyListeners();
+    return created;
   }
 
-  updateCategoria(id, updates) {
-    const data = this.getData();
-    const cat = data.categorias.find(c => c.id === id);
-    if (cat) {
-      Object.assign(cat, updates);
-      this.saveData(data);
-    }
+  async updateCategoria(id, updates) {
+    const updated = await this._req(`/categorias/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+    const idx = this.cache.categorias.findIndex((c) => c.id === id);
+    if (idx !== -1) this.cache.categorias[idx] = updated;
+    this.notifyListeners();
   }
 
-  deleteCategoria(id) {
-    const data = this.getData();
-    data.categorias = data.categorias.filter(c => c.id !== id);
-    this.saveData(data);
+  async deleteCategoria(id) {
+    await this._req(`/categorias/${id}`, { method: 'DELETE' });
+    this.cache.categorias = this.cache.categorias.filter((c) => c.id !== id);
+    this.notifyListeners();
   }
 
   // GASTOS FIJOS
   getGastosFijos() {
-    return this.getData().gastosFijos;
+    return this.cache?.gastosFijos ?? [];
   }
 
-  addGastoFijo(gasto) {
-    const data = this.getData();
-    gasto.id = Math.max(...data.gastosFijos.map(g => g.id), 0) + 1;
-    data.gastosFijos.push(gasto);
-    this.saveData(data);
-    return gasto;
+  async addGastoFijo(gasto) {
+    const created = await this._req('/gastos-fijos', {
+      method: 'POST',
+      body: JSON.stringify(gasto)
+    });
+    this.cache.gastosFijos.push(created);
+    this.notifyListeners();
+    return created;
   }
 
-  updateGastoFijo(id, updates) {
-    const data = this.getData();
-    const gasto = data.gastosFijos.find(g => g.id === id);
-    if (gasto) {
-      Object.assign(gasto, updates);
-      this.saveData(data);
-    }
+  async updateGastoFijo(id, updates) {
+    const updated = await this._req(`/gastos-fijos/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+    const idx = this.cache.gastosFijos.findIndex((g) => g.id === id);
+    if (idx !== -1) this.cache.gastosFijos[idx] = updated;
+    this.notifyListeners();
   }
 
-  deleteGastoFijo(id) {
-    const data = this.getData();
-    data.gastosFijos = data.gastosFijos.filter(g => g.id !== id);
-    this.saveData(data);
+  async deleteGastoFijo(id) {
+    await this._req(`/gastos-fijos/${id}`, { method: 'DELETE' });
+    this.cache.gastosFijos = this.cache.gastosFijos.filter((g) => g.id !== id);
+    this.notifyListeners();
   }
 
   // GASTOS VARIABLES
   getGastosVariables() {
-    return this.getData().gastosVariables;
+    return this.cache?.gastosVariables ?? [];
   }
 
-  addGastoVariable(gasto) {
-    const data = this.getData();
-    gasto.id = Math.max(...data.gastosVariables.map(g => g.id), 0) + 1;
-    data.gastosVariables.push(gasto);
-    this.saveData(data);
-    return gasto;
+  async addGastoVariable(gasto) {
+    const created = await this._req('/gastos-variables', {
+      method: 'POST',
+      body: JSON.stringify(gasto)
+    });
+    this.cache.gastosVariables.push(created);
+    this.notifyListeners();
+    return created;
   }
 
-  updateGastoVariable(id, updates) {
-    const data = this.getData();
-    const gasto = data.gastosVariables.find(g => g.id === id);
-    if (gasto) {
-      Object.assign(gasto, updates);
-      this.saveData(data);
-    }
+  async updateGastoVariable(id, updates) {
+    const updated = await this._req(`/gastos-variables/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+    const idx = this.cache.gastosVariables.findIndex((g) => g.id === id);
+    if (idx !== -1) this.cache.gastosVariables[idx] = updated;
+    this.notifyListeners();
   }
 
-  deleteGastoVariable(id) {
-    const data = this.getData();
-    data.gastosVariables = data.gastosVariables.filter(g => g.id !== id);
-    this.saveData(data);
+  async deleteGastoVariable(id) {
+    await this._req(`/gastos-variables/${id}`, { method: 'DELETE' });
+    this.cache.gastosVariables = this.cache.gastosVariables.filter((g) => g.id !== id);
+    this.notifyListeners();
   }
 
   // INGRESOS EXTRA
   getIngresosExtra() {
-    return this.getData().ingresosExtra;
+    return this.cache?.ingresosExtra ?? [];
   }
 
-  addIngresoExtra(ingreso) {
-    const data = this.getData();
-    ingreso.id = Math.max(...data.ingresosExtra.map(i => i.id), 0) + 1;
-    data.ingresosExtra.push(ingreso);
-    this.saveData(data);
-    return ingreso;
+  async addIngresoExtra(ingreso) {
+    const created = await this._req('/ingresos-extra', {
+      method: 'POST',
+      body: JSON.stringify(ingreso)
+    });
+    this.cache.ingresosExtra.push(created);
+    this.notifyListeners();
+    return created;
   }
 
-  updateIngresoExtra(id, updates) {
-    const data = this.getData();
-    const ingreso = data.ingresosExtra.find(i => i.id === id);
-    if (ingreso) {
-      Object.assign(ingreso, updates);
-      this.saveData(data);
-    }
+  async updateIngresoExtra(id, updates) {
+    const updated = await this._req(`/ingresos-extra/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+    const idx = this.cache.ingresosExtra.findIndex((i) => i.id === id);
+    if (idx !== -1) this.cache.ingresosExtra[idx] = updated;
+    this.notifyListeners();
   }
 
-  deleteIngresoExtra(id) {
-    const data = this.getData();
-    data.ingresosExtra = data.ingresosExtra.filter(i => i.id !== id);
-    this.saveData(data);
+  async deleteIngresoExtra(id) {
+    await this._req(`/ingresos-extra/${id}`, { method: 'DELETE' });
+    this.cache.ingresosExtra = this.cache.ingresosExtra.filter((i) => i.id !== id);
+    this.notifyListeners();
   }
 
   // TARJETAS
   getTarjetas() {
-    return this.getData().tarjetas;
+    return this.cache?.tarjetas ?? [];
   }
 
   getTarjeta(id) {
-    return this.getTarjetas().find(t => t.id === id);
+    return this.getTarjetas().find((t) => t.id === id);
   }
 
-  addTarjeta(tarjeta) {
-    const data = this.getData();
-    tarjeta.id = Math.max(...data.tarjetas.map(t => t.id), 0) + 1;
-    tarjeta.compras = [];
-    data.tarjetas.push(tarjeta);
-    this.saveData(data);
-    return tarjeta;
+  async addTarjeta(tarjeta) {
+    const created = await this._req('/tarjetas', {
+      method: 'POST',
+      body: JSON.stringify(tarjeta)
+    });
+    this.cache.tarjetas.push(created);
+    this.notifyListeners();
+    return created;
   }
 
-  updateTarjeta(id, updates) {
-    const data = this.getData();
-    const tarjeta = data.tarjetas.find(t => t.id === id);
-    if (tarjeta) {
-      Object.assign(tarjeta, updates);
-      this.saveData(data);
-    }
+  async updateTarjeta(id, updates) {
+    const updated = await this._req(`/tarjetas/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+    const idx = this.cache.tarjetas.findIndex((t) => t.id === id);
+    if (idx !== -1) this.cache.tarjetas[idx] = updated;
+    this.notifyListeners();
   }
 
-  deleteTarjeta(id) {
-    const data = this.getData();
-    data.tarjetas = data.tarjetas.filter(t => t.id !== id);
-    this.saveData(data);
+  async deleteTarjeta(id) {
+    await this._req(`/tarjetas/${id}`, { method: 'DELETE' });
+    this.cache.tarjetas = this.cache.tarjetas.filter((t) => t.id !== id);
+    this.notifyListeners();
   }
 
   // COMPRAS A CUOTAS
-  addCompra(tarjetaId, compra) {
-    const data = this.getData();
-    const tarjeta = data.tarjetas.find(t => t.id === tarjetaId);
-    if (tarjeta) {
-      compra.id = Math.max(...tarjeta.compras.map(c => c.id), 0) + 1;
-      tarjeta.compras.push(compra);
-      this.saveData(data);
-      return compra;
-    }
+  async addCompra(tarjetaId, compra) {
+    const created = await this._req(`/tarjetas/${tarjetaId}/compras`, {
+      method: 'POST',
+      body: JSON.stringify(compra)
+    });
+    const tarjeta = this.getTarjeta(tarjetaId);
+    if (tarjeta) tarjeta.compras.push(created);
+    this.notifyListeners();
+    return created;
   }
 
-  updateCompra(tarjetaId, compraId, updates) {
-    const data = this.getData();
-    const tarjeta = data.tarjetas.find(t => t.id === tarjetaId);
+  async updateCompra(tarjetaId, compraId, updates) {
+    const updated = await this._req(`/tarjetas/${tarjetaId}/compras/${compraId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+    const tarjeta = this.getTarjeta(tarjetaId);
     if (tarjeta) {
-      const compra = tarjeta.compras.find(c => c.id === compraId);
-      if (compra) {
-        Object.assign(compra, updates);
-        this.saveData(data);
-      }
+      const idx = tarjeta.compras.findIndex((c) => c.id === compraId);
+      if (idx !== -1) tarjeta.compras[idx] = updated;
     }
+    this.notifyListeners();
   }
 
-  deleteCompra(tarjetaId, compraId) {
-    const data = this.getData();
-    const tarjeta = data.tarjetas.find(t => t.id === tarjetaId);
-    if (tarjeta) {
-      tarjeta.compras = tarjeta.compras.filter(c => c.id !== compraId);
-      this.saveData(data);
-    }
+  async deleteCompra(tarjetaId, compraId) {
+    await this._req(`/tarjetas/${tarjetaId}/compras/${compraId}`, { method: 'DELETE' });
+    const tarjeta = this.getTarjeta(tarjetaId);
+    if (tarjeta) tarjeta.compras = tarjeta.compras.filter((c) => c.id !== compraId);
+    this.notifyListeners();
   }
 
-  // METAS DE AHORRO
+  // METAS
   getMetas() {
-    return this.getData().metas;
+    return this.cache?.metas ?? [];
   }
 
   getMeta(id) {
-    return this.getMetas().find(m => m.id === id);
+    return this.getMetas().find((m) => m.id === id);
   }
 
-  addMeta(meta) {
-    const data = this.getData();
-    meta.id = Math.max(...data.metas.map(m => m.id), 0) + 1;
-    meta.montoActual = meta.montoActual || 0;
-    data.metas.push(meta);
-    this.saveData(data);
-    return meta;
+  async addMeta(meta) {
+    const created = await this._req('/metas', {
+      method: 'POST',
+      body: JSON.stringify(meta)
+    });
+    this.cache.metas.push(created);
+    this.notifyListeners();
+    return created;
   }
 
-  updateMeta(id, updates) {
-    const data = this.getData();
-    const meta = data.metas.find(m => m.id === id);
-    if (meta) {
-      Object.assign(meta, updates);
-      this.saveData(data);
-    }
+  async updateMeta(id, updates) {
+    const updated = await this._req(`/metas/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+    const idx = this.cache.metas.findIndex((m) => m.id === id);
+    if (idx !== -1) this.cache.metas[idx] = updated;
+    this.notifyListeners();
   }
 
-  deleteMeta(id) {
-    const data = this.getData();
-    data.metas = data.metas.filter(m => m.id !== id);
-    this.saveData(data);
+  async deleteMeta(id) {
+    await this._req(`/metas/${id}`, { method: 'DELETE' });
+    this.cache.metas = this.cache.metas.filter((m) => m.id !== id);
+    this.notifyListeners();
   }
 
-  // EXPORTAR/IMPORTAR
+  // EXPORTAR/IMPORTAR/RESET
   exportData() {
-    return JSON.stringify(this.getData(), null, 2);
+    return JSON.stringify(this.cache ?? {}, null, 2);
   }
 
-  importData(jsonString) {
+  async importData(jsonString) {
     try {
       const data = JSON.parse(jsonString);
-      this.saveData(data);
+      if (data.salario) await this.setSalario(data.salario);
+      for (const c of data.categorias || []) await this.addCategoria(c);
+      for (const g of data.gastosFijos || []) await this.addGastoFijo(g);
+      for (const g of data.gastosVariables || []) await this.addGastoVariable(g);
+      for (const i of data.ingresosExtra || []) await this.addIngresoExtra(i);
+      for (const t of data.tarjetas || []) {
+        const created = await this.addTarjeta(t);
+        for (const compra of t.compras || []) {
+          await this.addCompra(created.id, compra);
+        }
+      }
+      for (const m of data.metas || []) await this.addMeta(m);
+      await this.refresh();
+      this.notifyListeners();
       return true;
     } catch (error) {
       console.error('Error importing data:', error);
@@ -277,9 +376,10 @@ class StorageModel {
     }
   }
 
-  resetData() {
-    localStorage.removeItem(this.storageKey);
-    this.initializeStorage();
+  async resetData() {
+    // No borramos en backend sin endpoint dedicado; solo refresca estado.
+    await this.refresh();
+    this.notifyListeners();
   }
 }
 

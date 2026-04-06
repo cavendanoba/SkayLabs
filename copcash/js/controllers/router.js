@@ -8,7 +8,7 @@ import { MetasView } from '/copcash/js/views/metasView.js';
 import { FlujoView } from '/copcash/js/views/flujoView.js';
 import { CategoriasView } from '/copcash/js/views/categoriasView.js';
 import { NavbarView, ConfiguracionView } from '/copcash/js/views/navbarView.js';
-import { TarjetasCalculos } from '/copcash/js/models/calculos.js';
+import { TarjetasCalculos, FlujoCalculos } from '/copcash/js/models/calculos.js';
 
 export class Router {
   constructor() {
@@ -178,6 +178,15 @@ export class Router {
         mobileMenu.classList.toggle('hidden');
       });
     }
+
+    // Logout
+    const logoutBtn = document.getElementById('btn-logout');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        storage.logout();
+        window.location.reload();
+      });
+    }
   }
 
   setupGastosListeners() {
@@ -192,7 +201,7 @@ export class Router {
 
     const formGastoFijo = document.getElementById('form-gastoFijo');
     if (formGastoFijo) {
-      formGastoFijo.addEventListener('submit', (e) => {
+      formGastoFijo.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('gastoFijo-id')?.value;
         const gasto = {
@@ -204,9 +213,9 @@ export class Router {
         };
 
         if (id) {
-          storage.updateGastoFijo(parseInt(id), gasto);
+          await storage.updateGastoFijo(parseInt(id), gasto);
         } else {
-          storage.addGastoFijo(gasto);
+          await storage.addGastoFijo(gasto);
         }
 
         this.renderGastos();
@@ -223,7 +232,7 @@ export class Router {
     }
 
     document.querySelectorAll('.btn-edit-gastoFijo').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         const gasto = storage.getGastosFijos().find(g => g.id === id);
         const gastosFijosView = new GastosFijosView();
@@ -238,7 +247,7 @@ export class Router {
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         if (confirm('¿Eliminar este gasto fijo?')) {
-          storage.deleteGastoFijo(id);
+          await storage.deleteGastoFijo(id);
           this.renderGastos();
           this.setupEventListeners();
         }
@@ -256,7 +265,7 @@ export class Router {
 
     const formGastoVariable = document.getElementById('form-gastoVariable');
     if (formGastoVariable) {
-      formGastoVariable.addEventListener('submit', (e) => {
+      formGastoVariable.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('gastoVariable-id')?.value;
         const gasto = {
@@ -268,9 +277,9 @@ export class Router {
         };
 
         if (id) {
-          storage.updateGastoVariable(parseInt(id), gasto);
+          await storage.updateGastoVariable(parseInt(id), gasto);
         } else {
-          storage.addGastoVariable(gasto);
+          await storage.addGastoVariable(gasto);
         }
 
         this.renderGastos();
@@ -287,17 +296,17 @@ export class Router {
     }
 
     document.querySelectorAll('.btn-toggle-gastoVariable').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         const gasto = storage.getGastosVariables().find(g => g.id === id);
-        storage.updateGastoVariable(id, { ...gasto, pagado: !gasto.pagado });
+        await storage.updateGastoVariable(id, { ...gasto, pagado: !gasto.pagado });
         this.renderGastos();
         this.setupEventListeners();
       });
     });
 
     document.querySelectorAll('.btn-edit-gastoVariable').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         const gasto = storage.getGastosVariables().find(g => g.id === id);
         const gastosVariablesView = new GastosVariablesView();
@@ -312,7 +321,7 @@ export class Router {
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         if (confirm('¿Eliminar este gasto variable?')) {
-          storage.deleteGastoVariable(id);
+          await storage.deleteGastoVariable(id);
           this.renderGastos();
           this.setupEventListeners();
         }
@@ -331,7 +340,7 @@ export class Router {
 
     const formIngresoExtra = document.getElementById('form-ingresoExtra');
     if (formIngresoExtra) {
-      formIngresoExtra.addEventListener('submit', (e) => {
+      formIngresoExtra.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('ingresoExtra-id')?.value;
         const ingreso = {
@@ -343,9 +352,9 @@ export class Router {
         };
 
         if (id) {
-          storage.updateIngresoExtra(parseInt(id), ingreso);
+          await storage.updateIngresoExtra(parseInt(id), ingreso);
         } else {
-          storage.addIngresoExtra(ingreso);
+          await storage.addIngresoExtra(ingreso);
         }
 
         this.navigate('ingresos');
@@ -360,16 +369,16 @@ export class Router {
     }
 
     document.querySelectorAll('.btn-toggle-ingresoExtra').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         const ingreso = storage.getIngresosExtra().find(i => i.id === id);
-        storage.updateIngresoExtra(id, { ...ingreso, completado: !ingreso.completado });
+        await storage.updateIngresoExtra(id, { ...ingreso, completado: !ingreso.completado });
         this.navigate('ingresos');
       });
     });
 
     document.querySelectorAll('.btn-edit-ingresoExtra').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         const ingreso = storage.getIngresosExtra().find(i => i.id === id);
         const ingresosView = new IngresosExtraView();
@@ -384,7 +393,7 @@ export class Router {
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         if (confirm('¿Eliminar este ingreso?')) {
-          storage.deleteIngresoExtra(id);
+          await storage.deleteIngresoExtra(id);
           this.navigate('ingresos');
         }
       });
@@ -402,7 +411,7 @@ export class Router {
 
     const formTarjeta = document.getElementById('form-tarjeta');
     if (formTarjeta) {
-      formTarjeta.addEventListener('submit', (e) => {
+      formTarjeta.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('tarjeta-id')?.value;
         const tarjeta = {
@@ -424,10 +433,10 @@ export class Router {
           tarjeta.saldoPeriodosAnteriores = tarjetaActual.saldoPeriodosAnteriores;
           tarjeta.interesAcumulado = tarjetaActual.interesAcumulado;
           tarjeta.pagos_realizados = tarjetaActual.pagos_realizados || [];
-          storage.updateTarjeta(parseInt(id), tarjeta);
+          await storage.updateTarjeta(parseInt(id), tarjeta);
         } else {
           tarjeta.compras = [];
-          storage.addTarjeta(tarjeta);
+          await storage.addTarjeta(tarjeta);
         }
 
         this.renderTarjetas();
@@ -444,7 +453,7 @@ export class Router {
     }
 
     document.querySelectorAll('.btn-edit-tarjeta').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         const tarjeta = storage.getTarjeta(id);
         const tarjetasView = new TarjetasView();
@@ -459,7 +468,7 @@ export class Router {
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         if (confirm('¿Eliminar esta tarjeta y todas sus compras?')) {
-          storage.deleteTarjeta(id);
+          await storage.deleteTarjeta(id);
           this.renderTarjetas();
           this.setupEventListeners();
         }
@@ -478,7 +487,7 @@ export class Router {
     });
 
     document.querySelectorAll('[id^="form-compra-"]').forEach(form => {
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const tarjetaId = parseInt(form.id.split('-')[2]);
         const compraId = document.getElementById(`compra-id-${tarjetaId}`)?.value;
@@ -504,9 +513,9 @@ export class Router {
         }
 
         if (compraId) {
-          storage.updateCompra(tarjetaId, parseInt(compraId), compra);
+          await storage.updateCompra(tarjetaId, parseInt(compraId), compra);
         } else {
-          storage.addCompra(tarjetaId, compra);
+          await storage.addCompra(tarjetaId, compra);
         }
 
         this.renderTarjetas();
@@ -515,7 +524,7 @@ export class Router {
     });
 
     document.querySelectorAll('.btn-edit-compra').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const tarjetaId = parseInt(e.currentTarget.dataset.tarjetaId);
         const compraId = parseInt(e.currentTarget.dataset.compraId);
         const tarjeta = storage.getTarjeta(tarjetaId);
@@ -539,7 +548,7 @@ export class Router {
         const tarjetaId = parseInt(e.currentTarget.dataset.tarjetaId);
         const compraId = parseInt(e.currentTarget.dataset.compraId);
         if (confirm('¿Eliminar esta compra?')) {
-          storage.deleteCompra(tarjetaId, compraId);
+          await storage.deleteCompra(tarjetaId, compraId);
           this.renderTarjetas();
           this.setupEventListeners();
         }
@@ -556,7 +565,7 @@ export class Router {
 
     // ========== NUEVO: PAGAR CUENTA COMPLETA ==========
     document.querySelectorAll('.btn-pagar-cuenta').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const tarjetaId = parseInt(e.currentTarget.dataset.tarjetaId);
         const monto = parseFloat(e.currentTarget.dataset.monto);
         const tarjeta = storage.getTarjeta(tarjetaId);
@@ -573,7 +582,7 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
         if (confirm(mensaje)) {
           try {
             const resultado = TarjetasCalculos.registrarPagoCuenta(tarjeta, monto, "completo");
-            storage.updateTarjeta(tarjetaId, tarjeta);
+            await storage.updateTarjeta(tarjetaId, tarjeta);
             alert(`✓ ${resultado.mensaje}\n\nProxima cuota: $${resultado.proximaCuota.toLocaleString('es-ES', { maximumFractionDigits: 0 })}`);
             this.renderTarjetas();
             this.setupEventListeners();
@@ -586,7 +595,7 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
 
     // ========== NUEVO: PAGO PARCIAL ==========
     document.querySelectorAll('.btn-pagar-parcial').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const tarjetaId = parseInt(e.currentTarget.dataset.tarjetaId);
         const tarjeta = storage.getTarjeta(tarjetaId);
         const proximaCuota = TarjetasCalculos.calcularProximaCuotaAPagar(tarjeta);
@@ -623,7 +632,7 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
               es_monto_parcial: true
             });
 
-            storage.updateTarjeta(tarjetaId, tarjeta);
+            await storage.updateTarjeta(tarjetaId, tarjeta);
             alert(`✓ Pago parcial registrado\n\nPagado: $${montoPagado.toLocaleString('es-ES', { maximumFractionDigits: 0 })}\nDeuda restante: $${diferenciaNoPageda.toLocaleString('es-ES', { maximumFractionDigits: 0 })}\n\n⚠️ Se generarán intereses sobre el saldo no pagado`);
             this.renderTarjetas();
             this.setupEventListeners();
@@ -647,7 +656,7 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
 
     const formMeta = document.getElementById('form-meta');
     if (formMeta) {
-      formMeta.addEventListener('submit', (e) => {
+      formMeta.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('meta-id')?.value;
         const meta = {
@@ -660,9 +669,9 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
         };
 
         if (id) {
-          storage.updateMeta(parseInt(id), meta);
+          await storage.updateMeta(parseInt(id), meta);
         } else {
-          storage.addMeta(meta);
+          await storage.addMeta(meta);
         }
 
         this.renderMetas();
@@ -679,7 +688,7 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
     }
 
     document.querySelectorAll('.btn-edit-meta').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         const meta = storage.getMeta(id);
         const metasView = new MetasView();
@@ -694,7 +703,7 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         if (confirm('¿Eliminar esta meta?')) {
-          storage.deleteMeta(id);
+          await storage.deleteMeta(id);
           this.renderMetas();
           this.setupEventListeners();
         }
@@ -703,7 +712,7 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
 
     // Diálogo de aportes
     document.querySelectorAll('.btn-aporte-meta').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         const metaId = parseInt(e.currentTarget.dataset.id);
         const dialog = document.getElementById(`dialog-aporte-${metaId}`);
         if (dialog) {
@@ -719,7 +728,7 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
         const monto = parseFloat(document.getElementById(`aporte-monto-${metaId}`).value);
 
         if (monto > 0) {
-          storage.updateMeta(metaId, { ...meta, montoActual: meta.montoActual + monto });
+          await storage.updateMeta(metaId, { ...meta, montoActual: meta.montoActual + monto });
           this.renderMetas();
           this.setupEventListeners();
         }
@@ -748,7 +757,7 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
 
     const formCategoria = document.getElementById('form-categoria');
     if (formCategoria) {
-      formCategoria.addEventListener('submit', (e) => {
+      formCategoria.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('categoria-id')?.value;
         const categoria = {
@@ -759,9 +768,9 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
         };
 
         if (id) {
-          storage.updateCategoria(parseInt(id), categoria);
+          await storage.updateCategoria(parseInt(id), categoria);
         } else {
-          storage.addCategoria(categoria);
+          await storage.addCategoria(categoria);
         }
 
         this.renderCategorias();
@@ -778,7 +787,7 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
     }
 
     document.querySelectorAll('.color-picker').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         e.preventDefault();
         const color = e.currentTarget.dataset.color;
         document.getElementById('categoria-color').value = color;
@@ -809,7 +818,7 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
       btn.addEventListener('click', (e) => {
         const id = parseInt(e.currentTarget.dataset.id);
         if (confirm('¿Eliminar esta categoría? (Los gastos asociados no se eliminarán)')) {
-          storage.deleteCategoria(id);
+          await storage.deleteCategoria(id);
           this.renderCategorias();
           this.setupEventListeners();
         }
@@ -820,9 +829,9 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
   setupConfigListeners() {
     const formSalario = document.getElementById('form-salario');
     if (formSalario) {
-      formSalario.addEventListener('submit', (e) => {
+      formSalario.addEventListener('submit', async (e) => {
         e.preventDefault();
-        storage.setSalario({
+        await storage.setSalario({
           monto: parseFloat(document.getElementById('salario-monto').value),
           diaCobro: parseInt(document.getElementById('salario-dia').value),
           descripcion: document.getElementById('salario-descripcion').value
@@ -854,9 +863,9 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
         const file = e.target.files[0];
         if (file) {
           const reader = new FileReader();
-          reader.onload = (event) => {
+          reader.onload = async (event) => {
             try {
-              if (storage.importData(event.target.result)) {
+              if (await storage.importData(event.target.result)) {
                 alert('Datos importados correctamente');
                 this.navigate('dashboard');
               } else {
@@ -873,9 +882,9 @@ Monto: $${monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })} COP
 
     const btnReset = document.getElementById('btn-reset-datos');
     if (btnReset) {
-      btnReset.addEventListener('click', () => {
+      btnReset.addEventListener('click', async () => {
         if (confirm('¿Restaurar todos los datos a valores de ejemplo? Esta acción no se puede deshacer.')) {
-          storage.resetData();
+          await storage.resetData();
           alert('Datos restaurados');
           this.navigate('dashboard');
         }
