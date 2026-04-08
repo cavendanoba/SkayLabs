@@ -8,7 +8,7 @@ import { MetasView } from '/copcash/js/views/metasView.js';
 import { FlujoView } from '/copcash/js/views/flujoView.js';
 import { CategoriasView } from '/copcash/js/views/categoriasView.js';
 import { NavbarView, ConfiguracionView } from '/copcash/js/views/navbarView.js';
-import { TarjetasCalculos } from '/copcash/js/models/calculos.js';
+import { TarjetasCalculos, FlujoCalculos, IngresosGastosCalculos, MetasCalculos } from '/copcash/js/models/calculos.js';
 
 export class Router {
   constructor() {

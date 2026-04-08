@@ -66,9 +66,9 @@ export class DashboardView {
           <div class="kpi-card blue">
             <div class="kpi-label">💵 Salario</div>
             <div class="kpi-value" style="color: #5b7cfa;">
-              $${salario.monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
+              $${this.salario.monto.toLocaleString('es-ES', { maximumFractionDigits: 0 })}
             </div>
-            <div class="kpi-change">Día ${salario.diaCobro}</div>
+            <div class="kpi-change">Día ${this.salario.diaCobro}</div>
           </div>
 
           <div class="kpi-card warning">
