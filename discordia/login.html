@@ -192,6 +192,16 @@
       btnSpinner.classList.toggle('hidden', !loading);
     }
 
+    function getApiUrl(endpoint) {
+      const host = window.location.hostname;
+      const isLocal = host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.endsWith('.local');
+      
+      if (isLocal) {
+        return `http://localhost:5000${endpoint}`;
+      }
+      return endpoint;
+    }
+
     loginBtn.addEventListener('click', async () => {
       errorMsg.classList.add('hidden');
       const username = document.getElementById('username').value.trim();
@@ -205,7 +215,8 @@
       setLoading(true);
 
       try {
-        const res  = await fetch('/api/discordia/admin-login', {
+        const apiUrl = getApiUrl('/api/discordia/admin-login');
+        const res  = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
@@ -220,7 +231,7 @@
           showError(data.message || 'Credenciales inválidas.');
         }
       } catch {
-        showError('Error de conexión. Intenta de nuevo.');
+        showError('Error de conexión. Verifica que el servidor esté activo.');
       } finally {
         setLoading(false);
       }
