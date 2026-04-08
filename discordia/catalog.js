@@ -221,6 +221,114 @@ function getCardLayout(index) {
     };
 }
 
+function triggerCartPulse() {
+    const cartBtn = document.getElementById('openCartFloating')
+        || document.getElementById('openCartHeader')
+        || document.querySelector('.open-cart-btn');
+
+    if (!cartBtn) return;
+    cartBtn.classList.remove('cart-target-pulse');
+    // Forzar reflow para reiniciar la animación
+    void cartBtn.offsetWidth;
+    cartBtn.classList.add('cart-target-pulse');
+
+    const badge = cartBtn.querySelector('.cart-count-badge');
+    if (badge) {
+        badge.classList.remove('cart-badge-bump');
+        void badge.offsetWidth;
+        badge.classList.add('cart-badge-bump');
+    }
+
+    const ripple = document.createElement('span');
+    ripple.className = 'cart-ripple';
+    cartBtn.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 540);
+}
+
+function spawnCartSparkles(x, y, tone = 'mixed') {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const colors = tone === 'target'
+        ? ['#ec5c8d', '#ff8c91', '#ffc4a6', '#ffffff']
+        : ['#ec5c8d', '#ff8c91', '#ffffff'];
+
+    const count = tone === 'target' ? 8 : 5;
+
+    for (let i = 0; i < count; i++) {
+        const sparkle = document.createElement('span');
+        sparkle.className = 'cart-sparkle';
+        sparkle.style.left = `${x + (Math.random() * 32 - 16)}px`;
+        sparkle.style.top = `${y + (Math.random() * 32 - 16)}px`;
+        sparkle.style.background = colors[i % colors.length];
+        sparkle.style.animationDelay = `${i * 18}ms`;
+        sparkle.style.setProperty('--sparkle-x', `${Math.random() * 44 - 22}px`);
+        sparkle.style.setProperty('--sparkle-y', `${-24 - Math.random() * 26}px`);
+        document.body.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 520);
+    }
+}
+
+function animateAddToCart(sourceElement) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        triggerCartPulse();
+        return;
+    }
+
+    const cartBtn = document.getElementById('openCartFloating')
+        || document.getElementById('openCartHeader')
+        || document.querySelector('.open-cart-btn');
+
+    if (!sourceElement || !cartBtn) {
+        triggerCartPulse();
+        return;
+    }
+
+    const sourceRect = sourceElement.getBoundingClientRect();
+    const targetRect = cartBtn.getBoundingClientRect();
+    const sourceImg = sourceElement.querySelector('img');
+
+    spawnCartSparkles(
+        sourceRect.left + (sourceRect.width / 2),
+        sourceRect.top + (sourceRect.height / 2),
+        'source'
+    );
+
+    const fly = document.createElement('div');
+    fly.className = 'cart-fly-item';
+
+    if (sourceImg && sourceImg.src) {
+        fly.style.backgroundImage = `url("${sourceImg.src}")`;
+    } else {
+        fly.style.backgroundImage = 'none';
+        fly.style.background = 'linear-gradient(90deg, #ec5c8d, #ff8c91)';
+    }
+
+    document.body.appendChild(fly);
+
+    const startX = sourceRect.left + (sourceRect.width / 2) - 28;
+    const startY = sourceRect.top + (sourceRect.height / 2) - 28;
+    const endX = targetRect.left + (targetRect.width / 2) - 20;
+    const endY = targetRect.top + (targetRect.height / 2) - 20;
+
+    fly.animate([
+        { transform: `translate(${startX}px, ${startY}px) scale(1) rotate(0deg)`, opacity: 0.98 },
+        { transform: `translate(${(startX + endX) / 2}px, ${Math.min(startY, endY) - 90}px) scale(0.75) rotate(8deg)`, opacity: 0.92, offset: 0.6 },
+        { transform: `translate(${endX}px, ${endY}px) scale(0.2) rotate(16deg)`, opacity: 0.2 }
+    ], {
+        duration: 680,
+        easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)',
+        fill: 'forwards'
+    }).onfinish = () => {
+        spawnCartSparkles(
+            targetRect.left + (targetRect.width / 2),
+            targetRect.top + (targetRect.height / 2),
+            'target'
+        );
+        fly.remove();
+        triggerCartPulse();
+    };
+}
+
 // Función para mostrar el modal del producto con SweetAlert2
 export function showProductModal(productId, cartCallback) {
     const product = getCatalog().find(p => p.id === productId);
@@ -248,6 +356,7 @@ export function showProductModal(productId, cartCallback) {
     }).then((result) => {
         if (result.isConfirmed) {
             if (cartCallback) cartCallback(product);
+            triggerCartPulse();
             Swal.fire({
                 icon: 'success',
                 title: '¡Agregado!',
@@ -373,6 +482,13 @@ function onCatalogClick(e) {
     const product = getCatalog().find(p => p.id === id);
     if (product) {
         addToCart(product);
+        const productCard = btn.closest('[data-product-id]');
+        if (productCard) {
+            productCard.classList.remove('add-cart-pop');
+            void productCard.offsetWidth;
+            productCard.classList.add('add-cart-pop');
+        }
+        animateAddToCart(productCard);
         if (product.stock < 2) {
             Swal.fire({
                 icon: 'warning',
