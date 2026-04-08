@@ -1,12 +1,15 @@
 // catalog.js
-import { products } from "./products.js";
+import { fetchProducts } from "./products.js"; // Importamos la función para obtener productos desde la API
 import { addToCart } from "./cart.js";
 import { CONFIG } from "./config.js";
 
 const catalogUiState = {
     search: '',
     onlyInStock: false,
-    sort: 'featured'
+    sort: 'featured',
+    category: 'all',
+    priceMin: 0,
+    priceMax: Infinity
 };
 
 let lastContainerId = null;
@@ -20,7 +23,20 @@ export function getCatalog() {
     } catch (e) {
         console.warn('No se pudo leer skcCatalog desde localStorage', e);
     }
-    return products;
+    return [];
+}
+
+// Carga productos desde la API y los guarda en localStorage
+// Se llama una vez al iniciar la app para tener datos frescos
+export async function initCatalog() {
+    try {
+        const products = await fetchProducts();
+        if (products.length > 0) {
+            localStorage.setItem(CONFIG.CATALOG_STORAGE_KEY, JSON.stringify(products));
+        }
+    } catch (e) {
+        console.warn('No se pudo inicializar el catálogo desde la API:', e);
+    }
 }
 
 function getFilteredCatalog() {
@@ -36,6 +52,18 @@ function getFilteredCatalog() {
 
     if (catalogUiState.onlyInStock) {
         items = items.filter((product) => product.stock > 0);
+    }
+
+    if (catalogUiState.category && catalogUiState.category !== 'all') {
+        items = items.filter((p) => p.category === catalogUiState.category);
+    }
+
+    if (catalogUiState.priceMin > 0) {
+        items = items.filter((p) => p.price >= catalogUiState.priceMin);
+    }
+
+    if (catalogUiState.priceMax < Infinity) {
+        items = items.filter((p) => p.price <= catalogUiState.priceMax);
     }
 
     if (catalogUiState.sort === 'price-asc') {
@@ -63,6 +91,9 @@ if (typeof window !== 'undefined') {
         img.src = './assets/default.png';
         img.onerror = null;
     };
+    // Exponer getCatalog y setFilters para componentes externos
+    window.getCatalog = getCatalog;
+    window.setFilters = setFilters;
 }
 
 // Crear un placeholder borroso (blur-up effect)
@@ -226,6 +257,16 @@ export function showProductModal(productId, cartCallback) {
             });
         }
     });
+}
+
+// Aplica filtros externos (desde filters.js) y re-renderiza
+export function setFilters(opts = {}, containerId) {
+    if ('search' in opts) catalogUiState.search = opts.search;
+    if ('category' in opts) catalogUiState.category = opts.category;
+    if ('priceMin' in opts) catalogUiState.priceMin = opts.priceMin;
+    if ('priceMax' in opts) catalogUiState.priceMax = opts.priceMax;
+    const id = containerId || lastContainerId;
+    if (id) renderCatalog(id);
 }
 
 // Renderiza los productos en un contenedor (grid)

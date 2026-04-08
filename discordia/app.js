@@ -1,107 +1,85 @@
-import { getCatalog, renderCatalog } from './catalog.js';
+// app.js — Bootstrap de Discordia
+// Compatible con el nuevo index.html refactorizado
+
+import { getCatalog, renderCatalog, initCatalog, setFilters } from './catalog.js';
 import { CONFIG } from './config.js';
 
-function ensureAosVisibilityFallback() {
-    document.querySelectorAll('[data-aos]').forEach((el) => {
-        el.classList.add('aos-animate');
-        el.style.opacity = '1';
-        el.style.transform = 'none';
-    });
-}
-
-if (typeof window !== 'undefined' && window.AOS && typeof window.AOS.init === 'function') {
-    window.AOS.init({
-        duration: 900,
-        once: true
-    });
-} else {
-    ensureAosVisibilityFallback();
-}
-
-// Typed.js hero text
-if (typeof window !== 'undefined' && typeof window.Typed === 'function') {
-    new window.Typed('#typed', {
-        strings: [
-            'Belleza auténtica para tu rutina real',
-            'Productos curados, precio justo y resultado visible',
-            'DISCORDIA: maquillaje con identidad ✨'
-        ],
-        typeSpeed: 50,
-        backSpeed: 30,
-        loop: true
-    });
-} else {
-    const typedNode = document.getElementById('typed');
-    if (typedNode) {
-        typedNode.textContent = 'Belleza auténtica para tu rutina real';
-    }
-}
-
-// Mobile menu toggle
-const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-const mobileMenu = document.getElementById('mobileMenu');
-if (mobileMenuBtn && mobileMenu) {
-    mobileMenuBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-    });
-    // Close menu when clicking on a link
-    mobileMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
-        });
-    });
-}
-
-// Configurar datos de contacto desde config
-document.querySelectorAll('[data-contact-email]').forEach((node) => {
-    node.textContent = CONFIG.ADMIN_EMAIL;
+// ── CONFIGURACIÓN DE CONTACTO ─────────────────────────────
+document.querySelectorAll('[data-contact-email]').forEach(n => {
+  n.textContent = CONFIG.ADMIN_EMAIL;
+});
+document.querySelectorAll('.contact-whatsapp').forEach(n => {
+  n.setAttribute('href', `https://wa.me/${CONFIG.WHATSAPP_PHONE}`);
 });
 
-document.querySelectorAll('.contact-whatsapp').forEach((node) => {
-    node.setAttribute('href', `https://wa.me/${CONFIG.WHATSAPP_PHONE}`);
-});
-
+// ── HERO PRODUCT PREVIEW ──────────────────────────────────
 function renderHeroProductPreview() {
-    const previewContainer = document.getElementById('heroProductPreview');
-    if (!previewContainer) return;
+  const container = document.getElementById('heroProductPreview');
+  if (!container) return;
 
-    const items = getCatalog().filter((item) => item.stock > 0).slice(0, 4);
-    previewContainer.innerHTML = '';
+  const items = getCatalog().filter(p => p.stock > 0).slice(0, 4);
+  container.innerHTML = '';
 
-    if (!items.length) {
-        previewContainer.innerHTML = `
-            <div class="col-span-full bg-white rounded-2xl border border-gray-200 p-5 text-center text-sm text-gray-600">
-                Estamos actualizando productos, vuelve a intentar en unos minutos.
-            </div>
-        `;
-        return;
-    }
+  if (!items.length) {
+    container.innerHTML = `
+      <div class="col-span-full bg-white/20 backdrop-blur-sm rounded-2xl p-5 text-center text-white/70 text-sm">
+        Cargando productos...
+      </div>
+    `;
+    return;
+  }
 
-    items.forEach((product) => {
-        const card = document.createElement('a');
-        card.href = '#productos';
-        card.className = 'flex-none w-[72%] sm:w-[48%] md:w-auto snap-start bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition block';
-        card.innerHTML = `
-            <div class="aspect-square bg-[#f9edf2] overflow-hidden">
-                <img src="${product.image || './assets/default.png'}"
-                    alt="${product.name}"
-                    class="w-full h-full object-cover"
-                    onerror="this.src='./assets/default.png'; this.onerror=null;">
-            </div>
-            <div class="p-3">
-                <p class="font-bold text-xs md:text-sm text-[#6d165a] line-clamp-2 min-h-[2.2rem]">${product.name}</p>
-                <div class="flex items-center justify-between mt-2">
-                    <p class="font-extrabold text-lg text-[#a0346e]">$${product.price.toLocaleString()}</p>
-                    <span class="text-[11px] text-gray-500">Stock: ${product.stock}</span>
-                </div>
-            </div>
-        `;
-        previewContainer.appendChild(card);
-    });
+  items.forEach(product => {
+    const card = document.createElement('a');
+    card.href = '#catalogo';
+    card.className = 'flex-none w-[72%] sm:w-[48%] lg:w-auto snap-start bg-white/95 backdrop-blur-sm rounded-2xl border border-white/50 overflow-hidden shadow-lg hover:shadow-xl transition hover:-translate-y-1 block';
+    card.innerHTML = `
+      <div class="aspect-square bg-gradient-to-br from-[#fdf2f7] to-[#fff5f8] overflow-hidden">
+        <img src="${product.image || './assets/default.png'}"
+          alt="${product.name}"
+          class="w-full h-full object-cover hover:scale-105 transition duration-300"
+          onerror="this.src='./assets/default.png'; this.onerror=null;">
+      </div>
+      <div class="p-3">
+        <p class="font-bold text-xs text-[#6d165a] line-clamp-2 min-h-[2rem] leading-snug">${product.name}</p>
+        <div class="flex items-center justify-between mt-2">
+          <p class="font-extrabold text-base text-[#a0346e]">$${product.price.toLocaleString('es-CO')}</p>
+          <span class="text-[10px] text-gray-400">Stock: ${product.stock}</span>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
 }
 
-renderHeroProductPreview();
+// ── CATEGORY PILLS DINÁMICAS ──────────────────────────────
+// Las genera basándose en las categorías reales de la BD
+function buildCategoryPills() {
+  const container = document.getElementById('categoryPills');
+  if (!container) return;
 
-// Render del catálogo principal
-renderCatalog('catalog');
+  const catalog = getCatalog();
+  const cats = Array.from(new Set(catalog.map(p => p.category).filter(Boolean))).sort();
 
+  // Mantener el botón "Todas" y agregar el resto
+  container.innerHTML = `
+    <button onclick="filterByCategory('all')" data-cat="all"
+      class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-[#ec5c8d] bg-[#ec5c8d] text-white transition">
+      Todas
+    </button>
+    ${cats.map(cat => `
+      <button onclick="filterByCategory('${cat}')" data-cat="${cat}"
+        class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-gray-200 bg-white text-gray-700 hover:border-[#ec5c8d] hover:text-[#6d165a] transition">
+        ${cat}
+      </button>
+    `).join('')}
+  `;
+}
+
+// ── INICIALIZACIÓN PRINCIPAL ──────────────────────────────
+// Orden: init BD → render hero → pills → catálogo
+initCatalog().then(() => {
+  renderHeroProductPreview();
+  buildCategoryPills();
+  renderCatalog('catalog');
+});

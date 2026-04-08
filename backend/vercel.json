@@ -1,0 +1,49 @@
+{
+  "buildCommand": "echo 'Serverless functions ready for deployment'",
+  "public": false,
+  "functions": {
+    "api/discordia/admin-login.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/discordia/products.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/discordia/catalog.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/discordia/customers.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/discordia/payments.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/discordia/dashboard.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/discordia/sales.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/discordia/ventas.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/discordia/deudas.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/discordia/discordia-data.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
+  "env": {
+    "DATABASE_URL": "@database_url"
+  }
+}

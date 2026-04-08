@@ -1,807 +1,387 @@
-import { products } from './products.js';
-import { CONFIG } from './config.js';
+// discordia/admin.js
+// ─────────────────────────────────────────────────────────────
+// Panel de administración de Discordia.
+// 5 módulos: Dashboard · Catálogo · Ventas · Deudas · Clientes
+//
+// Arquitectura:
+// - admin.js es el coordinador. Solo maneja tabs y nav.
+// - Cada módulo vive en su propio archivo (dashboard.js, etc.)
+//   y exporta una función renderXxx(container).
+// - admin.js llama a esa función cuando el usuario activa el tab.
+// ─────────────────────────────────────────────────────────────
 
-const panel = document.getElementById('admin-panel');
+import { requireAuth, getAdminUser, logout } from './auth.js';
+import { renderDashboard }                   from './modules/dashboard.js';
+import { renderVentas }                      from './modules/ventas.js';
+import { renderDeudas }                      from './modules/deudas.js';
+import { fetchProducts }                     from './products.js';
+import { CONFIG }                            from './config.js';
+
+// ── GUARD ─────────────────────────────────────────────────────
+requireAuth();
+
+// ── ESTADO ────────────────────────────────────────────────────
+let activeTab = 'dashboard';
+
+const panel            = document.getElementById('admin-panel');
 const summaryContainer = document.getElementById('admin-summary');
-const tabButtons = Array.from(document.querySelectorAll('.admin-tab-btn'));
-const exportBackupBtn = document.getElementById('export-backup');
-const importBackupBtn = document.getElementById('import-backup');
-const resetAdminDataBtn = document.getElementById('reset-admin-data');
-const backupFileInput = document.getElementById('backup-file-input');
+const tabButtons       = Array.from(document.querySelectorAll('.admin-tab-btn'));
 
+// ── STORAGE (para compatibilidad con funciones heredadas) ─────
 const STORAGE_KEYS = {
-    catalog: CONFIG.CATALOG_STORAGE_KEY,
-    sales: CONFIG.SALES_STORAGE_KEY || 'skcSales',
-    customers: CONFIG.CUSTOMERS_STORAGE_KEY || 'skcCustomers'
-};
-
-const API_ENDPOINT = CONFIG.ADMIN_API_PATH || '/api/skc-data';
-
-let activeTab = 'catalog';
-const uiState = {
-    catalogQuery: '',
-    catalogLowStockOnly: false,
-    salesQuery: '',
-    customersQuery: ''
+  catalog:   CONFIG.CATALOG_STORAGE_KEY   || 'skcCatalog',
+  sales:     CONFIG.SALES_STORAGE_KEY     || 'skcSales',
+  customers: CONFIG.CUSTOMERS_STORAGE_KEY || 'skcCustomers'
 };
 
 const state = {
-    catalog: loadCollection(STORAGE_KEYS.catalog, products),
-    sales: loadCollection(STORAGE_KEYS.sales, []),
-    customers: loadCollection(STORAGE_KEYS.customers, [])
+  catalog:   loadFromStorage(STORAGE_KEYS.catalog,   []),
+  sales:     loadFromStorage(STORAGE_KEYS.sales,     []),
+  customers: loadFromStorage(STORAGE_KEYS.customers, [])
 };
 
-let storageMode = 'local';
-let remoteSyncTimer = null;
-let pendingRemotePayload = {};
-
-function loadCollection(key, fallback) {
-    try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return structuredCloneSafe(fallback);
-        return JSON.parse(raw);
-    } catch (e) {
-        console.warn(`No se pudo leer ${key} desde localStorage`, e);
-        return structuredCloneSafe(fallback);
-    }
+function loadFromStorage(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch { return fallback; }
 }
 
-function structuredCloneSafe(value) {
-    return JSON.parse(JSON.stringify(value));
+function saveToStorage(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
 }
 
-function saveCollection(key, value) {
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-        console.warn(`No se pudo guardar ${key} en localStorage`, e);
-    }
+// ── TABS ──────────────────────────────────────────────────────
+const TABS = [
+  { id: 'dashboard', label: '📊 Dashboard',  icon: '📊' },
+  { id: 'catalog',   label: '📦 Catálogo',   icon: '📦' },
+  { id: 'sales',     label: '🛍️ Ventas',     icon: '🛍️' },
+  { id: 'debts',     label: '⚠️ Deudas',     icon: '⚠️' },
+  { id: 'customers', label: '👥 Clientes',   icon: '👥' },
+];
+
+function buildTabs() {
+  const nav = document.getElementById('admin-tabs-nav');
+  if (!nav) return;
+  nav.innerHTML = TABS.map(t => `
+    <button data-admin-tab="${t.id}"
+      class="admin-tab-btn flex-none px-3 md:px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap
+             ${t.id === activeTab ? 'bg-[#6d165a] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+      ${t.label}
+    </button>`).join('');
+
+  nav.querySelectorAll('.admin-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.adminTab));
+  });
 }
 
-function saveCatalog() {
-    saveCollection(STORAGE_KEYS.catalog, state.catalog);
-    queueRemoteSync({ catalog: state.catalog });
+function updateTabStyles() {
+  document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+    const isActive = btn.dataset.adminTab === activeTab;
+    btn.className = `admin-tab-btn flex-none px-3 md:px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap ${
+      isActive ? 'bg-[#6d165a] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+    }`;
+  });
 }
 
-function saveSales() {
-    saveCollection(STORAGE_KEYS.sales, state.sales);
-    queueRemoteSync({ sales: state.sales });
+async function switchTab(tabId) {
+  activeTab = tabId;
+  updateTabStyles();
+  panel.innerHTML = `<div class="animate-pulse bg-gray-100 rounded-2xl h-64"></div>`;
+
+  switch (tabId) {
+    case 'dashboard': await renderDashboard(panel);             break;
+    case 'catalog':   renderCatalogTab();                       break;
+    case 'sales':     await renderVentas(panel);                break;
+    case 'debts':     await renderDeudas(panel);                break;
+    case 'customers': renderCustomersTab();                     break;
+  }
 }
 
-function saveCustomers() {
-    saveCollection(STORAGE_KEYS.customers, state.customers);
-    queueRemoteSync({ customers: state.customers });
-}
-
-async function requestApi(method, payload) {
-    const response = await fetch(API_ENDPOINT, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: payload ? JSON.stringify(payload) : undefined
-    });
-
-    if (!response.ok) {
-        throw new Error(`API ${method} ${response.status}`);
-    }
-
-    return response.json();
-}
-
-function applyRemoteData(data) {
-    if (!data) return;
-    if (Array.isArray(data.catalog)) state.catalog = data.catalog;
-    if (Array.isArray(data.sales)) state.sales = data.sales;
-    if (Array.isArray(data.customers)) state.customers = data.customers;
-}
-
-async function hydrateFromApi() {
-    try {
-        const response = await requestApi('GET');
-        if (response?.ok && response?.data) {
-            applyRemoteData(response.data);
-            storageMode = response.storage === 'vercel-kv' ? 'remoto' : 'local';
-            saveCollection(STORAGE_KEYS.catalog, state.catalog);
-            saveCollection(STORAGE_KEYS.sales, state.sales);
-            saveCollection(STORAGE_KEYS.customers, state.customers);
-            refreshUI();
-        }
-    } catch (error) {
-        storageMode = 'local';
-        console.info('API remota no disponible, se mantiene modo local.');
-    }
-}
-
-function queueRemoteSync(partial) {
-    pendingRemotePayload = { ...pendingRemotePayload, ...partial };
-
-    if (remoteSyncTimer) {
-        clearTimeout(remoteSyncTimer);
-    }
-
-    remoteSyncTimer = setTimeout(async () => {
-        const payload = pendingRemotePayload;
-        pendingRemotePayload = {};
-
-        try {
-            const response = await requestApi('POST', payload);
-            storageMode = response?.storage === 'vercel-kv' ? 'remoto' : 'local';
-            if (response?.data) {
-                applyRemoteData(response.data);
-            }
-            refreshUI();
-        } catch (error) {
-            storageMode = 'local';
-        }
-    }, 250);
-}
-
-function bindTabActions() {
-    tabButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-            activeTab = button.dataset.adminTab;
-            refreshUI();
-        });
-    });
-}
-
-function bindGlobalActions() {
-    if (exportBackupBtn) {
-        exportBackupBtn.addEventListener('click', exportBackup);
-    }
-
-    if (importBackupBtn && backupFileInput) {
-        importBackupBtn.addEventListener('click', () => backupFileInput.click());
-        backupFileInput.addEventListener('change', handleImportBackupFile);
-    }
-
-    if (resetAdminDataBtn) {
-        resetAdminDataBtn.addEventListener('click', resetAdminData);
-    }
-}
-
-function refreshUI() {
-    renderSummary();
-    renderTabButtons();
-    renderActiveTab();
-}
-
+// ── RESUMEN (header KPIs) ─────────────────────────────────────
 function renderSummary() {
-    const totalProducts = state.catalog.length;
-    const totalStock = state.catalog.reduce((sum, item) => sum + Number(item.stock || 0), 0);
-    const totalSales = state.sales.length;
-    const totalRevenue = state.sales.reduce((sum, sale) => sum + Number(sale.total || 0), 0);
+  const totalStock   = state.catalog.reduce((s, p) => s + Number(p.stock || 0), 0);
+  const totalSales   = state.sales.length;
+  const totalRevenue = state.sales.reduce((s, v) => s + Number(v.total || 0), 0);
+  const user         = getAdminUser();
 
-    const cards = [
-        { label: 'Productos', value: totalProducts, note: 'Items activos en catálogo' },
-        { label: 'Stock total', value: totalStock, note: 'Unidades disponibles' },
-        { label: 'Ventas', value: totalSales, note: 'Registros acumulados' },
-        { label: 'Ingresos', value: `$${totalRevenue.toLocaleString()}`, note: `Total ventas registradas · Modo ${storageMode}` }
-    ];
+  const cards = [
+    { label: 'Productos',   value: state.catalog.length, note: 'en catálogo' },
+    { label: 'Stock total', value: totalStock,            note: 'unidades disponibles' },
+    { label: 'Ventas',      value: totalSales,            note: 'registradas' },
+    { label: 'Ingresos',    value: `$${totalRevenue.toLocaleString('es-CO')}`, note: `· Admin: ${user}` },
+  ];
 
-    summaryContainer.innerHTML = cards.map((card) => `
-        <article class="bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm">
-            <p class="text-xs uppercase tracking-[0.15em] text-gray-500">${card.label}</p>
-            <p class="text-2xl md:text-3xl font-bold text-[#6d165a] mt-2">${card.value}</p>
-            <p class="text-sm text-gray-500 mt-1">${card.note}</p>
-        </article>
-    `).join('');
+  if (summaryContainer) {
+    summaryContainer.innerHTML = cards.map(c => `
+      <article class="bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm">
+        <p class="text-xs uppercase tracking-[0.15em] text-gray-500">${c.label}</p>
+        <p class="text-2xl md:text-3xl font-bold text-[#6d165a] mt-2">${c.value}</p>
+        <p class="text-sm text-gray-500 mt-1">${c.note}</p>
+      </article>`).join('');
+  }
 }
 
-function renderTabButtons() {
-    tabButtons.forEach((button) => {
-        const isActive = button.dataset.adminTab === activeTab;
-        button.className = `admin-tab-btn px-3 py-2 rounded-xl font-semibold text-sm md:text-base transition ${isActive ? 'bg-[#6d165a] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`;
-    });
-}
-
-function renderActiveTab() {
-    if (activeTab === 'catalog') {
-        renderCatalogTab();
-        return;
-    }
-    if (activeTab === 'sales') {
-        renderSalesTab();
-        return;
-    }
-    renderCustomersTab();
-}
+// ── CATÁLOGO ──────────────────────────────────────────────────
+const catalogUiState = { query: '', lowStockOnly: false };
 
 function renderCatalogTab() {
-    const normalizedQuery = uiState.catalogQuery.trim().toLowerCase();
-    const filteredCatalog = state.catalog.filter((item) => {
-        const queryMatch = !normalizedQuery || `${item.name || ''} ${item.category || ''} ${item.description || ''}`.toLowerCase().includes(normalizedQuery);
-        const stockMatch = !uiState.catalogLowStockOnly || Number(item.stock || 0) <= 5;
-        return queryMatch && stockMatch;
-    });
+  const q        = catalogUiState.query.trim().toLowerCase();
+  const filtered = state.catalog.filter(item => {
+    const matchQ = !q || `${item.name} ${item.category||''} ${item.description||''}`.toLowerCase().includes(q);
+    const matchS = !catalogUiState.lowStockOnly || Number(item.stock||0) <= 5;
+    return matchQ && matchS;
+  });
 
-    const rows = filteredCatalog.map((item) => `
-        <tr class="border-b border-gray-100 hover:bg-[#fdf7fa]">
-            <td class="p-3 text-center font-medium">${item.id}</td>
-            <td class="p-3">
-                <div class="flex items-center gap-3 min-w-[260px]">
-                    <img src="${item.image || './assets/default.png'}" alt="${item.name}" class="w-12 h-12 rounded-lg object-cover border border-gray-200" onerror="this.src='./assets/default.png'; this.onerror=null;">
-                    <div>
-                        <p class="font-semibold text-gray-900 leading-tight">${item.name}</p>
-                        <p class="text-xs text-gray-500 mt-1">${item.description || 'Sin descripción'}</p>
-                    </div>
-                </div>
-            </td>
-            <td class="p-3 font-semibold text-[#a0346e]">$${Number(item.price || 0).toLocaleString()}</td>
-            <td class="p-3">${item.stock}</td>
-            <td class="p-3">${item.category || '-'}</td>
-            <td class="p-3">
-                <div class="flex gap-2">
-                    <button class="edit-product px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-semibold" data-id="${item.id}">Editar</button>
-                    <button class="delete-product px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-semibold" data-id="${item.id}">Eliminar</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+  const rows = filtered.map(item => `
+    <tr class="border-b border-gray-100 hover:bg-[#fdf7fa]">
+      <td class="p-3 text-center font-medium text-sm text-gray-500">${item.id}</td>
+      <td class="p-3">
+        <div class="flex items-center gap-3">
+          <img src="${item.image||'./assets/default.png'}" alt="${item.name}"
+            class="w-11 h-11 rounded-lg object-cover border border-gray-200"
+            onerror="this.src='./assets/default.png';this.onerror=null;">
+          <div>
+            <p class="font-semibold text-gray-900 text-sm leading-tight">${item.name}</p>
+            <p class="text-xs text-gray-400 mt-0.5 truncate max-w-[200px]">${item.description||'Sin descripción'}</p>
+          </div>
+        </div>
+      </td>
+      <td class="p-3 font-bold text-[#a0346e] text-sm">$${Number(item.price||0).toLocaleString('es-CO')}</td>
+      <td class="p-3">
+        <span class="text-sm font-semibold ${Number(item.stock)<=3?'text-rose-600':Number(item.stock)<=5?'text-amber-600':'text-gray-800'}">${item.stock}</span>
+      </td>
+      <td class="p-3 text-sm text-gray-600">${item.category||'—'}</td>
+      <td class="p-3">
+        <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${item.active!==false?'bg-emerald-100 text-emerald-700':'bg-gray-100 text-gray-500'}">
+          ${item.active!==false?'Activo':'Inactivo'}
+        </span>
+      </td>
+      <td class="p-3">
+        <div class="flex gap-2">
+          <button class="edit-product px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-semibold text-xs hover:bg-amber-200 transition" data-id="${item.id}">Editar</button>
+          <button class="delete-product px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-semibold text-xs hover:bg-rose-200 transition" data-id="${item.id}">Desactivar</button>
+        </div>
+      </td>
+    </tr>`).join('');
 
-    panel.innerHTML = `
-        <article class="bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm overflow-hidden">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <h3 class="text-2xl font-bold text-[#6d165a]">Catálogo</h3>
-                <div class="flex flex-wrap gap-2">
-                    <button id="add-product" class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-semibold">Agregar producto</button>
-                    <button id="restore-catalog" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 font-semibold">Restaurar base</button>
-                </div>
-            </div>
+  panel.innerHTML = `
+    <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+      <div class="bg-gradient-to-r from-[#6d165a] to-[#a0346e] px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+        <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">📦 Catálogo de productos</h3>
+        <button id="add-product"
+          class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold rounded-xl transition flex items-center gap-2">
+          + Agregar producto
+        </button>
+      </div>
 
-            <div class="flex flex-wrap items-center gap-3 mb-4">
-                <input id="catalog-search" class="px-3 py-2 rounded-xl border border-gray-200 text-sm flex-1 min-w-[220px]" placeholder="Buscar por nombre, categoría o descripción" value="${uiState.catalogQuery}">
-                <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-                    <input id="catalog-low-stock" type="checkbox" ${uiState.catalogLowStockOnly ? 'checked' : ''}>
-                    Solo stock bajo (<= 5)
-                </label>
-                <span class="text-xs text-gray-500">Mostrando ${filteredCatalog.length} de ${state.catalog.length}</span>
-            </div>
+      <div class="p-4 border-b border-gray-100 flex flex-wrap gap-3">
+        <input id="catalog-search" value="${catalogUiState.query}"
+          placeholder="Buscar por nombre, categoría o descripción..."
+          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ec5c8d]">
+        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+          <input id="catalog-low-stock" type="checkbox" ${catalogUiState.lowStockOnly?'checked':''} class="w-3.5 h-3.5 accent-[#ec5c8d]">
+          Solo stock bajo (≤ 5)
+        </label>
+        <span class="self-center text-xs text-gray-400">Mostrando ${filtered.length} de ${state.catalog.length}</span>
+      </div>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-[#fdf2f7] text-[#6d165a]">
-                        <tr>
-                            <th class="p-3 text-left">ID</th>
-                            <th class="p-3 text-left">Producto</th>
-                            <th class="p-3 text-left">Precio</th>
-                            <th class="p-3 text-left">Stock</th>
-                            <th class="p-3 text-left">Categoría</th>
-                            <th class="p-3 text-left">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>${rows || '<tr><td colspan="6" class="p-5 text-center text-gray-500">No hay productos que coincidan con el filtro.</td></tr>'}</tbody>
-                </table>
-            </div>
-        </article>
-    `;
-
-    document.getElementById('catalog-search').addEventListener('input', (event) => {
-        uiState.catalogQuery = event.target.value;
-        renderCatalogTab();
-    });
-    document.getElementById('catalog-low-stock').addEventListener('change', (event) => {
-        uiState.catalogLowStockOnly = event.target.checked;
-        renderCatalogTab();
-    });
-
-    document.getElementById('add-product').addEventListener('click', showProductModal);
-    document.getElementById('restore-catalog').addEventListener('click', restoreCatalog);
-    panel.querySelectorAll('.edit-product').forEach((button) => {
-        button.addEventListener('click', () => showProductModal(button.dataset.id));
-    });
-    panel.querySelectorAll('.delete-product').forEach((button) => {
-        button.addEventListener('click', () => deleteProduct(button.dataset.id));
-    });
-}
-
-function renderSalesTab() {
-    const normalizedQuery = uiState.salesQuery.trim().toLowerCase();
-    const filteredSales = state.sales.slice().reverse().filter((sale) => {
-        if (!normalizedQuery) return true;
-        const line = `${sale.customerName || ''} ${sale.customerPhone || ''} ${sale.channel || ''} ${sale.notes || ''}`.toLowerCase();
-        return line.includes(normalizedQuery);
-    });
-
-    const rows = filteredSales.map((sale) => {
-        const date = new Date(sale.createdAt).toLocaleString('es-CO');
-        const itemCount = (sale.items || []).reduce((sum, item) => sum + Number(item.qty || 0), 0);
-        return `
-            <tr class="border-b border-gray-100 hover:bg-[#fdf7fa]">
-                <td class="p-3 text-xs text-gray-500 min-w-[140px]">${date}</td>
-                <td class="p-3 min-w-[180px]">
-                    <p class="font-semibold text-gray-900">${sale.customerName || 'Sin nombre'}</p>
-                    <p class="text-xs text-gray-500">${sale.customerPhone || 'Sin teléfono'}</p>
-                </td>
-                <td class="p-3">${itemCount}</td>
-                <td class="p-3 font-semibold text-[#a0346e]">$${Number(sale.total || 0).toLocaleString()}</td>
-                <td class="p-3">${sale.channel || 'Manual'}</td>
-                <td class="p-3 text-xs text-gray-500 max-w-[280px]">${sale.notes || '-'}</td>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-[#fdf2f7]">
+            <tr>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">ID</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Producto</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Precio</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Stock</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Categoría</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Estado</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Acciones</th>
             </tr>
-        `;
-    }).join('');
+          </thead>
+          <tbody>
+            ${rows || `<tr><td colspan="7" class="p-6 text-center text-gray-400">No hay productos que coincidan.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </article>`;
 
-    panel.innerHTML = `
-        <article class="bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm overflow-hidden">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <h3 class="text-2xl font-bold text-[#6d165a]">Ventas</h3>
-                <div class="flex flex-wrap gap-2">
-                    <button id="register-sale" class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-semibold">Registrar venta</button>
-                    <button id="clear-sales" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 font-semibold">Limpiar historial</button>
-                </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-3 mb-4">
-                <input id="sales-search" class="px-3 py-2 rounded-xl border border-gray-200 text-sm flex-1 min-w-[220px]" placeholder="Buscar por cliente, teléfono, canal o nota" value="${uiState.salesQuery}">
-                <span class="text-xs text-gray-500">Mostrando ${filteredSales.length} de ${state.sales.length}</span>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-[#fdf2f7] text-[#6d165a]">
-                        <tr>
-                            <th class="p-3 text-left">Fecha</th>
-                            <th class="p-3 text-left">Cliente</th>
-                            <th class="p-3 text-left">Items</th>
-                            <th class="p-3 text-left">Total</th>
-                            <th class="p-3 text-left">Canal</th>
-                            <th class="p-3 text-left">Notas</th>
-                        </tr>
-                    </thead>
-                    <tbody>${rows || '<tr><td colspan="6" class="p-5 text-center text-gray-500">No hay ventas que coincidan con el filtro.</td></tr>'}</tbody>
-                </table>
-            </div>
-        </article>
-    `;
-
-    document.getElementById('sales-search').addEventListener('input', (event) => {
-        uiState.salesQuery = event.target.value;
-        renderSalesTab();
-    });
-
-    document.getElementById('register-sale').addEventListener('click', showRegisterSale);
-    document.getElementById('clear-sales').addEventListener('click', clearSales);
+  panel.querySelector('#catalog-search').addEventListener('input', e => {
+    catalogUiState.query = e.target.value;
+    renderCatalogTab();
+  });
+  panel.querySelector('#catalog-low-stock').addEventListener('change', e => {
+    catalogUiState.lowStockOnly = e.target.checked;
+    renderCatalogTab();
+  });
+  panel.querySelector('#add-product').addEventListener('click', () => showProductModal(null));
+  panel.querySelectorAll('.edit-product').forEach(btn => btn.addEventListener('click', () => showProductModal(Number(btn.dataset.id))));
+  panel.querySelectorAll('.delete-product').forEach(btn => btn.addEventListener('click', () => deactivateProduct(Number(btn.dataset.id))));
 }
 
-function renderCustomersTab() {
-    const normalizedQuery = uiState.customersQuery.trim().toLowerCase();
-    const filteredCustomers = state.customers
-        .slice()
-        .sort((a, b) => Number(b.totalSpent || 0) - Number(a.totalSpent || 0))
-        .filter((customer) => {
-            if (!normalizedQuery) return true;
-            const line = `${customer.name || ''} ${customer.phone || ''} ${customer.email || ''} ${customer.city || ''}`.toLowerCase();
-            return line.includes(normalizedQuery);
-        });
+// ── MODAL PRODUCTO ────────────────────────────────────────────
+async function showProductModal(productId) {
+  const editing = productId != null;
+  const product = editing ? state.catalog.find(p => Number(p.id) === productId) : null;
 
-    const rows = filteredCustomers.map((customer) => `
-        <tr class="border-b border-gray-100 hover:bg-[#fdf7fa]">
-            <td class="p-3 min-w-[220px]">
-                <p class="font-semibold text-gray-900">${customer.name || 'Sin nombre'}</p>
-                <p class="text-xs text-gray-500">${customer.city || '-'}</p>
-            </td>
-            <td class="p-3">${customer.phone || '-'}</td>
-            <td class="p-3">${customer.email || '-'}</td>
-            <td class="p-3">${Number(customer.orderCount || 0)}</td>
-            <td class="p-3 font-semibold text-[#a0346e]">$${Number(customer.totalSpent || 0).toLocaleString()}</td>
-            <td class="p-3 text-xs text-gray-500">${customer.lastPurchaseAt ? new Date(customer.lastPurchaseAt).toLocaleDateString('es-CO') : '-'}</td>
-            <td class="p-3">
-                <button class="delete-customer px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-semibold" data-id="${customer.id}">Eliminar</button>
-            </td>
-        </tr>
-    `).join('');
-
-    panel.innerHTML = `
-        <article class="bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm overflow-hidden">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <h3 class="text-2xl font-bold text-[#6d165a]">Clientes</h3>
-                <div class="flex flex-wrap gap-2">
-                    <button id="add-customer" class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-semibold">Agregar cliente</button>
-                </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-3 mb-4">
-                <input id="customers-search" class="px-3 py-2 rounded-xl border border-gray-200 text-sm flex-1 min-w-[220px]" placeholder="Buscar por nombre, teléfono, email o ciudad" value="${uiState.customersQuery}">
-                <span class="text-xs text-gray-500">Mostrando ${filteredCustomers.length} de ${state.customers.length}</span>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-[#fdf2f7] text-[#6d165a]">
-                        <tr>
-                            <th class="p-3 text-left">Cliente</th>
-                            <th class="p-3 text-left">Teléfono</th>
-                            <th class="p-3 text-left">Email</th>
-                            <th class="p-3 text-left">Órdenes</th>
-                            <th class="p-3 text-left">Total compra</th>
-                            <th class="p-3 text-left">Última compra</th>
-                            <th class="p-3 text-left">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>${rows || '<tr><td colspan="7" class="p-5 text-center text-gray-500">No hay clientes que coincidan con el filtro.</td></tr>'}</tbody>
-                </table>
-            </div>
-        </article>
-    `;
-
-    document.getElementById('customers-search').addEventListener('input', (event) => {
-        uiState.customersQuery = event.target.value;
-        renderCustomersTab();
-    });
-
-    document.getElementById('add-customer').addEventListener('click', showAddCustomer);
-    panel.querySelectorAll('.delete-customer').forEach((button) => {
-        button.addEventListener('click', () => deleteCustomer(button.dataset.id));
-    });
-}
-
-function getNextId(items) {
-    if (!items.length) return 1;
-    return Math.max(...items.map((item) => Number(item.id) || 0)) + 1;
-}
-
-function showProductModal(productId) {
-    const editing = productId != null;
-    const product = editing ? state.catalog.find((item) => Number(item.id) === Number(productId)) : null;
-
-    Swal.fire({
-        title: editing ? 'Editar producto' : 'Agregar producto',
-        html: `
-            <input id="swal-name" class="swal2-input" placeholder="Nombre" value="${product?.name || ''}">
-            <input id="swal-price" class="swal2-input" type="number" min="0" placeholder="Precio" value="${product?.price ?? ''}">
-            <input id="swal-stock" class="swal2-input" type="number" min="0" placeholder="Stock" value="${product?.stock ?? 0}">
-            <input id="swal-image" class="swal2-input" placeholder="Ruta imagen (assets/xx.jpg)" value="${product?.image || 'assets/default.png'}">
-            <input id="swal-category" class="swal2-input" placeholder="Categoría" value="${product?.category || ''}">
-            <textarea id="swal-description" class="swal2-textarea" placeholder="Descripción">${product?.description || ''}</textarea>
-        `,
-        showCancelButton: true,
-        confirmButtonText: editing ? 'Guardar' : 'Agregar',
-        confirmButtonColor: '#ec5c8d',
-        preConfirm: () => {
-            const name = document.getElementById('swal-name').value.trim();
-            const price = Number(document.getElementById('swal-price').value);
-            const stock = Number(document.getElementById('swal-stock').value);
-            const image = document.getElementById('swal-image').value.trim() || 'assets/default.png';
-            const category = document.getElementById('swal-category').value.trim();
-            const description = document.getElementById('swal-description').value.trim();
-
-            if (!name || Number.isNaN(price) || price <= 0 || Number.isNaN(stock) || stock < 0) {
-                Swal.showValidationMessage('Completa nombre, precio válido (> 0) y stock válido (>= 0).');
-                return false;
-            }
-            return { name, price, stock, image, category, description };
-        }
-    }).then((result) => {
-        if (!result.isConfirmed || !result.value) return;
-
-        if (editing && product) {
-            Object.assign(product, result.value);
-        } else {
-            state.catalog.push({ id: getNextId(state.catalog), ...result.value });
-        }
-
-        saveCatalog();
-        refreshUI();
-        Swal.fire('Guardado', 'Catálogo actualizado correctamente.', 'success');
-    });
-}
-
-function deleteProduct(productId) {
-    const product = state.catalog.find((item) => Number(item.id) === Number(productId));
-    if (!product) return;
-
-    Swal.fire({
-        title: '¿Eliminar producto?',
-        text: product.name,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Eliminar',
-        confirmButtonColor: '#ec5c8d'
-    }).then((result) => {
-        if (!result.isConfirmed) return;
-        state.catalog = state.catalog.filter((item) => Number(item.id) !== Number(productId));
-        saveCatalog();
-        refreshUI();
-    });
-}
-
-function restoreCatalog() {
-    Swal.fire({
-        title: '¿Restaurar catálogo base?',
-        text: 'Se reemplazará el catálogo actual por el listado original.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Restaurar',
-        confirmButtonColor: '#ec5c8d'
-    }).then((result) => {
-        if (!result.isConfirmed) return;
-        state.catalog = structuredCloneSafe(products);
-        saveCatalog();
-        refreshUI();
-    });
-}
-
-function showRegisterSale() {
-    const productOptions = state.catalog.map((item) => `<option value="${item.id}">${item.name} (stock: ${item.stock})</option>`).join('');
-    const customerOptions = ['<option value="">Cliente nuevo</option>', ...state.customers.map((customer) => `<option value="${customer.id}">${customer.name} · ${customer.phone || 'sin teléfono'}</option>`)].join('');
-
-    Swal.fire({
-        title: 'Registrar venta',
-        width: 640,
-        html: `
-            <select id="swal-customer" class="swal2-input">${customerOptions}</select>
-            <input id="swal-customer-name" class="swal2-input" placeholder="Nombre cliente">
-            <input id="swal-customer-phone" class="swal2-input" placeholder="Teléfono cliente">
-            <input id="swal-customer-email" class="swal2-input" placeholder="Email cliente (opcional)">
-            <select id="swal-product" class="swal2-input">${productOptions}</select>
-            <input id="swal-qty" class="swal2-input" type="number" min="1" value="1" placeholder="Cantidad">
-            <select id="swal-channel" class="swal2-input">
-                <option value="WhatsApp">WhatsApp</option>
-                <option value="Instagram">Instagram</option>
-                <option value="Tienda física">Tienda física</option>
-                <option value="Manual">Manual</option>
-            </select>
-            <textarea id="swal-notes" class="swal2-textarea" placeholder="Notas de venta (opcional)"></textarea>
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Guardar venta',
-        confirmButtonColor: '#ec5c8d',
-        didOpen: () => {
-            const customerSelect = document.getElementById('swal-customer');
-            customerSelect.addEventListener('change', () => {
-                const selected = state.customers.find((item) => Number(item.id) === Number(customerSelect.value));
-                document.getElementById('swal-customer-name').value = selected?.name || '';
-                document.getElementById('swal-customer-phone').value = selected?.phone || '';
-                document.getElementById('swal-customer-email').value = selected?.email || '';
-            });
-        },
-        preConfirm: () => {
-            const productId = Number(document.getElementById('swal-product').value);
-            const qty = Number(document.getElementById('swal-qty').value);
-            const customerName = document.getElementById('swal-customer-name').value.trim();
-            const customerPhone = document.getElementById('swal-customer-phone').value.trim();
-            const customerEmail = document.getElementById('swal-customer-email').value.trim();
-            const channel = document.getElementById('swal-channel').value;
-            const notes = document.getElementById('swal-notes').value.trim();
-
-            const product = state.catalog.find((item) => Number(item.id) === productId);
-            if (!product) {
-                Swal.showValidationMessage('Selecciona un producto válido.');
-                return false;
-            }
-            if (Number.isNaN(qty) || qty <= 0) {
-                Swal.showValidationMessage('Cantidad inválida.');
-                return false;
-            }
-            if (product.stock < qty) {
-                Swal.showValidationMessage(`Stock insuficiente. Solo hay ${product.stock} unidad(es).`);
-                return false;
-            }
-            if (!customerName) {
-                Swal.showValidationMessage('Ingresa al menos el nombre del cliente.');
-                return false;
-            }
-
-            return { product, qty, customerName, customerPhone, customerEmail, channel, notes };
-        }
-    }).then((result) => {
-        if (!result.isConfirmed || !result.value) return;
-        const { product, qty, customerName, customerPhone, customerEmail, channel, notes } = result.value;
-
-        product.stock -= qty;
-        const total = Number(product.price) * qty;
-        const sale = {
-            id: getNextId(state.sales),
-            createdAt: new Date().toISOString(),
-            items: [{ productId: product.id, name: product.name, qty, unitPrice: product.price }],
-            total,
-            customerName,
-            customerPhone,
-            customerEmail,
-            channel,
-            notes
-        };
-        state.sales.push(sale);
-
-        upsertCustomerFromSale(sale);
-
-        saveCatalog();
-        saveSales();
-        saveCustomers();
-        refreshUI();
-        Swal.fire('Venta registrada', `Se guardó la venta por $${total.toLocaleString()}.`, 'success');
-    });
-}
-
-function upsertCustomerFromSale(sale) {
-    const nameKey = (sale.customerName || '').trim().toLowerCase();
-    const phoneKey = (sale.customerPhone || '').trim();
-
-    let customer = state.customers.find((item) => {
-        const samePhone = phoneKey && item.phone && item.phone.trim() === phoneKey;
-        const sameName = item.name && item.name.trim().toLowerCase() === nameKey;
-        return samePhone || sameName;
-    });
-
-    if (!customer) {
-        customer = {
-            id: getNextId(state.customers),
-            name: sale.customerName,
-            phone: sale.customerPhone || '',
-            email: sale.customerEmail || '',
-            city: '',
-            orderCount: 0,
-            totalSpent: 0,
-            lastPurchaseAt: null
-        };
-        state.customers.push(customer);
+  const { value, isConfirmed } = await Swal.fire({
+    title: editing ? 'Editar producto' : 'Agregar producto',
+    html: `
+      <input id="sw-name"     class="swal2-input" placeholder="Nombre *"      value="${product?.name||''}">
+      <input id="sw-price"    class="swal2-input" placeholder="Precio *"      type="number" min="0" value="${product?.price??''}">
+      <input id="sw-stock"    class="swal2-input" placeholder="Stock *"       type="number" min="0" value="${product?.stock??0}">
+      <input id="sw-category" class="swal2-input" placeholder="Categoría *"   value="${product?.category||''}">
+      <input id="sw-image"    class="swal2-input" placeholder="Ruta imagen (assets/xx.jpg)" value="${product?.image||'assets/default.png'}">
+      <textarea id="sw-desc"  class="swal2-textarea" placeholder="Descripción">${product?.description||''}</textarea>`,
+    showCancelButton: true,
+    confirmButtonText: editing ? 'Guardar' : 'Agregar',
+    confirmButtonColor: '#ec5c8d',
+    preConfirm: () => {
+      const name  = document.getElementById('sw-name').value.trim();
+      const price = Number(document.getElementById('sw-price').value);
+      const stock = Number(document.getElementById('sw-stock').value);
+      const cat   = document.getElementById('sw-category').value.trim();
+      if (!name || !cat || isNaN(price) || price < 0 || isNaN(stock) || stock < 0) {
+        Swal.showValidationMessage('Nombre, precio, stock y categoría son obligatorios.');
+        return false;
+      }
+      return {
+        id:          productId,
+        name, price, stock,
+        category:    cat,
+        image:       document.getElementById('sw-image').value.trim() || 'assets/default.png',
+        description: document.getElementById('sw-desc').value.trim(),
+        active:      true
+      };
     }
+  });
 
-    customer.name = sale.customerName || customer.name;
-    customer.phone = sale.customerPhone || customer.phone;
-    customer.email = sale.customerEmail || customer.email;
-    customer.orderCount = Number(customer.orderCount || 0) + 1;
-    customer.totalSpent = Number(customer.totalSpent || 0) + Number(sale.total || 0);
-    customer.lastPurchaseAt = sale.createdAt;
-}
+  if (!isConfirmed || !value) return;
 
-function clearSales() {
-    Swal.fire({
-        title: '¿Limpiar ventas?',
-        text: 'Esta acción borra el historial de ventas, pero no tocará catálogo ni clientes.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Limpiar',
-        confirmButtonColor: '#ec5c8d'
-    }).then((result) => {
-        if (!result.isConfirmed) return;
-        state.sales = [];
-        saveSales();
-        refreshUI();
+  try {
+    const method = editing ? 'PUT' : 'POST';
+    const res    = await fetch('/api/products', {
+      method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value)
     });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.message);
+
+    // Actualizar state local
+    if (editing) {
+      const idx = state.catalog.findIndex(p => Number(p.id) === productId);
+      if (idx >= 0) state.catalog[idx] = json.data;
+    } else {
+      state.catalog.push(json.data);
+    }
+    saveToStorage(STORAGE_KEYS.catalog, state.catalog);
+    renderSummary();
+    renderCatalogTab();
+    Swal.fire('Guardado', 'Catálogo actualizado.', 'success');
+  } catch (err) {
+    Swal.fire('Error', err.message || 'No se pudo guardar.', 'error');
+  }
 }
 
-function showAddCustomer() {
-    Swal.fire({
-        title: 'Agregar cliente',
-        html: `
-            <input id="swal-c-name" class="swal2-input" placeholder="Nombre">
-            <input id="swal-c-phone" class="swal2-input" placeholder="Teléfono">
-            <input id="swal-c-email" class="swal2-input" placeholder="Email">
-            <input id="swal-c-city" class="swal2-input" placeholder="Ciudad">
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Guardar',
-        confirmButtonColor: '#ec5c8d',
-        preConfirm: () => {
-            const name = document.getElementById('swal-c-name').value.trim();
-            const phone = document.getElementById('swal-c-phone').value.trim();
-            const email = document.getElementById('swal-c-email').value.trim();
-            const city = document.getElementById('swal-c-city').value.trim();
+async function deactivateProduct(productId) {
+  const product = state.catalog.find(p => Number(p.id) === productId);
+  if (!product) return;
 
-            if (!name) {
-                Swal.showValidationMessage('El nombre es obligatorio.');
-                return false;
-            }
+  const { isConfirmed } = await Swal.fire({
+    title: '¿Desactivar producto?',
+    text: product.name,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Desactivar',
+    confirmButtonColor: '#ec5c8d'
+  });
+  if (!isConfirmed) return;
 
-            return { name, phone, email, city };
-        }
-    }).then((result) => {
-        if (!result.isConfirmed || !result.value) return;
-
-        state.customers.push({
-            id: getNextId(state.customers),
-            ...result.value,
-            orderCount: 0,
-            totalSpent: 0,
-            lastPurchaseAt: null
-        });
-        saveCustomers();
-        refreshUI();
+  try {
+    await fetch('/api/products', {
+      method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: productId })
     });
+    state.catalog = state.catalog.filter(p => Number(p.id) !== productId);
+    saveToStorage(STORAGE_KEYS.catalog, state.catalog);
+    renderSummary();
+    renderCatalogTab();
+  } catch {
+    Swal.fire('Error', 'No se pudo desactivar.', 'error');
+  }
 }
 
-function deleteCustomer(customerId) {
-    const customer = state.customers.find((item) => Number(item.id) === Number(customerId));
-    if (!customer) return;
+// ── CLIENTES ──────────────────────────────────────────────────
+function renderCustomersTab() {
+  const customers = state.customers.slice()
+    .sort((a,b) => Number(b.total_spent||0) - Number(a.total_spent||0));
 
-    Swal.fire({
-        title: '¿Eliminar cliente?',
-        text: customer.name,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Eliminar',
-        confirmButtonColor: '#ec5c8d'
-    }).then((result) => {
-        if (!result.isConfirmed) return;
-        state.customers = state.customers.filter((item) => Number(item.id) !== Number(customerId));
-        saveCustomers();
-        refreshUI();
-    });
+  const rows = customers.map(c => `
+    <tr class="border-b border-gray-100 hover:bg-[#fdf7fa]">
+      <td class="p-3">
+        <p class="font-semibold text-gray-900 text-sm">${c.name||'Sin nombre'}</p>
+        <p class="text-xs text-gray-400">${c.city||'—'}</p>
+      </td>
+      <td class="p-3 text-sm text-gray-600">${c.phone||'—'}</td>
+      <td class="p-3 text-sm text-gray-600">${c.email||'—'}</td>
+      <td class="p-3 text-center text-sm">${Number(c.order_count||0)}</td>
+      <td class="p-3 font-bold text-[#a0346e] text-sm whitespace-nowrap">$${Number(c.total_spent||0).toLocaleString('es-CO')}</td>
+      <td class="p-3">
+        ${Number(c.total_debt||0) > 0
+          ? `<span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">$${Number(c.total_debt).toLocaleString('es-CO')}</span>`
+          : `<span class="text-xs text-gray-400">—</span>`}
+      </td>
+      <td class="p-3 text-xs text-gray-400">${c.last_purchase_at ? new Date(c.last_purchase_at).toLocaleDateString('es-CO') : '—'}</td>
+    </tr>`).join('');
+
+  panel.innerHTML = `
+    <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+      <div class="bg-gradient-to-r from-[#a0346e] to-[#ec5c8d] px-5 py-4">
+        <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">👥 Clientes</h3>
+        <p class="text-white/70 text-xs mt-0.5">${customers.length} registrados · Ordenados por total comprado</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-[#fdf2f7]">
+            <tr>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Cliente</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Teléfono</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Email</th>
+              <th class="p-3 text-center text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Órdenes</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Total comprado</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Deuda</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Última compra</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows || `<tr><td colspan="7" class="p-6 text-center text-gray-400">Sin clientes registrados aún.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </article>`;
 }
 
-function exportBackup() {
-    const backup = {
-        version: 1,
-        exportedAt: new Date().toISOString(),
-        data: {
-            catalog: state.catalog,
-            sales: state.sales,
-            customers: state.customers
-        }
-    };
+// ── LOGOUT BUTTON ─────────────────────────────────────────────
+const logoutBtn = document.getElementById('logout-btn');
+if (logoutBtn) logoutBtn.addEventListener('click', logout);
 
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `discordia-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
+  // Hidratar state desde la API antes de renderizar
+  try {
+    const res  = await fetch('/api/discordia-data');
+    const json = await res.json();
+    if (json.ok) {
+      state.catalog   = json.data.catalog   || state.catalog;
+      state.sales     = json.data.sales     || state.sales;
+      state.customers = json.data.customers || state.customers;
+      saveToStorage(STORAGE_KEYS.catalog,   state.catalog);
+      saveToStorage(STORAGE_KEYS.sales,     state.sales);
+      saveToStorage(STORAGE_KEYS.customers, state.customers);
+    }
+  } catch { /* usar datos locales como fallback */ }
 
-    Swal.fire('Respaldo exportado', 'Se descargó el archivo JSON con todos los datos.', 'success');
+  buildTabs();
+  renderSummary();
+  await switchTab('dashboard');
 }
 
-function handleImportBackupFile(event) {
-    const [file] = event.target.files || [];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-        try {
-            const parsed = JSON.parse(reader.result);
-            const payload = parsed?.data || parsed;
-
-            if (!Array.isArray(payload.catalog) || !Array.isArray(payload.sales) || !Array.isArray(payload.customers)) {
-                throw new Error('Formato inválido');
-            }
-
-            state.catalog = payload.catalog;
-            state.sales = payload.sales;
-            state.customers = payload.customers;
-
-            saveCatalog();
-            saveSales();
-            saveCustomers();
-            refreshUI();
-
-            Swal.fire('Respaldo importado', 'Datos cargados correctamente.', 'success');
-        } catch (error) {
-            Swal.fire('Error', 'No se pudo importar el archivo JSON.', 'error');
-        } finally {
-            event.target.value = '';
-        }
-    };
-
-    reader.readAsText(file);
-}
-
-function resetAdminData() {
-    Swal.fire({
-        title: '¿Reiniciar datos del panel?',
-        text: 'Restaurará catálogo base y borrará ventas/clientes.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, reiniciar',
-        confirmButtonColor: '#ec5c8d'
-    }).then((result) => {
-        if (!result.isConfirmed) return;
-
-        state.catalog = structuredCloneSafe(products);
-        state.sales = [];
-        state.customers = [];
-        uiState.catalogQuery = '';
-        uiState.catalogLowStockOnly = false;
-        uiState.salesQuery = '';
-        uiState.customersQuery = '';
-
-        saveCatalog();
-        saveSales();
-        saveCustomers();
-        refreshUI();
-
-        Swal.fire('Listo', 'El panel fue reiniciado.', 'success');
-    });
-}
-
-bindTabActions();
-bindGlobalActions();
-refreshUI();
-hydrateFromApi();
+init();

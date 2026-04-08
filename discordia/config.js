@@ -27,7 +27,7 @@ export const CONFIG = {
   DEFAULT_PRODUCTS_PATH: './products.js',
 
   // Endpoint API para persistencia remota del panel admin
-  ADMIN_API_PATH: '/api/skc-data',
+  ADMIN_API_PATH: '/api/discordia-data',
   
   // Ruta de la imagen por defecto para fallback
   DEFAULT_IMAGE: './assets/default.png'
