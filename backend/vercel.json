@@ -30,10 +30,6 @@
       "memory": 1024,
       "maxDuration": 60
     },
-    "api/discordia/ventas.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
     "api/discordia/deudas.js": {
       "memory": 1024,
       "maxDuration": 60
