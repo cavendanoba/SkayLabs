@@ -23,8 +23,13 @@ Se completó la reorganización de la estructura de SkayLabs separando clarament
 | `backend/api/discordia/` | `catalog.js` | 60 | GET public + agregaciones |
 | `backend/api/discordia/` | `customers.js` | 80 | CRUD clientes |
 | `backend/api/discordia/` | `payments.js` | 65 | POST abonos |
+| `backend/api/discordia/` | `dashboard.js` | 120 | KPIs + métricas |
+| `backend/api/discordia/` | `deudas.js` | 130 | Ventas pendientes |
 | `backend/api/discordia/` | `discordia-data.js` | 50 | Bulk endpoint |
 | `backend/api/discordia/` | **`sales.js`** ⭐ | 95 | GET/POST ventas (NEW) |
+| `backend/api/copcash/` | `[...,slug].js` | 180 | Catch-all CopCash API |
+| `backend/api/` | `health.js` | 20 | Endpoint de salud |
+| `backend/lib/` | `db.js` | 20 | Conexión PostgreSQL compartida |
 | `backend/` | `vercel.json` | 40 | Configuración Vercel |
 | `backend/` | `README.md` | 150+ | Documentación endpoints |
 | `discordia/modules/` | **`dashboard.js`** ✅ | 1,700+ | Movido de `api/` |
@@ -74,17 +79,25 @@ fetch('/api/discordia/sales', { method: 'POST', ... })  ✅
 ```
 SkayLabs/
 ├── backend/
-│   ├── api/discordia/
-│   │   ├── db.js
-│   │   ├── admin-login.js
-│   │   ├── products.js
-│   │   ├── catalog.js
-│   │   ├── customers.js
-│   │   ├── payments.js
-│   │   ├── discordia-data.js
-│   │   └── sales.js
-│   ├── vercel.json
-│   └── README.md (endpoints documentados)
+│   ├── api/
+│   │   ├── copcash/
+│   │   │   └── [...slug].js
+│   │   ├── discordia/
+│   │   │   ├── admin-login.js
+│   │   │   ├── catalog.js
+│   │   │   ├── customers.js
+│   │   │   ├── dashboard.js
+│   │   │   ├── deudas.js
+│   │   │   ├── discordia-data.js
+│   │   │   ├── payments.js
+│   │   │   ├── products.js
+│   │   │   └── sales.js
+│   │   ├── health.js
+│   │   └── vercel.json
+│   ├── lib/
+│   │   └── copcash/
+│   │       └── _helpers.js
+│   ├── README.md (endpoints documentados)
 │
 ├── discordia/
 │   ├── modules/
@@ -110,10 +123,10 @@ SkayLabs/
 
 - ✅ **Imports:** Los 3 imports en `discordia/admin.js` apuntan a `./modules/` correctamente
 - ✅ **Fetch URLs:** Los 4 endpoints (`/api/discordia/sales`, `/api/discordia/payments`) están corrects
-- ✅ **Estructura:** `backend/api/discordia/` contiene los 8 archivos del backend
+- ✅ **Estructura:** `backend/api/discordia/` contiene los 9 archivos del backend
 - ✅ **Módulos:** `discordia/modules/` contiene los 3 módulos frontend
 - ✅ **Sin referencias rotas:** No hay imports a `./deudas.js` o `./ventas.js` sin el prefijo `modules/`
-- ✅ **Vercel Config:** `backend/vercel.json` lista los 8 endpoints
+- ✅ **Vercel Config:** `backend/vercel.json` lista las 8 funciones serverless
 
 ---
 

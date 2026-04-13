@@ -260,7 +260,7 @@ async function showProductModal(productId) {
 
   try {
     const method = editing ? 'PUT' : 'POST';
-    const res    = await fetch('/api/products', {
+    const res    = await fetch('/api/discordia/products', {
       method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value)
     });
     const json = await res.json();
@@ -297,7 +297,7 @@ async function deactivateProduct(productId) {
   if (!isConfirmed) return;
 
   try {
-    await fetch('/api/products', {
+    await fetch('/api/discordia/products', {
       method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: productId })
     });
     state.catalog = state.catalog.filter(p => Number(p.id) !== productId);

@@ -1,7 +1,7 @@
 // ENDPOINT: backend/api/discordia/sales.js
 // GET    → listar todas las ventas (soporta status=paid|pending&limit=N)
 // POST   → crear una venta nueva desde el panel admin
-import { sql } from './db.js';
+import { sql } from '../lib/db.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');

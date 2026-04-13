@@ -3,7 +3,7 @@
 // De esta forma, el frontend no tiene que preocuparse por cómo se accede a la base de datos, solo tiene que hacer una petición a esta API y recibir los datos en formato JSON.
 // Esto también nos permite mantener toda la lógica de acceso a datos en un solo lugar, lo que hace que el código sea más fácil de mantener y escalar.
 
-import { sql } from './db.js';
+import { sql } from '../lib/db.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');

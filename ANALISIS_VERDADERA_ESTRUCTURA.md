@@ -71,11 +71,11 @@ fetch(`${BASE}/gastos-fijos`, ...)
 
 ### **Discordia Frontend** (`/discordia/admin.js`)
 ```javascript
-fetch('/api/products', ...)      // ← Usa /api/products
-fetch('/api/dashboard', ...)     // ← Usa /api/dashboard
+fetch('/api/discordia/products', ...)      // ← Usa /api/discordia/products
+fetch('/api/discordia/dashboard', ...)     // ← Usa /api/discordia/dashboard
 ```
 
-**Estado:** ✅ Usando `/api/*` correctamente
+**Estado:** ✅ Usando `/api/discordia/*` correctamente
 
 ---
 
@@ -135,16 +135,17 @@ Estructura:
 Estructura después:
 /backend/api/
 ├── discordia/*   (copiar desde /api/)
-├── copcash/*     (copiar desde /api/copcash/)
-└── db.js         (copiar desde /api/db.js)
+├── copcash/*     (mover a `backend/lib/copcash/` y exponer con `backend/api/copcash/[...slug].js`)
+└── db.js         (mover a `backend/lib/db.js`)
 
 /api/            ← Eliminar (muerto)
-vercel.json      ← Mover a raíz
+vercel.json      ← Queda en `backend/vercel.json` para Vercel
+
 
 Cambios en frontends:
 - CopCash: BASE = '/api/copcash' (sin cambios, funciona igual)
-- Discordia: fetch('/api/products', ...) (sin cambios, funciona igual)
-  * Porque Vercel serviría /backend/api/* como /api/*
+- Discordia: fetch('/api/discordia/products', ...) (actual)
+  * Porque la estructura final usa `backend/api/discordia/` y Vercel expone estas rutas como `/api/discordia/*`
 ```
 
 ---

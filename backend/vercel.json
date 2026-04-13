@@ -10,14 +10,6 @@
       "memory": 1024,
       "maxDuration": 60
     },
-    "api/discordia/catalog.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
-    "api/discordia/customers.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
     "api/discordia/payments.js": {
       "memory": 1024,
       "maxDuration": 60
@@ -30,13 +22,17 @@
       "memory": 1024,
       "maxDuration": 60
     },
-    "api/discordia/deudas.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
     "api/discordia/discordia-data.js": {
       "memory": 1024,
       "maxDuration": 60
+    },
+    "api/copcash/[...slug].js": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "api/health.js": {
+      "memory": 128,
+      "maxDuration": 10
     }
   },
   "env": {

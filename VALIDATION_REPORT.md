@@ -109,17 +109,17 @@ SkayLabs/
 ├── 📁 bieco/
 ├── 📁 copcash/
 ├── 📁 scripts/
-├── 📁 api/                               ⚠️ [ANTIGUOS — PUEDEN ELIMINARSE]
-│   ├── db.js                             (copia en backend/api/discordia/)
-│   ├── admin-login.js                    (copia en backend/api/discordia/)
-│   ├── products.js                       (copia en backend/api/discordia/)
-│   ├── catalog.js                        (copia en backend/api/discordia/)
-│   ├── customers.js                      (copia en backend/api/discordia/)
-│   ├── payments.js                       (copia en backend/api/discordia/)
-│   ├── discordia-data.js                 (copia en backend/api/discordia/)
-│   ├── dashboard.js                      (copia en discordia/modules/)
-│   ├── deudas.js                         (copia en discordia/modules/)
-│   └── ventas.js                         (copia en discordia/modules/)
+├── 📁 api/                               ⚠️ [ANTIGUOS — eliminados del proyecto]
+│   ├── db.js                             (copiado anteriormente a backend/lib/db.js)
+│   ├── admin-login.js                    (copiado a backend/api/discordia/admin-login.js)
+│   ├── products.js                       (copiado a backend/api/discordia/products.js)
+│   ├── catalog.js                        (eliminado, no usado)
+│   ├── customers.js                      (eliminado, no usado)
+│   ├── payments.js                       (copiado a backend/api/discordia/payments.js)
+│   ├── discordia-data.js                 (copiado a backend/api/discordia/discordia-data.js)
+│   ├── dashboard.js                      (copiado a discordia/modules/dashboard.js)
+│   ├── deudas.js                         (copiado a discordia/modules/deudas.js)
+│   └── ventas.js                         (copiado a discordia/modules/ventas.js)
 │
 └── 📄 (archivos raíz)
 ```
@@ -183,14 +183,17 @@ discordia/modules/ventas.js
 |----------|--------|---------|--------|
 | `/api/discordia/admin-login` | POST | `admin-login.js` | ✅ |
 | `/api/discordia/products` | GET, POST, PUT | `products.js` | ✅ |
-| `/api/discordia/catalog` | GET | `catalog.js` | ✅ |
-| `/api/discordia/customers` | GET, POST, PUT, DEL | `customers.js` | ✅ |
 | `/api/discordia/payments` | POST | `payments.js` | ✅ |
+| `/api/discordia/dashboard` | GET | `dashboard.js` | ✅ |
 | `/api/discordia/sales` | GET, POST | `sales.js` | ✅ [NEW] |
 | `/api/discordia/discordia-data` | GET | `discordia-data.js` | ✅ |
+| `/api/copcash/*` | GET, POST, PUT, DELETE | `copcash/[...slug].js` | ✅ |
+| `/api/health` | GET | `health.js` | ✅ |
+| `/api/copcash/*` | GET, POST, PUT, DELETE | `copcash/[...slug].js` | ✅ |
+| `/api/health` | GET | `health.js` | ✅ |
 | `/` | (static files) | — | ✅ |
 
-**PASS** — 8 endpoints configurados, 0 conflictos
+**PASS** — 8 funciones configuradas, 0 conflictos
 
 ---
 

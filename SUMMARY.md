@@ -157,7 +157,7 @@ export const CONFIG = {
 
 2. **Verificar que `backend/` está completo:**
    ```bash
-   ls -la backend/api/discordia/  # Debe listar 8 archivos (.js)
+   ls -la backend/api/discordia/  # Debe listar 9 archivos (.js)
    ```
 
 3. **Verificar que no hay imports circulares:**
@@ -202,8 +202,7 @@ R: `backend/api/discordia/` — Para Vercel Serverless
 R: `discordia/modules/` — Lógica de renderizado + lógica de negocio
 
 **P: ¿Qué pasa con los conflictos de nombres (catalog.js, etc.)?**  
-R: No hay conflicto — `backend/api/discordia/catalog.js` expone `/api/discordia/catalog` (endpoint), `discordia/modules/catalog.js` lo consume
-
+R: Se eliminó el endpoint backend `backend/api/discordia/catalog.js` porque no era utilizado por la app. El frontend `discordia/catalog.js` sigue siendo un módulo independiente para renderizado local.
 **P: ¿Bieco y Copcash qué hacen?**  
 R: Proyectos independientes que pueden usar `assets/` compartidos. Podrán seguir el mismo patrón de estructura
 
