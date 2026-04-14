@@ -1,38 +1,5 @@
 {
+{
   "buildCommand": "echo 'Serverless functions ready for deployment'",
-  "public": false,
-  "functions": {
-    "backend/api/discordia/admin-login.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
-    "backend/api/discordia/products.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
-    "backend/api/discordia/payments.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
-    "backend/api/discordia/dashboard.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
-    "backend/api/discordia/sales.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
-    "backend/api/discordia/discordia-data.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
-    "backend/api/copcash/[...slug].js": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
-    "backend/api/health.js": {
-      "memory": 128,
-      "maxDuration": 10
-    }
-  }
+  "public": false
 }
