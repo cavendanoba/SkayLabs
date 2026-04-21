@@ -1,7 +1,7 @@
 // backend/api/discordia/payments.js
 // POST → registrar abono a una venta pendiente
 // Cuando el abono cubre el total → la venta pasa a 'paid'
-import { sql } from './db.js';
+import { sql } from '../lib/db.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');

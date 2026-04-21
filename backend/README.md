@@ -7,20 +7,32 @@ Este directorio contiene todas las funciones Serverless para Vercel que sirven a
 ```
 backend/
 ├── api/
-│   └── discordia/
-│       ├── db.js                  ← Conexión PostgreSQL centralizada
-│       ├── admin-login.js         ← POST /api/discordia/admin-login
-│       ├── products.js            ← GET/POST/PUT/DELETE /api/discordia/products
-│       ├── catalog.js             ← GET/POST/PUT/DELETE /api/discordia/catalog
-│       ├── customers.js           ← GET/POST/PUT/DELETE /api/discordia/customers
-│       ├── payments.js            ← POST /api/discordia/payments
-│       ├── dashboard.js           ← GET /api/discordia/dashboard
-│       ├── sales.js               ← GET/POST /api/discordia/sales
-│       ├── ventas.js              ← GET /api/discordia/ventas
-│       ├── deudas.js              ← GET /api/discordia/deudas
-│       └── discordia-data.js      ← GET /api/discordia/discordia-data
+│   ├── copcash/
+│   │   └── [...slug].js            ← Catch-all para CopCash API
+│   ├── discordia/
+│   │   ├── admin-login.js         ← POST /api/discordia/admin-login
+│   │   ├── products.js            ← GET/POST/PUT/DELETE /api/discordia/products
+│   │   ├── payments.js            ← POST /api/discordia/payments
+│   │   ├── dashboard.js           ← GET /api/discordia/dashboard
+│   │   ├── sales.js               ← GET/POST /api/discordia/sales
+│   │   └── discordia-data.js      ← GET /api/discordia/discordia-data
+│   └── health.js                  ← GET /api/health
+├── lib/
+│   └── copcash/                   ← Código reusable y helpers de CopCash
+│       ├── _helpers.js
+│       ├── auth/
+│       ├── categorias/
+│       ├── gastos-fijos/
+│       ├── gastos-variables/
+│       ├── ingresos-extra/
+│       ├── metas/
+│       ├── salario.js
+│       ├── tarjetas/
+│       └── schema.sql
 ├── vercel.json                    ← Configuración Vercel
 └── README.md                      ← Este archivo
+
+NOTA: La carpeta raíz `api/` ya no existe. Las rutas actuales de Vercel usan `backend/api/`.
 
 ## Endpoints Disponibles
 
@@ -32,15 +44,6 @@ backend/
 - `POST /api/discordia/products` — Crear producto
 - `PUT /api/discordia/products` — Editar producto
 - `DELETE /api/discordia/products` — Desactivar producto
-
-### Catálogo Público
-- `GET /api/discordia/catalog` — Listar solo activos + metátricas
-
-### Clientes
-- `GET /api/discordia/customers` — Listar todos + metátricas
-- `POST /api/discordia/customers` — Crear cliente
-- `PUT /api/discordia/customers` — Editar cliente
-- `DELETE /api/discordia/customers` — Eliminar cliente
 
 ### Pagos
 - `POST /api/discordia/payments` — Registrar abono a venta

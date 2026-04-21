@@ -1,5 +1,5 @@
 // backend/api/discordia/admin-login.js
-import { sql } from './db.js';
+import { sql } from '../lib/db.js';
 import bcrypt from 'bcryptjs';
 
 export default async function handler(req, res) {

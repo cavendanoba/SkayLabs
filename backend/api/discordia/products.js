@@ -4,7 +4,7 @@
 // POST   → crear producto nuevo
 // PUT    → editar producto existente
 // DELETE → desactivar producto (nunca borramos, solo active=false)
-import { sql } from './db.js';
+import { sql } from '../lib/db.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
