@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DISCORDIA — Maquillaje con Identidad · Bogotá</title>
-  <meta name="description" content="Descubre maquillaje auténtico, curado con criterio y pensado para tu rutina real. Entrega en Bogotá, atención por WhatsApp.">
+  <meta name="description"
+    content="Descubre maquillaje auténtico, curado con criterio y pensado para tu rutina real. Entrega en Bogotá, atención por WhatsApp.">
 
   <script>
     (function () {
@@ -36,7 +38,8 @@
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&display=swap');
   </style>
@@ -47,22 +50,34 @@
   <style>
     /* ── CUSTOM STYLES ───────────────────────────── */
     :root {
-      --deep:   #6d165a;
-      --mid:    #a0346e;
-      --pink:   #ec5c8d;
-      --light:  #ff8c91;
-      --peach:  #ffc4a6;
-      --warm:   #faf8f7;
-      --section:#f5ede8;
+      --deep: #6d165a;
+      --mid: #a0346e;
+      --pink: #ec5c8d;
+      --light: #ff8c91;
+      --peach: #ffc4a6;
+      --warm: #faf8f7;
+      --section: #f5ede8;
     }
 
     /* Announcement bar scroll */
     @keyframes ticker {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
     }
-    .ticker-inner { animation: ticker 28s linear infinite; white-space: nowrap; }
-    .ticker-inner:hover { animation-play-state: paused; }
+
+    .ticker-inner {
+      animation: ticker 28s linear infinite;
+      white-space: nowrap;
+    }
+
+    .ticker-inner:hover {
+      animation-play-state: paused;
+    }
 
     /* Hero text gradient */
     .hero-gradient {
@@ -74,9 +89,15 @@
 
     /* Smooth shimmer on product cards */
     @keyframes shimmer {
-      0%   { background-position: -200% center; }
-      100% { background-position: 200% center; }
+      0% {
+        background-position: -200% center;
+      }
+
+      100% {
+        background-position: 200% center;
+      }
     }
+
     .card-shimmer {
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
@@ -85,61 +106,132 @@
 
     /* Floating badge pulse */
     @keyframes pulse-badge {
-      0%, 100% { transform: scale(1); }
-      50%       { transform: scale(1.1); }
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
     }
-    .badge-pulse { animation: pulse-badge 2s ease-in-out infinite; }
+
+    .badge-pulse {
+      animation: pulse-badge 2s ease-in-out infinite;
+    }
 
     /* Category card hover */
-    .cat-card { transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease; }
-    .cat-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 24px 48px rgba(109,22,90,0.18); }
+    .cat-card {
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+    }
+
+    .cat-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 24px 48px rgba(109, 22, 90, 0.18);
+    }
 
     /* Product card */
-    .product-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-    .product-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(109,22,90,0.15); }
+    .product-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(109, 22, 90, 0.15);
+    }
 
     /* Sticky header scroll effect */
-    .header-scrolled { box-shadow: 0 4px 32px rgba(109,22,90,0.12); }
+    .header-scrolled {
+      box-shadow: 0 4px 32px rgba(109, 22, 90, 0.12);
+    }
 
     /* WhatsApp pulse */
     @keyframes wa-ping {
-      0%   { transform: scale(1); opacity: 0.75; }
-      70%  { transform: scale(1.55); opacity: 0; }
-      100% { transform: scale(1.55); opacity: 0; }
+      0% {
+        transform: scale(1);
+        opacity: 0.75;
+      }
+
+      70% {
+        transform: scale(1.55);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1.55);
+        opacity: 0;
+      }
     }
+
     .wa-pulse-ring {
-      position: absolute; inset: 0; border-radius: 50%;
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
       border: 2px solid #40c351;
       animation: wa-ping 2.2s ease-out infinite;
       pointer-events: none;
     }
 
     /* Section divider wave */
-    .wave-divider { display: block; width: 100%; overflow: hidden; line-height: 0; }
-    .wave-divider svg { display: block; }
+    .wave-divider {
+      display: block;
+      width: 100%;
+      overflow: hidden;
+      line-height: 0;
+    }
+
+    .wave-divider svg {
+      display: block;
+    }
 
     /* Reveal animations */
     @keyframes fadeSlideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    .reveal { animation: fadeSlideUp 0.7s ease forwards; }
+
+    .reveal {
+      animation: fadeSlideUp 0.7s ease forwards;
+    }
 
     /* Blur-up */
-    .blur-image { filter: blur(10px); transition: filter 0.8s ease-out; }
-    .blur-image.loaded { filter: blur(0); }
+    .blur-image {
+      filter: blur(10px);
+      transition: filter 0.8s ease-out;
+    }
+
+    .blur-image.loaded {
+      filter: blur(0);
+    }
 
     /* Scrollbar oculto */
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
 
     /* Brand chip */
     .brand-chip {
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(160,52,110,0.18);
-      border-radius: 1rem; padding: 0.9rem 1rem;
-      text-align: center; font-weight: 600; color: #6d165a;
-      box-shadow: 0 8px 20px rgba(109,22,90,0.08);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(160, 52, 110, 0.18);
+      border-radius: 1rem;
+      padding: 0.9rem 1rem;
+      text-align: center;
+      font-weight: 600;
+      color: #6d165a;
+      box-shadow: 0 8px 20px rgba(109, 22, 90, 0.08);
       backdrop-filter: blur(6px);
     }
 
@@ -147,21 +239,52 @@
     .button {
       --bg: linear-gradient(90deg, #ec5c8d, #ff8c91);
       --bg-hover: linear-gradient(90deg, #ff8c91, #ffc4a6);
-      border: none; border-radius: 0.65rem;
-      background: var(--bg); color: #fff; font-weight: 700;
+      border: none;
+      border-radius: 0.65rem;
+      background: var(--bg);
+      color: #fff;
+      font-weight: 700;
       padding: 0.62rem 0.95rem;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 10px 24px rgba(236,92,141,0.24);
+      box-shadow: 0 10px 24px rgba(236, 92, 141, 0.24);
     }
-    .button:hover { background: var(--bg-hover); transform: translateY(-1px); box-shadow: 0 14px 26px rgba(236,92,141,0.3); }
-    .button.small { font-size: 0.95rem; padding-top: 0.58rem; padding-bottom: 0.58rem; }
-    .button:disabled { opacity: 0.62; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .button:hover {
+      background: var(--bg-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 26px rgba(236, 92, 141, 0.3);
+    }
+
+    .button.small {
+      font-size: 0.95rem;
+      padding-top: 0.58rem;
+      padding-bottom: 0.58rem;
+    }
+
+    .button:disabled {
+      opacity: 0.62;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
 
     /* Parallax layer */
-    .par-layer { position: absolute; left: 0; right: 0; will-change: transform; }
+    .par-layer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      will-change: transform;
+    }
 
     /* Trust badge row */
-    .trust-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 600; color: #6d165a; }
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #6d165a;
+    }
   </style>
 </head>
 
@@ -189,7 +312,8 @@
   <!-- ════════════════════════════════════════════════════ -->
   <!-- HEADER                                              -->
   <!-- ════════════════════════════════════════════════════ -->
-  <header id="mainHeader" class="sticky top-0 left-0 w-full bg-white/96 backdrop-blur-md z-50 border-b border-gray-100 transition-shadow duration-300">
+  <header id="mainHeader"
+    class="sticky top-0 left-0 w-full bg-white/96 backdrop-blur-md z-50 border-b border-gray-100 transition-shadow duration-300">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
 
       <!-- Logo -->
@@ -198,9 +322,11 @@
       </a>
 
       <!-- Search (desktop) -->
-      <div class="hidden lg:flex flex-1 max-w-md mx-6 items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5 focus-within:border-[#ec5c8d] focus-within:shadow-md transition-all">
+      <div
+        class="hidden lg:flex flex-1 max-w-md mx-6 items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5 focus-within:border-[#ec5c8d] focus-within:shadow-md transition-all">
         <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm mr-3"></i>
-        <input id="catalogSearch" type="text" placeholder="Buscar rubores, brillos, sombras..." class="bg-transparent outline-none w-full text-sm text-gray-700 placeholder:text-gray-400">
+        <input id="catalogSearch" type="text" placeholder="Buscar rubores, brillos, sombras..."
+          class="bg-transparent outline-none w-full text-sm text-gray-700 placeholder:text-gray-400">
         <span id="searchSpinner" class="hidden ml-2">
           <i class="fa-solid fa-spinner fa-spin text-[#ec5c8d] text-sm"></i>
         </span>
@@ -231,24 +357,36 @@
         <button id="mobileMenuBtn" class="md:hidden p-2 text-[#6d165a]">
           <i class="fa-solid fa-bars text-xl"></i>
         </button>
-        <button id="openCartHeader" class="open-cart-btn relative flex items-center justify-center bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white p-2.5 rounded-full hover:shadow-lg transition hover:scale-105">
+        <button id="openCartHeader"
+          class="open-cart-btn relative flex items-center justify-center bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white p-2.5 rounded-full hover:shadow-lg transition hover:scale-105">
           <i class="fa-solid fa-bag-shopping text-lg"></i>
-          <span class="cart-count-badge absolute -top-1.5 -right-1.5 bg-[#ffc4a6] text-[#6d165a] text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center badge-pulse">0</span>
+          <span
+            class="cart-count-badge absolute -top-1.5 -right-1.5 bg-[#ffc4a6] text-[#6d165a] text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center badge-pulse">0</span>
         </button>
       </div>
     </div>
 
     <!-- Mobile menu -->
     <nav id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-100 px-4 py-4">
-      <div class="flex items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5 mb-4 focus-within:border-[#ec5c8d] transition">
+      <div
+        class="flex items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5 mb-4 focus-within:border-[#ec5c8d] transition">
         <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm mr-3"></i>
-        <input id="mobileSearchInput" type="search" placeholder="Buscar productos..." class="bg-transparent outline-none w-full text-sm text-gray-700">
+        <input id="mobileSearchInput" type="search" placeholder="Buscar productos..."
+          class="bg-transparent outline-none w-full text-sm text-gray-700">
       </div>
       <div class="flex flex-col gap-1">
-        <a href="#catalogo"  class="py-3 px-2 text-gray-700 hover:text-[#6d165a] hover:bg-[#fdf2f7] rounded-xl transition font-medium border-b border-gray-50">🛍️ Catálogo</a>
-        <a href="#categorias" class="py-3 px-2 text-gray-700 hover:text-[#6d165a] hover:bg-[#fdf2f7] rounded-xl transition font-medium border-b border-gray-50">✨ Categorías</a>
-        <a href="#nosotros"  class="py-3 px-2 text-gray-700 hover:text-[#6d165a] hover:bg-[#fdf2f7] rounded-xl transition font-medium border-b border-gray-50">💄 Nosotros</a>
-        <a href="#pagos"     class="py-3 px-2 text-gray-700 hover:text-[#6d165a] hover:bg-[#fdf2f7] rounded-xl transition font-medium">💳 Pagos</a>
+        <a href="#catalogo"
+          class="py-3 px-2 text-gray-700 hover:text-[#6d165a] hover:bg-[#fdf2f7] rounded-xl transition font-medium border-b border-gray-50">🛍️
+          Catálogo</a>
+        <a href="#categorias"
+          class="py-3 px-2 text-gray-700 hover:text-[#6d165a] hover:bg-[#fdf2f7] rounded-xl transition font-medium border-b border-gray-50">✨
+          Categorías</a>
+        <a href="#nosotros"
+          class="py-3 px-2 text-gray-700 hover:text-[#6d165a] hover:bg-[#fdf2f7] rounded-xl transition font-medium border-b border-gray-50">💄
+          Nosotros</a>
+        <a href="#pagos"
+          class="py-3 px-2 text-gray-700 hover:text-[#6d165a] hover:bg-[#fdf2f7] rounded-xl transition font-medium">💳
+          Pagos</a>
       </div>
     </nav>
   </header>
@@ -270,46 +408,62 @@
 
         <!-- Left: copy -->
         <div class="py-12 lg:py-20 text-center lg:text-left">
-          <div class="inline-flex items-center gap-2 bg-white/15 border border-white/25 text-white/90 text-xs font-semibold tracking-widest uppercase px-4 py-2 rounded-full mb-6" data-aos="fade-down">
+          <div
+            class="inline-flex items-center gap-2 bg-white/15 border border-white/25 text-white/90 text-xs font-semibold tracking-widest uppercase px-4 py-2 rounded-full mb-6"
+            data-aos="fade-down">
             <span class="w-2 h-2 bg-[#ffc4a6] rounded-full animate-pulse"></span>
-            Beauty Studio · Bogotá
+            Beauty Store · Bogotá
           </div>
 
-          <h1 class="text-[2.4rem] sm:text-[3rem] lg:text-[3.6rem] font-extrabold text-white leading-[1.1] mb-6" data-aos="fade-up" style="font-family:'Playfair Display',serif;">
+          <h1 class="text-[2.4rem] sm:text-[3rem] lg:text-[3.6rem] font-extrabold text-white leading-[1.1] mb-6"
+            data-aos="fade-up" style="font-family:'Playfair Display',serif;">
             Belleza auténtica<br>
             <span id="typed" class="text-[#ffc4a6]">para tu rutina real</span>
           </h1>
 
-          <p class="text-white/75 text-base lg:text-lg max-w-lg mx-auto lg:mx-0 mb-8 leading-relaxed" data-aos="fade-up" data-aos-delay="100">
-            Maquillaje curado con criterio, precios honestos y atención cercana. Cada producto pasa por nuestro filtro antes de llegar a tus manos.
+          <p class="text-white/75 text-base lg:text-lg max-w-lg mx-auto lg:mx-0 mb-8 leading-relaxed" data-aos="fade-up"
+            data-aos-delay="100">
+            Maquillaje a precios honestos y atención cercana. Cada producto pasa por nuestro filtro
+            antes de llegar a tus manos.
           </p>
 
-          <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-10" data-aos="fade-up" data-aos-delay="150">
-            <a href="#catalogo" class="inline-flex items-center justify-center gap-2 bg-[#ffc4a6] text-[#6d165a] px-8 py-4 rounded-full font-bold text-base hover:bg-white hover:text-[#6d165a] transition transform hover:scale-105 shadow-xl">
+          <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-10" data-aos="fade-up"
+            data-aos-delay="150">
+            <a href="#catalogo"
+              class="inline-flex items-center justify-center gap-2 bg-[#ffc4a6] text-[#6d165a] px-8 py-4 rounded-full font-bold text-base hover:bg-white hover:text-[#6d165a] transition transform hover:scale-105 shadow-xl">
               <i class="fa-solid fa-sparkles"></i> Ver Catálogo
             </a>
-            <a href="https://wa.me/573508311346" target="_blank" class="contact-whatsapp inline-flex items-center justify-center gap-2 bg-white/15 border border-white/40 text-white px-7 py-4 rounded-full font-semibold text-base hover:bg-white/25 transition">
+            <a href="https://wa.me/573508311346" target="_blank"
+              class="contact-whatsapp inline-flex items-center justify-center gap-2 bg-white/15 border border-white/40 text-white px-7 py-4 rounded-full font-semibold text-base hover:bg-white/25 transition">
               <i class="fa-brands fa-whatsapp"></i> Escríbenos
             </a>
           </div>
 
           <!-- Trust row -->
-          <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-white/70 text-xs font-medium" data-aos="fade-up" data-aos-delay="200">
-            <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-check text-[#ffc4a6]"></i> Originales verificados</span>
+          <div
+            class="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-white/70 text-xs font-medium"
+            data-aos="fade-up" data-aos-delay="200">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-check text-[#ffc4a6]"></i> Originales
+              verificados</span>
             <span class="w-px h-4 bg-white/30"></span>
-            <span class="flex items-center gap-1.5"><i class="fa-solid fa-truck-fast text-[#ffc4a6]"></i> Entrega en Bogotá</span>
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-truck-fast text-[#ffc4a6]"></i> Entrega en
+              Bogotá</span>
             <span class="w-px h-4 bg-white/30"></span>
-            <span class="flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-[#ffc4a6]"></i> Atención 24/7</span>
+            <span class="flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-[#ffc4a6]"></i> Atención
+              24/7</span>
           </div>
         </div>
 
         <!-- Right: product preview -->
         <div class="relative lg:py-12" data-aos="fade-left" data-aos-delay="100">
-          <div id="heroProductPreview" class="flex lg:grid lg:grid-cols-2 gap-3 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 no-scrollbar">
+          <div id="heroProductPreview"
+            class="flex lg:grid lg:grid-cols-2 gap-3 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 no-scrollbar">
             <!-- Filled by JS -->
           </div>
           <!-- Decorative circle behind cards -->
-          <div class="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-white/8 rounded-full blur-3xl pointer-events-none"></div>
+          <div
+            class="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-white/8 rounded-full blur-3xl pointer-events-none">
+          </div>
         </div>
 
       </div>
@@ -318,7 +472,9 @@
     <!-- Wave bottom -->
     <div class="wave-divider -mb-px">
       <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-        <path d="M0 60L48 51.7C96 43.3 192 26.7 288 20C384 13.3 480 16.7 576 23.3C672 30 768 40 864 43.3C960 46.7 1056 43.3 1152 36.7C1248 30 1344 20 1392 15L1440 10V60H1392C1344 60 1248 60 1152 60C1056 60 960 60 864 60C768 60 672 60 576 60C480 60 384 60 288 60C192 60 96 60 48 60H0Z" fill="#faf8f7"/>
+        <path
+          d="M0 60L48 51.7C96 43.3 192 26.7 288 20C384 13.3 480 16.7 576 23.3C672 30 768 40 864 43.3C960 46.7 1056 43.3 1152 36.7C1248 30 1344 20 1392 15L1440 10V60H1392C1344 60 1248 60 1152 60C1056 60 960 60 864 60C768 60 672 60 576 60C480 60 384 60 288 60C192 60 96 60 48 60H0Z"
+          fill="#faf8f7" />
       </svg>
     </div>
   </section>
@@ -355,15 +511,20 @@
   <section id="categorias" class="py-16 max-w-7xl mx-auto px-4">
     <div class="text-center mb-10" data-aos="fade-up">
       <p class="text-xs uppercase tracking-[0.2em] text-[#a0346e] font-semibold mb-2">Explorar</p>
-      <h2 class="text-3xl md:text-4xl font-bold text-[#6d165a]" style="font-family:'Playfair Display',serif;">Compra por categoría</h2>
+      <h2 class="text-3xl md:text-4xl font-bold text-[#6d165a]" style="font-family:'Playfair Display',serif;">Compra por
+        categoría</h2>
     </div>
 
     <div id="categoryFilters" class="grid grid-cols-2 md:grid-cols-4 gap-4" data-aos="fade-up" data-aos-delay="50">
       <!-- Labios -->
-      <a href="#catalogo" data-cat="Labios" class="cat-card cursor-pointer group block" onclick="filterByCategory('Labios')">
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] h-44 flex flex-col items-center justify-center gap-2">
+      <a href="#catalogo" data-cat="Labios" class="cat-card cursor-pointer group block"
+        onclick="filterByCategory('Labios')">
+        <div
+          class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] h-44 flex flex-col items-center justify-center gap-2">
           <span class="text-5xl group-hover:scale-110 transition duration-300">💄</span>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition">
+          </div>
         </div>
         <div class="pt-3 text-center">
           <h3 class="font-bold text-gray-900">Labios</h3>
@@ -372,10 +533,14 @@
       </a>
 
       <!-- Ojos -->
-      <a href="#catalogo" data-cat="Ojos" class="cat-card cursor-pointer group block" onclick="filterByCategory('Ojos')">
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] h-44 flex flex-col items-center justify-center gap-2">
+      <a href="#catalogo" data-cat="Ojos" class="cat-card cursor-pointer group block"
+        onclick="filterByCategory('Ojos')">
+        <div
+          class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] h-44 flex flex-col items-center justify-center gap-2">
           <span class="text-5xl group-hover:scale-110 transition duration-300">👁️</span>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition">
+          </div>
         </div>
         <div class="pt-3 text-center">
           <h3 class="font-bold text-gray-900">Ojos</h3>
@@ -384,10 +549,14 @@
       </a>
 
       <!-- Rubor & Iluminador -->
-      <a href="#catalogo" data-cat="Rubor" class="cat-card cursor-pointer group block" onclick="filterByCategory('Rubor')">
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#a0346e] to-[#6d165a] h-44 flex flex-col items-center justify-center gap-2">
+      <a href="#catalogo" data-cat="Rubor" class="cat-card cursor-pointer group block"
+        onclick="filterByCategory('Rubor')">
+        <div
+          class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#a0346e] to-[#6d165a] h-44 flex flex-col items-center justify-center gap-2">
           <span class="text-5xl group-hover:scale-110 transition duration-300">🌸</span>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition">
+          </div>
         </div>
         <div class="pt-3 text-center">
           <h3 class="font-bold text-gray-900">Rubor</h3>
@@ -396,10 +565,14 @@
       </a>
 
       <!-- Iluminador -->
-      <a href="#catalogo" data-cat="Iluminador" class="cat-card cursor-pointer group block" onclick="filterByCategory('Iluminador')">
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#6d165a] to-[#ec5c8d] h-44 flex flex-col items-center justify-center gap-2">
+      <a href="#catalogo" data-cat="Iluminador" class="cat-card cursor-pointer group block"
+        onclick="filterByCategory('Iluminador')">
+        <div
+          class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#6d165a] to-[#ec5c8d] h-44 flex flex-col items-center justify-center gap-2">
           <span class="text-5xl group-hover:scale-110 transition duration-300">✨</span>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition">
+          </div>
         </div>
         <div class="pt-3 text-center">
           <h3 class="font-bold text-gray-900">Iluminador</h3>
@@ -419,10 +592,12 @@
       <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8" data-aos="fade-up">
         <div>
           <p class="text-xs uppercase tracking-[0.2em] text-[#a0346e] font-semibold mb-1">Nuestro catálogo</p>
-          <h2 class="text-3xl md:text-4xl font-bold text-[#6d165a]" style="font-family:'Playfair Display',serif;">Todos los productos</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-[#6d165a]" style="font-family:'Playfair Display',serif;">Todos
+            los productos</h2>
           <p id="resultsCount" class="text-sm text-gray-500 mt-1">Cargando...</p>
         </div>
-        <select id="sortProducts" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#ec5c8d] bg-white shadow-sm">
+        <select id="sortProducts"
+          class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#ec5c8d] bg-white shadow-sm">
           <option value="featured">Ordenar</option>
           <option value="newest">Más recientes</option>
           <option value="price-asc">Menor precio</option>
@@ -434,9 +609,11 @@
       <!-- Filters bar -->
       <div class="flex flex-wrap items-center gap-2 mb-8" data-aos="fade-up" data-aos-delay="50">
         <!-- Search (mobile) -->
-        <div class="flex lg:hidden items-center bg-white border border-gray-200 rounded-full px-4 py-2 w-full focus-within:border-[#ec5c8d] transition">
+        <div
+          class="flex lg:hidden items-center bg-white border border-gray-200 rounded-full px-4 py-2 w-full focus-within:border-[#ec5c8d] transition">
           <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm mr-2"></i>
-          <input id="mobileSearchInput2" type="search" placeholder="Buscar..." class="bg-transparent outline-none w-full text-sm text-gray-700">
+          <input id="mobileSearchInput2" type="search" placeholder="Buscar..."
+            class="bg-transparent outline-none w-full text-sm text-gray-700">
         </div>
         <!-- Category pills -->
         <div id="categoryPills" class="flex flex-wrap gap-2">
@@ -446,15 +623,15 @@
           </button>
         </div>
         <!-- Stock toggle -->
-        <label class="flex items-center gap-2 ml-auto cursor-pointer select-none bg-white border border-gray-200 rounded-full px-4 py-2 text-sm hover:border-[#ec5c8d] transition">
+        <label
+          class="flex items-center gap-2 ml-auto cursor-pointer select-none bg-white border border-gray-200 rounded-full px-4 py-2 text-sm hover:border-[#ec5c8d] transition">
           <input id="filterInStock" type="checkbox" class="w-3.5 h-3.5 accent-[#ec5c8d]">
           <span class="text-gray-700 font-medium">Solo en stock</span>
         </label>
       </div>
 
       <!-- Grid -->
-      <div id="catalog"
-        class="grid gap-4 md:gap-5"
+      <div id="catalog" class="grid gap-4 md:gap-5"
         style="grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));">
         <!-- Skeleton placeholders mientras carga -->
         <div class="card-shimmer rounded-2xl h-80"></div>
@@ -477,12 +654,15 @@
       <div class="absolute bottom-0 right-0 w-64 h-64 bg-[#ffc4a6]/8 rounded-full blur-3xl"></div>
     </div>
     <div class="relative z-10 max-w-5xl mx-auto px-4 text-center text-white">
-      <p class="text-xs uppercase tracking-[0.2em] text-[#ffc4a6] font-semibold mb-3" data-aos="fade-up">Especial para regalar</p>
-      <h2 class="text-3xl md:text-5xl font-bold mb-4" style="font-family:'Playfair Display',serif;" data-aos="fade-up" data-aos-delay="50">
+      <p class="text-xs uppercase tracking-[0.2em] text-[#ffc4a6] font-semibold mb-3" data-aos="fade-up">Especial para
+        regalar</p>
+      <h2 class="text-3xl md:text-5xl font-bold mb-4" style="font-family:'Playfair Display',serif;" data-aos="fade-up"
+        data-aos-delay="50">
         🎁 Cajas Regalo Personalizadas
       </h2>
       <p class="text-white/70 max-w-xl mx-auto mb-8 text-base leading-relaxed" data-aos="fade-up" data-aos-delay="100">
-        Elige tus productos favoritos y los armamos en una caja especial con diseño exclusivo. El regalo perfecto para sorprender con estilo.
+        Elige tus productos favoritos y los armamos en una caja especial con diseño exclusivo. El regalo perfecto para
+        sorprender con estilo.
       </p>
       <a href="https://wa.me/573508311346?text=Hola!%20Quiero%20armar%20una%20caja%20regalo%20%F0%9F%8E%81"
         target="_blank"
@@ -501,11 +681,14 @@
 
       <div data-aos="fade-right">
         <p class="text-xs uppercase tracking-[0.2em] text-[#a0346e] font-semibold mb-3">Nuestro propósito</p>
-        <h2 class="text-3xl md:text-4xl font-bold text-[#6d165a] mb-6 leading-tight" style="font-family:'Playfair Display',serif;">
+        <h2 class="text-3xl md:text-4xl font-bold text-[#6d165a] mb-6 leading-tight"
+          style="font-family:'Playfair Display',serif;">
           Belleza con criterio,<br>atención que importa
         </h2>
         <p class="text-gray-600 text-base leading-relaxed mb-6">
-          Desde la ingeniería y la administración construimos DISCORDIA: un emprendimiento basado en análisis real de mercado, selección cuidadosa de productos y un servicio de atención que te acompaña desde la primera consulta hasta que tienes tu pedido en las manos.
+          Desde la ingeniería y la administración construimos DISCORDIA: un emprendimiento basado en análisis real de
+          mercado, selección cuidadosa de productos y un servicio de atención que te acompaña desde la primera consulta
+          hasta que tienes tu pedido en las manos.
         </p>
         <div class="space-y-3">
           <div class="flex items-center gap-3">
@@ -552,26 +735,31 @@
     <div class="max-w-5xl mx-auto px-4">
       <div class="text-center mb-10" data-aos="fade-up">
         <p class="text-xs uppercase tracking-[0.2em] text-[#a0346e] font-semibold mb-2">Sin complicaciones</p>
-        <h2 class="text-3xl md:text-4xl font-bold text-[#6d165a]" style="font-family:'Playfair Display',serif;">💳 Métodos de pago</h2>
+        <h2 class="text-3xl md:text-4xl font-bold text-[#6d165a]" style="font-family:'Playfair Display',serif;">💳
+          Métodos de pago</h2>
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4" data-aos="fade-up" data-aos-delay="50">
-        <div class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#6d165a] to-[#a0346e] text-white rounded-2xl p-5 hover:scale-105 transition shadow-lg">
+        <div
+          class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#6d165a] to-[#a0346e] text-white rounded-2xl p-5 hover:scale-105 transition shadow-lg">
           <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-black">N</div>
           <p class="font-bold">Nequi</p>
           <p class="text-xs text-white/70">Pago inmediato</p>
         </div>
-        <div class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#a0346e] to-[#ec5c8d] text-white rounded-2xl p-5 hover:scale-105 transition shadow-lg">
+        <div
+          class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#a0346e] to-[#ec5c8d] text-white rounded-2xl p-5 hover:scale-105 transition shadow-lg">
           <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-black">D</div>
           <p class="font-bold">Daviplata</p>
           <p class="text-xs text-white/70">Transferencia móvil</p>
         </div>
-        <div class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] text-[#6d165a] rounded-2xl p-5 hover:scale-105 transition shadow-lg">
+        <div
+          class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] text-[#6d165a] rounded-2xl p-5 hover:scale-105 transition shadow-lg">
           <div class="w-12 h-12 rounded-full bg-white/50 flex items-center justify-center text-xl font-black">B</div>
           <p class="font-bold">Breve</p>
           <p class="text-xs text-[#6d165a]/70">Pago bancario</p>
         </div>
-        <div class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] text-white rounded-2xl p-5 hover:scale-105 transition shadow-lg">
+        <div
+          class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] text-white rounded-2xl p-5 hover:scale-105 transition shadow-lg">
           <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-lg">
             <i class="fa-solid fa-truck"></i>
           </div>
@@ -589,37 +777,50 @@
     <div class="max-w-6xl mx-auto px-4">
       <div class="text-center mb-10" data-aos="fade-up">
         <p class="text-xs uppercase tracking-[0.2em] text-[#a0346e] font-semibold mb-2">Opiniones reales</p>
-        <h2 class="text-3xl md:text-4xl font-bold text-[#6d165a]" style="font-family:'Playfair Display',serif;">💬 Lo que dicen nuestras clientas</h2>
+        <h2 class="text-3xl md:text-4xl font-bold text-[#6d165a]" style="font-family:'Playfair Display',serif;">💬 Lo
+          que dicen nuestras clientas</h2>
       </div>
 
       <div class="grid md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition" data-aos="zoom-in">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition"
+          data-aos="zoom-in">
           <div class="flex text-yellow-400 text-sm mb-4">★★★★★</div>
-          <p class="text-gray-600 text-sm leading-relaxed mb-5 italic">"Excelente calidad y los mejores precios. Mis productos de maquillaje favoritos están aquí. ¡Muy recomendado y la atención es increíble!"</p>
+          <p class="text-gray-600 text-sm leading-relaxed mb-5 italic">"Excelente calidad y los mejores precios. Mis
+            productos de maquillaje favoritos están aquí. ¡Muy recomendado y la atención es increíble!"</p>
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] flex items-center justify-center text-white font-bold text-sm">M</div>
+            <div
+              class="w-10 h-10 rounded-full bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] flex items-center justify-center text-white font-bold text-sm">
+              M</div>
             <div>
               <p class="font-semibold text-gray-900 text-sm">María López</p>
               <p class="text-xs text-gray-400">Bogotá · Cliente frecuente</p>
             </div>
           </div>
         </div>
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition" data-aos="zoom-in" data-aos-delay="50">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition"
+          data-aos="zoom-in" data-aos-delay="50">
           <div class="flex text-yellow-400 text-sm mb-4">★★★★★</div>
-          <p class="text-gray-600 text-sm leading-relaxed mb-5 italic">"La entrega fue rápida y los productos llegaron en perfectas condiciones. El rubor que pedí es exactamente lo que buscaba. Definitivamente vuelvo."</p>
+          <p class="text-gray-600 text-sm leading-relaxed mb-5 italic">"La entrega fue rápida y los productos llegaron
+            en perfectas condiciones. El rubor que pedí es exactamente lo que buscaba. Definitivamente vuelvo."</p>
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] flex items-center justify-center text-white font-bold text-sm">D</div>
+            <div
+              class="w-10 h-10 rounded-full bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] flex items-center justify-center text-white font-bold text-sm">
+              D</div>
             <div>
               <p class="font-semibold text-gray-900 text-sm">Daniela Ruiz</p>
               <p class="text-xs text-gray-400">Soacha · 3 compras</p>
             </div>
           </div>
         </div>
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition" data-aos="zoom-in" data-aos-delay="100">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition"
+          data-aos="zoom-in" data-aos-delay="100">
           <div class="flex text-yellow-400 text-sm mb-4">★★★★★</div>
-          <p class="text-gray-600 text-sm leading-relaxed mb-5 italic">"El servicio al cliente es impecable. Resolvieron todas mis dudas y me ayudaron a elegir los productos perfectos para mi tono de piel."</p>
+          <p class="text-gray-600 text-sm leading-relaxed mb-5 italic">"El servicio al cliente es impecable. Resolvieron
+            todas mis dudas y me ayudaron a elegir los productos perfectos para mi tono de piel."</p>
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#a0346e] to-[#6d165a] flex items-center justify-center text-white font-bold text-sm">S</div>
+            <div
+              class="w-10 h-10 rounded-full bg-gradient-to-br from-[#a0346e] to-[#6d165a] flex items-center justify-center text-white font-bold text-sm">
+              S</div>
             <div>
               <p class="font-semibold text-gray-900 text-sm">Sandra Torres</p>
               <p class="text-xs text-gray-400">Cundinamarca · Cliente nueva</p>
@@ -638,15 +839,19 @@
       <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-10 mb-10">
         <div>
           <img src="./assets/texto-discordia.png" alt="DISCORDIA" class="h-8 w-auto object-contain mb-4 brightness-200">
-          <p class="text-sm leading-relaxed text-gray-500 mb-5">Belleza auténtica con criterio: productos originales, selección inteligente y atención cercana.</p>
+          <p class="text-sm leading-relaxed text-gray-500 mb-5">Belleza auténtica con criterio: productos originales,
+            selección inteligente y atención cercana.</p>
           <div class="flex gap-3">
-            <a href="https://instagram.com" target="_blank" class="w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ec5c8d] hover:border-[#ec5c8d] transition flex items-center justify-center text-sm">
+            <a href="https://instagram.com" target="_blank"
+              class="w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ec5c8d] hover:border-[#ec5c8d] transition flex items-center justify-center text-sm">
               <i class="fa-brands fa-instagram"></i>
             </a>
-            <a href="https://tiktok.com" target="_blank" class="w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ec5c8d] hover:border-[#ec5c8d] transition flex items-center justify-center text-sm">
+            <a href="https://tiktok.com" target="_blank"
+              class="w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ec5c8d] hover:border-[#ec5c8d] transition flex items-center justify-center text-sm">
               <i class="fa-brands fa-tiktok"></i>
             </a>
-            <a href="https://wa.me/573508311346" target="_blank" class="contact-whatsapp w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ec5c8d] hover:border-[#ec5c8d] transition flex items-center justify-center text-sm">
+            <a href="https://wa.me/573508311346" target="_blank"
+              class="contact-whatsapp w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ec5c8d] hover:border-[#ec5c8d] transition flex items-center justify-center text-sm">
               <i class="fa-brands fa-whatsapp"></i>
             </a>
           </div>
@@ -655,20 +860,25 @@
         <div>
           <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Navegar</h4>
           <ul class="space-y-2.5 text-sm">
-            <li><a href="#catalogo"   class="hover:text-[#ec5c8d] transition">Catálogo</a></li>
+            <li><a href="#catalogo" class="hover:text-[#ec5c8d] transition">Catálogo</a></li>
             <li><a href="#categorias" class="hover:text-[#ec5c8d] transition">Categorías</a></li>
-            <li><a href="#nosotros"   class="hover:text-[#ec5c8d] transition">Nosotros</a></li>
-            <li><a href="#pagos"      class="hover:text-[#ec5c8d] transition">Métodos de pago</a></li>
+            <li><a href="#nosotros" class="hover:text-[#ec5c8d] transition">Nosotros</a></li>
+            <li><a href="#pagos" class="hover:text-[#ec5c8d] transition">Métodos de pago</a></li>
           </ul>
         </div>
 
         <div>
           <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Contacto</h4>
           <ul class="space-y-2.5 text-sm">
-            <li class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-[#ec5c8d]"></i><a href="https://wa.me/573508311346" class="contact-whatsapp hover:text-[#ec5c8d] transition">+57 350 831 1346</a></li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-[#ec5c8d]"></i><span data-contact-email>info@discordia.com</span></li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-[#ec5c8d]"></i><span>Bogotá, Colombia</span></li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-clock text-[#ec5c8d]"></i><span>Atención 24/7</span></li>
+            <li class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-[#ec5c8d]"></i><a
+                href="https://wa.me/573508311346" class="contact-whatsapp hover:text-[#ec5c8d] transition">+57 350 831
+                1346</a></li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-[#ec5c8d]"></i><span
+                data-contact-email>info@discordia.com</span></li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-[#ec5c8d]"></i><span>Bogotá,
+                Colombia</span></li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-clock text-[#ec5c8d]"></i><span>Atención
+                24/7</span></li>
           </ul>
         </div>
 
@@ -678,18 +888,19 @@
             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ec5c8d]"></i>Nequi</li>
             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ec5c8d]"></i>Daviplata</li>
             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ec5c8d]"></i>Breve / Bancaria</li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ec5c8d]"></i>Contraentrega Bogotá</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ec5c8d]"></i>Contraentrega Bogotá
+            </li>
           </ul>
         </div>
       </div>
 
-      <div class="border-t border-white/8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-gray-600">
+      <div
+        class="border-t border-white/8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-gray-600">
         <p>&copy; 2026 <span class="text-[#ec5c8d] font-semibold">DISCORDIA</span> · Todos los derechos reservados.</p>
         <div class="flex gap-5">
           <a href="#" class="hover:text-[#ec5c8d] transition">Privacidad</a>
           <a href="#" class="hover:text-[#ec5c8d] transition">Términos</a>
           <a href="#" class="hover:text-[#ec5c8d] transition">Devoluciones</a>
-          <a href="./login.html" class="opacity-35 hover:opacity-80 transition text-[10px] tracking-wider" title="Acceso interno" aria-label="Acceso interno admin">admin</a>
         </div>
       </div>
     </div>
@@ -704,9 +915,13 @@
     title="Contáctanos por WhatsApp" aria-label="WhatsApp">
     <span class="wa-pulse-ring"></span>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-full h-full relative">
-      <path fill="#fff" d="M4.9,43.3l2.7-9.8C5.9,30.6,5,27.3,5,24C5,13.5,13.5,5,24,5c5.1,0,9.8,2,13.4,5.6C41,14.2,43,18.9,43,24c0,10.5-8.5,19-19,19h0c-3.2,0-6.3-0.8-9.1-2.3L4.9,43.3z"/>
-      <path fill="#40c351" d="M35.2,12.8c-3-3-6.9-4.6-11.2-4.6C15.3,8.2,8.2,15.3,8.2,24c0,3,0.8,5.9,2.4,8.4L11,33l-1.6,5.8l6-1.6l0.6,0.3c2.4,1.4,5.2,2.2,8,2.2h0c8.7,0,15.8-7.1,15.8-15.8C39.8,19.8,38.2,15.8,35.2,12.8z"/>
-      <path fill="#fff" fill-rule="evenodd" d="M19.3,16c-0.4-0.8-0.7-0.8-1.1-0.8c-0.3,0-0.6,0-0.9,0s-0.8,0.1-1.3,0.6c-0.4,0.5-1.7,1.6-1.7,4s1.7,4.6,1.9,4.9s3.3,5.3,8.1,7.2c4,1.6,4.8,1.3,5.7,1.2c0.9-0.1,2.8-1.1,3.2-2.3c0.4-1.1,0.4-2.1,0.3-2.3c-0.1-0.2-0.4-0.3-0.9-0.6s-2.8-1.4-3.2-1.5c-0.4-0.2-0.8-0.2-1.1,0.2c-0.3,0.5-1.2,1.5-1.5,1.9c-0.3,0.3-0.6,0.4-1,0.1c-0.5-0.2-2-0.7-3.8-2.4c-1.4-1.3-2.4-2.8-2.6-3.3c-0.3-0.5,0-0.7,0.2-1c0.2-0.2,0.5-0.6,0.7-0.8c0.2-0.3,0.3-0.5,0.5-0.8c0.2-0.3,0.1-0.6,0-0.8C20.6,19.3,19.7,17,19.3,16z" clip-rule="evenodd"/>
+      <path fill="#fff"
+        d="M4.9,43.3l2.7-9.8C5.9,30.6,5,27.3,5,24C5,13.5,13.5,5,24,5c5.1,0,9.8,2,13.4,5.6C41,14.2,43,18.9,43,24c0,10.5-8.5,19-19,19h0c-3.2,0-6.3-0.8-9.1-2.3L4.9,43.3z" />
+      <path fill="#40c351"
+        d="M35.2,12.8c-3-3-6.9-4.6-11.2-4.6C15.3,8.2,8.2,15.3,8.2,24c0,3,0.8,5.9,2.4,8.4L11,33l-1.6,5.8l6-1.6l0.6,0.3c2.4,1.4,5.2,2.2,8,2.2h0c8.7,0,15.8-7.1,15.8-15.8C39.8,19.8,38.2,15.8,35.2,12.8z" />
+      <path fill="#fff" fill-rule="evenodd"
+        d="M19.3,16c-0.4-0.8-0.7-0.8-1.1-0.8c-0.3,0-0.6,0-0.9,0s-0.8,0.1-1.3,0.6c-0.4,0.5-1.7,1.6-1.7,4s1.7,4.6,1.9,4.9s3.3,5.3,8.1,7.2c4,1.6,4.8,1.3,5.7,1.2c0.9-0.1,2.8-1.1,3.2-2.3c0.4-1.1,0.4-2.1,0.3-2.3c-0.1-0.2-0.4-0.3-0.9-0.6s-2.8-1.4-3.2-1.5c-0.4-0.2-0.8-0.2-1.1,0.2c-0.3,0.5-1.2,1.5-1.5,1.9c-0.3,0.3-0.6,0.4-1,0.1c-0.5-0.2-2-0.7-3.8-2.4c-1.4-1.3-2.4-2.8-2.6-3.3c-0.3-0.5,0-0.7,0.2-1c0.2-0.2,0.5-0.6,0.7-0.8c0.2-0.3,0.3-0.5,0.5-0.8c0.2-0.3,0.1-0.6,0-0.8C20.6,19.3,19.7,17,19.3,16z"
+        clip-rule="evenodd" />
     </svg>
   </a>
 
@@ -714,8 +929,10 @@
   <button id="openCartFloating"
     class="open-cart-btn fixed bottom-4 right-3 sm:bottom-6 sm:right-4 bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] hover:from-[#ff8c91] hover:to-[#ffc4a6] text-white p-3 sm:p-4 rounded-full shadow-xl z-30 transition transform hover:scale-110"
     aria-label="Abrir carrito">
-    <img width="28" height="28" class="sm:w-9 sm:h-9" src="https://img.icons8.com/stickers/100/fast-cart.png" alt="Carrito">
-    <span class="cart-count-badge absolute -top-2 -right-2 bg-[#ffc4a6] text-[#6d165a] text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">0</span>
+    <img width="28" height="28" class="sm:w-9 sm:h-9" src="https://img.icons8.com/stickers/100/fast-cart.png"
+      alt="Carrito">
+    <span
+      class="cart-count-badge absolute -top-2 -right-2 bg-[#ffc4a6] text-[#6d165a] text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">0</span>
   </button>
 
   <!-- Cart Backdrop -->
@@ -730,12 +947,15 @@
     class="fixed top-0 right-0 w-full sm:w-96 h-full bg-white/96 backdrop-blur-md text-gray-900 shadow-2xl border-l border-[#f1d7e2] transform translate-x-full transition-transform duration-300 z-50 flex flex-col overflow-hidden">
 
     <!-- Header -->
-    <div class="p-5 flex justify-between items-center border-b border-[#f1d7e2] bg-gradient-to-r from-[#ffc4a6] to-[#ff8c91]">
+    <div
+      class="p-5 flex justify-between items-center border-b border-[#f1d7e2] bg-gradient-to-r from-[#ffc4a6] to-[#ff8c91]">
       <div>
         <h2 class="text-xl font-bold text-white" style="font-family:'Playfair Display',serif;">Tu Carrito 🛒</h2>
         <p class="text-white/70 text-xs mt-0.5">Productos seleccionados</p>
       </div>
-      <button id="closeCart" class="text-white/80 hover:text-white text-2xl font-light w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/20 transition" aria-label="Cerrar">
+      <button id="closeCart"
+        class="text-white/80 hover:text-white text-2xl font-light w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/20 transition"
+        aria-label="Cerrar">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
@@ -746,17 +966,21 @@
     <!-- Footer -->
     <div class="p-5 border-t border-gray-100 bg-gray-50/80">
       <div class="space-y-2 mb-5">
-        <div class="flex justify-between text-sm text-gray-600"><span>Subtotal</span><span id="cartSubtotal">$0</span></div>
-        <div class="flex justify-between text-sm text-gray-600"><span>Envío</span><span class="text-emerald-600 font-medium">A convenir</span></div>
+        <div class="flex justify-between text-sm text-gray-600"><span>Subtotal</span><span id="cartSubtotal">$0</span>
+        </div>
+        <div class="flex justify-between text-sm text-gray-600"><span>Envío</span><span
+            class="text-emerald-600 font-medium">A convenir</span></div>
         <div class="flex justify-between font-bold text-lg border-t border-gray-200 pt-2 mt-2">
           <span>Total</span>
           <span id="cartTotal" class="text-[#a0346e]">$0</span>
         </div>
       </div>
-      <button id="checkoutBtn" class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] hover:from-[#ff8c91] hover:to-[#ffc4a6] text-white font-bold py-3.5 rounded-xl transition hover:shadow-lg mb-2 flex items-center justify-center gap-2">
+      <button id="checkoutBtn"
+        class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] hover:from-[#ff8c91] hover:to-[#ffc4a6] text-white font-bold py-3.5 rounded-xl transition hover:shadow-lg mb-2 flex items-center justify-center gap-2">
         <i class="fa-brands fa-whatsapp text-lg"></i> Finalizar por WhatsApp
       </button>
-      <button id="clearCart" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl transition text-sm">
+      <button id="clearCart"
+        class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl transition text-sm">
         Vaciar carrito
       </button>
     </div>
@@ -834,7 +1058,7 @@
     }, { passive: true });
 
     // ── FILTER BY CATEGORY (from category cards) ─────────
-    window.filterByCategory = function(cat) {
+    window.filterByCategory = function (cat) {
       // Update pills
       document.querySelectorAll('.cat-pill').forEach(p => {
         const isActive = p.dataset.cat === cat;
@@ -853,8 +1077,9 @@
 
     // ── PWA ──────────────────────────────────────────────
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+      window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => { }); });
     }
   </script>
 </body>
+
 </html>
