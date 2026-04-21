@@ -22,7 +22,7 @@ export async function renderVentas(container) {
     container.innerHTML = `
       <div class="bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl p-6 text-center">
         <p class="font-bold">Error al cargar ventas</p>
-        <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white rounded-xl text-sm font-semibold">Reintentar</button>
+        <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] text-white rounded-xl text-sm font-semibold">Reintentar</button>
       </div>`;
     return;
   }
@@ -103,10 +103,10 @@ function paintVentas(container, filtros = {}) {
       <!-- Filtros -->
       <div class="p-4 border-b border-gray-100 flex flex-wrap gap-3">
         <input id="ventas-search" placeholder="Buscar cliente, canal, nota..."
-          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ec5c8d]"
+          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ecd9ff]"
           value="${query}">
         <select id="ventas-status"
-          class="px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ec5c8d] bg-white">
+          class="px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ecd9ff] bg-white">
           <option value="all"     ${status==='all'    ?'selected':''}>Todos</option>
           <option value="paid"    ${status==='paid'   ?'selected':''}>Pagados</option>
           <option value="pending" ${status==='pending'?'selected':''}>Pendientes</option>
@@ -210,7 +210,7 @@ async function showNuevaVentaModal(container) {
         </div>
         <div id="sw-items-list" style="min-height:40px;background:#fdf2f7;border-radius:10px;padding:8px;font-size:13px;"></div>
         <button id="sw-add-item" type="button"
-          style="background:linear-gradient(90deg,#ec5c8d,#ff8c91);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-weight:700;cursor:pointer;width:100%;">
+          style="background:linear-gradient(90deg,#ecd9ff,#ffd5e3);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-weight:700;cursor:pointer;width:100%;">
           + Agregar producto a la venta
         </button>
         <div style="font-size:14px;font-weight:700;color:#a0346e;text-align:right;">
@@ -219,7 +219,7 @@ async function showNuevaVentaModal(container) {
       </div>`,
     showCancelButton: true,
     confirmButtonText: 'Guardar venta',
-    confirmButtonColor: '#ec5c8d',
+    confirmButtonColor: '#ecd9ff',
     cancelButtonText: 'Cancelar',
     didOpen: () => {
       window._swItems = [];
@@ -231,7 +231,7 @@ async function showNuevaVentaModal(container) {
               `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f1d7e2;">
                 <span>${i.name} x${i.qty}</span>
                 <span style="color:#a0346e;font-weight:700;">$${(i.price*i.qty).toLocaleString('es-CO')}
-                  <button data-idx="${idx}" style="background:none;border:none;color:#ec5c8d;cursor:pointer;margin-left:8px;font-size:16px;">✕</button>
+                  <button data-idx="${idx}" style="background:none;border:none;color:#ecd9ff;cursor:pointer;margin-left:8px;font-size:16px;">✕</button>
                 </span>
               </div>`).join('')
           : '<span style="color:#9ca3af;font-size:12px;">Sin productos aún</span>';

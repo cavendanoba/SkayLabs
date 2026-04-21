@@ -121,17 +121,17 @@ export function renderCart() {
                 />
 
                 <div class="flex-1 min-w-0">
-                    <p class="font-bold text-[#6d165a] leading-tight line-clamp-2">${p.name}</p>
-                    <p class="text-lg font-extrabold text-[#a0346e] mt-1">$${p.price.toLocaleString()}</p>
+                    <p class="font-bold text-[#5c4a6d] leading-tight line-clamp-2">${p.name}</p>
+                    <p class="text-lg font-extrabold text-[#5c4a6d] mt-1">$${p.price.toLocaleString()}</p>
                     <p class="text-xs text-gray-600 mt-1">Cantidad: ${p.quantity}</p>
                 </div>
 
                 <div class="flex flex-col items-end gap-2">
                     <div class="flex items-center gap-2">
-                        <button class="inc-btn bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white px-3 py-1 rounded-lg font-bold" data-id="${p.id}" data-action="inc">+</button>
+                        <button class="inc-btn bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] text-white px-3 py-1 rounded-lg font-bold" data-id="${p.id}" data-action="inc">+</button>
                         <button class="dec-btn bg-gray-100 border border-gray-300 text-gray-700 px-3 py-1 rounded-lg font-bold" data-id="${p.id}" data-action="dec">−</button>
                     </div>
-                    <button class="remove-btn text-[#a0346e] text-sm hover:underline" data-id="${p.id}" data-action="remove">Eliminar</button>
+                    <button class="remove-btn text-[#5c4a6d] text-sm hover:underline" data-id="${p.id}" data-action="remove">Eliminar</button>
                 </div>
             </div>
         `;

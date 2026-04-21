@@ -21,7 +21,7 @@
   <link rel="icon" type="image/png" href="./assets/logo-discordia.png?v=20260226">
   <link rel="apple-touch-icon" href="./assets/logo-discordia.png?v=20260226">
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#ec5c8d">
+  <meta name="theme-color" content="#d0edfd">
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -50,11 +50,12 @@
   <style>
     /* ── CUSTOM STYLES ───────────────────────────── */
     :root {
-      --deep: #6d165a;
-      --mid: #a0346e;
-      --pink: #ec5c8d;
-      --light: #ff8c91;
-      --peach: #ffc4a6;
+      --pale-sky: #d0edfdff;
+      --seashell: #fcf5eeff;
+      --lavender-veil: #ecd9ffff;
+      --petal-frost: #ffd5e3ff;
+      --brand-accent: #5c4a6d;
+      --brand-border: rgba(92, 74, 109, 0.18);
       --warm: #faf8f7;
       --section: #f5ede8;
     }
@@ -81,7 +82,7 @@
 
     /* Hero text gradient */
     .hero-gradient {
-      background: linear-gradient(135deg, #6d165a, #a0346e 40%, #ec5c8d 75%, #ff8c91);
+      background: linear-gradient(135deg, var(--pale-sky), var(--lavender-veil) 40%, var(--petal-frost) 75%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -237,8 +238,8 @@
 
     /* Button */
     .button {
-      --bg: linear-gradient(90deg, #ec5c8d, #ff8c91);
-      --bg-hover: linear-gradient(90deg, #ff8c91, #ffc4a6);
+      --bg: linear-gradient(90deg, var(--lavender-veil), var(--petal-frost));
+      --bg-hover: linear-gradient(90deg, var(--petal-frost), var(--seashell));
       border: none;
       border-radius: 0.65rem;
       background: var(--bg);
@@ -246,7 +247,7 @@
       font-weight: 700;
       padding: 0.62rem 0.95rem;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 10px 24px rgba(236, 92, 141, 0.24);
+      box-shadow: 0 10px 24px rgba(237, 217, 255, 0.4);
     }
 
     .button:hover {
@@ -323,12 +324,12 @@
 
       <!-- Search (desktop) -->
       <div
-        class="hidden lg:flex flex-1 max-w-md mx-6 items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5 focus-within:border-[#ec5c8d] focus-within:shadow-md transition-all">
+        class="hidden lg:flex flex-1 max-w-md mx-6 items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5 focus-within:border-[#ecd9ff] focus-within:shadow-md transition-all">
         <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm mr-3"></i>
         <input id="catalogSearch" type="text" placeholder="Buscar rubores, brillos, sombras..."
           class="bg-transparent outline-none w-full text-sm text-gray-700 placeholder:text-gray-400">
         <span id="searchSpinner" class="hidden ml-2">
-          <i class="fa-solid fa-spinner fa-spin text-[#ec5c8d] text-sm"></i>
+          <i class="fa-solid fa-spinner fa-spin text-[#ecd9ff] text-sm"></i>
         </span>
       </div>
 
@@ -336,19 +337,19 @@
       <nav class="hidden md:flex items-center gap-5 text-gray-600 font-medium text-sm">
         <a href="#catalogo" class="hover:text-[#6d165a] transition relative group">
           Catálogo
-          <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#ec5c8d] transition-all group-hover:w-full"></span>
+          <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#ecd9ff] transition-all group-hover:w-full"></span>
         </a>
         <a href="#categorias" class="hover:text-[#6d165a] transition relative group">
           Categorías
-          <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#ec5c8d] transition-all group-hover:w-full"></span>
+          <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#ecd9ff] transition-all group-hover:w-full"></span>
         </a>
         <a href="#nosotros" class="hover:text-[#6d165a] transition relative group">
           Nosotros
-          <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#ec5c8d] transition-all group-hover:w-full"></span>
+          <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#ecd9ff] transition-all group-hover:w-full"></span>
         </a>
         <a href="#pagos" class="hover:text-[#6d165a] transition relative group">
           Pagos
-          <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#ec5c8d] transition-all group-hover:w-full"></span>
+          <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#ecd9ff] transition-all group-hover:w-full"></span>
         </a>
       </nav>
 
@@ -358,10 +359,10 @@
           <i class="fa-solid fa-bars text-xl"></i>
         </button>
         <button id="openCartHeader"
-          class="open-cart-btn relative flex items-center justify-center bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white p-2.5 rounded-full hover:shadow-lg transition hover:scale-105">
+          class="open-cart-btn relative flex items-center justify-center bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] text-white p-2.5 rounded-full hover:shadow-lg transition hover:scale-105">
           <i class="fa-solid fa-bag-shopping text-lg"></i>
           <span
-            class="cart-count-badge absolute -top-1.5 -right-1.5 bg-[#ffc4a6] text-[#6d165a] text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center badge-pulse">0</span>
+            class="cart-count-badge absolute -top-1.5 -right-1.5 bg-[#fcf5ee] text-[#6d165a] text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center badge-pulse">0</span>
         </button>
       </div>
     </div>
@@ -369,7 +370,7 @@
     <!-- Mobile menu -->
     <nav id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-100 px-4 py-4">
       <div
-        class="flex items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5 mb-4 focus-within:border-[#ec5c8d] transition">
+        class="flex items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5 mb-4 focus-within:border-[#ecd9ff] transition">
         <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm mr-3"></i>
         <input id="mobileSearchInput" type="search" placeholder="Buscar productos..."
           class="bg-transparent outline-none w-full text-sm text-gray-700">
@@ -394,12 +395,12 @@
   <!-- ════════════════════════════════════════════════════ -->
   <!-- HERO                                                -->
   <!-- ════════════════════════════════════════════════════ -->
-  <section class="relative overflow-hidden bg-gradient-to-br from-[#6d165a] via-[#a0346e] to-[#ec5c8d] pt-16 pb-0">
+  <section class="relative overflow-hidden bg-gradient-to-br from-[#6d165a] via-[#a0346e] to-[#ecd9ff] pt-16 pb-0">
 
     <!-- Orbs -->
     <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
       <div id="heroOrb1" class="absolute -top-20 -left-20 w-96 h-96 bg-white/8 rounded-full blur-3xl"></div>
-      <div id="heroOrb2" class="absolute -bottom-20 -right-20 w-96 h-96 bg-[#ffc4a6]/12 rounded-full blur-3xl"></div>
+      <div id="heroOrb2" class="absolute -bottom-20 -right-20 w-96 h-96 bg-[#fcf5ee]/12 rounded-full blur-3xl"></div>
       <div id="heroOrb3" class="absolute top-1/3 left-1/3 w-64 h-64 bg-white/5 rounded-full blur-2xl"></div>
     </div>
 
@@ -411,14 +412,14 @@
           <div
             class="inline-flex items-center gap-2 bg-white/15 border border-white/25 text-white/90 text-xs font-semibold tracking-widest uppercase px-4 py-2 rounded-full mb-6"
             data-aos="fade-down">
-            <span class="w-2 h-2 bg-[#ffc4a6] rounded-full animate-pulse"></span>
+            <span class="w-2 h-2 bg-[#fcf5ee] rounded-full animate-pulse"></span>
             Beauty Store · Bogotá
           </div>
 
           <h1 class="text-[2.4rem] sm:text-[3rem] lg:text-[3.6rem] font-extrabold text-white leading-[1.1] mb-6"
             data-aos="fade-up" style="font-family:'Playfair Display',serif;">
             Belleza auténtica<br>
-            <span id="typed" class="text-[#ffc4a6]">para tu rutina real</span>
+            <span id="typed" class="text-[#fcf5ee]">para tu rutina real</span>
           </h1>
 
           <p class="text-white/75 text-base lg:text-lg max-w-lg mx-auto lg:mx-0 mb-8 leading-relaxed" data-aos="fade-up"
@@ -430,7 +431,7 @@
           <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-10" data-aos="fade-up"
             data-aos-delay="150">
             <a href="#catalogo"
-              class="inline-flex items-center justify-center gap-2 bg-[#ffc4a6] text-[#6d165a] px-8 py-4 rounded-full font-bold text-base hover:bg-white hover:text-[#6d165a] transition transform hover:scale-105 shadow-xl">
+              class="inline-flex items-center justify-center gap-2 bg-[#fcf5ee] text-[#6d165a] px-8 py-4 rounded-full font-bold text-base hover:bg-white hover:text-[#6d165a] transition transform hover:scale-105 shadow-xl">
               <i class="fa-solid fa-sparkles"></i> Ver Catálogo
             </a>
             <a href="https://wa.me/573508311346" target="_blank"
@@ -443,13 +444,13 @@
           <div
             class="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-white/70 text-xs font-medium"
             data-aos="fade-up" data-aos-delay="200">
-            <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-check text-[#ffc4a6]"></i> Originales
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-check text-[#fcf5ee]"></i> Originales
               verificados</span>
             <span class="w-px h-4 bg-white/30"></span>
-            <span class="flex items-center gap-1.5"><i class="fa-solid fa-truck-fast text-[#ffc4a6]"></i> Entrega en
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-truck-fast text-[#fcf5ee]"></i> Entrega en
               Bogotá</span>
             <span class="w-px h-4 bg-white/30"></span>
-            <span class="flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-[#ffc4a6]"></i> Atención
+            <span class="flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-[#fcf5ee]"></i> Atención
               24/7</span>
           </div>
         </div>
@@ -520,7 +521,7 @@
       <a href="#catalogo" data-cat="Labios" class="cat-card cursor-pointer group block"
         onclick="filterByCategory('Labios')">
         <div
-          class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] h-44 flex flex-col items-center justify-center gap-2">
+          class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#fcf5ee] to-[#ffd5e3] h-44 flex flex-col items-center justify-center gap-2">
           <span class="text-5xl group-hover:scale-110 transition duration-300">💄</span>
           <div
             class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition">
@@ -536,7 +537,7 @@
       <a href="#catalogo" data-cat="Ojos" class="cat-card cursor-pointer group block"
         onclick="filterByCategory('Ojos')">
         <div
-          class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] h-44 flex flex-col items-center justify-center gap-2">
+          class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ecd9ff] to-[#a0346e] h-44 flex flex-col items-center justify-center gap-2">
           <span class="text-5xl group-hover:scale-110 transition duration-300">👁️</span>
           <div
             class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition">
@@ -568,7 +569,7 @@
       <a href="#catalogo" data-cat="Iluminador" class="cat-card cursor-pointer group block"
         onclick="filterByCategory('Iluminador')">
         <div
-          class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#6d165a] to-[#ec5c8d] h-44 flex flex-col items-center justify-center gap-2">
+          class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#6d165a] to-[#ecd9ff] h-44 flex flex-col items-center justify-center gap-2">
           <span class="text-5xl group-hover:scale-110 transition duration-300">✨</span>
           <div
             class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition">
@@ -597,7 +598,7 @@
           <p id="resultsCount" class="text-sm text-gray-500 mt-1">Cargando...</p>
         </div>
         <select id="sortProducts"
-          class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#ec5c8d] bg-white shadow-sm">
+          class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#ecd9ff] bg-white shadow-sm">
           <option value="featured">Ordenar</option>
           <option value="newest">Más recientes</option>
           <option value="price-asc">Menor precio</option>
@@ -610,7 +611,7 @@
       <div class="flex flex-wrap items-center gap-2 mb-8" data-aos="fade-up" data-aos-delay="50">
         <!-- Search (mobile) -->
         <div
-          class="flex lg:hidden items-center bg-white border border-gray-200 rounded-full px-4 py-2 w-full focus-within:border-[#ec5c8d] transition">
+          class="flex lg:hidden items-center bg-white border border-gray-200 rounded-full px-4 py-2 w-full focus-within:border-[#ecd9ff] transition">
           <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm mr-2"></i>
           <input id="mobileSearchInput2" type="search" placeholder="Buscar..."
             class="bg-transparent outline-none w-full text-sm text-gray-700">
@@ -618,14 +619,14 @@
         <!-- Category pills -->
         <div id="categoryPills" class="flex flex-wrap gap-2">
           <button onclick="filterByCategory('all')" data-cat="all"
-            class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-[#ec5c8d] bg-[#ec5c8d] text-white transition">
+            class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-[#ecd9ff] bg-[#ecd9ff] text-white transition">
             Todas
           </button>
         </div>
         <!-- Stock toggle -->
         <label
-          class="flex items-center gap-2 ml-auto cursor-pointer select-none bg-white border border-gray-200 rounded-full px-4 py-2 text-sm hover:border-[#ec5c8d] transition">
-          <input id="filterInStock" type="checkbox" class="w-3.5 h-3.5 accent-[#ec5c8d]">
+          class="flex items-center gap-2 ml-auto cursor-pointer select-none bg-white border border-gray-200 rounded-full px-4 py-2 text-sm hover:border-[#ecd9ff] transition">
+          <input id="filterInStock" type="checkbox" class="w-3.5 h-3.5 accent-[#ecd9ff]">
           <span class="text-gray-700 font-medium">Solo en stock</span>
         </label>
       </div>
@@ -651,10 +652,10 @@
   <section class="py-16 bg-gradient-to-r from-[#6d165a] to-[#a0346e] relative overflow-hidden">
     <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
       <div class="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-0 right-0 w-64 h-64 bg-[#ffc4a6]/8 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 right-0 w-64 h-64 bg-[#fcf5ee]/8 rounded-full blur-3xl"></div>
     </div>
     <div class="relative z-10 max-w-5xl mx-auto px-4 text-center text-white">
-      <p class="text-xs uppercase tracking-[0.2em] text-[#ffc4a6] font-semibold mb-3" data-aos="fade-up">Especial para
+      <p class="text-xs uppercase tracking-[0.2em] text-[#fcf5ee] font-semibold mb-3" data-aos="fade-up">Especial para
         regalar</p>
       <h2 class="text-3xl md:text-5xl font-bold mb-4" style="font-family:'Playfair Display',serif;" data-aos="fade-up"
         data-aos-delay="50">
@@ -666,7 +667,7 @@
       </p>
       <a href="https://wa.me/573508311346?text=Hola!%20Quiero%20armar%20una%20caja%20regalo%20%F0%9F%8E%81"
         target="_blank"
-        class="contact-whatsapp inline-flex items-center gap-2 bg-[#ffc4a6] text-[#6d165a] font-bold px-8 py-4 rounded-full hover:bg-white transition transform hover:scale-105 shadow-xl"
+        class="contact-whatsapp inline-flex items-center gap-2 bg-[#fcf5ee] text-[#6d165a] font-bold px-8 py-4 rounded-full hover:bg-white transition transform hover:scale-105 shadow-xl"
         data-aos="fade-up" data-aos-delay="150">
         <i class="fa-brands fa-whatsapp text-lg"></i> Armar mi caja regalo
       </a>
@@ -693,25 +694,25 @@
         <div class="space-y-3">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-[#fdf2f7] flex items-center justify-center flex-none">
-              <i class="fa-solid fa-star text-[#ec5c8d] text-sm"></i>
+              <i class="fa-solid fa-star text-[#ecd9ff] text-sm"></i>
             </div>
             <span class="text-gray-700 font-medium text-sm">Optimización continua de productos y procesos</span>
           </div>
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-[#fdf2f7] flex items-center justify-center flex-none">
-              <i class="fa-solid fa-star text-[#ec5c8d] text-sm"></i>
+              <i class="fa-solid fa-star text-[#ecd9ff] text-sm"></i>
             </div>
             <span class="text-gray-700 font-medium text-sm">Servicio al cliente de alta calidad 24/7</span>
           </div>
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-[#fdf2f7] flex items-center justify-center flex-none">
-              <i class="fa-solid fa-star text-[#ec5c8d] text-sm"></i>
+              <i class="fa-solid fa-star text-[#ecd9ff] text-sm"></i>
             </div>
             <span class="text-gray-700 font-medium text-sm">Análisis de mercado real para mejores precios</span>
           </div>
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-[#fdf2f7] flex items-center justify-center flex-none">
-              <i class="fa-solid fa-star text-[#ec5c8d] text-sm"></i>
+              <i class="fa-solid fa-star text-[#ecd9ff] text-sm"></i>
             </div>
             <span class="text-gray-700 font-medium text-sm">100% productos originales, siempre verificados</span>
           </div>
@@ -719,9 +720,9 @@
       </div>
 
       <div class="relative" data-aos="fade-left">
-        <div class="absolute -inset-4 bg-gradient-to-br from-[#ffc4a6]/20 to-[#ec5c8d]/10 rounded-3xl blur-xl"></div>
+        <div class="absolute -inset-4 bg-gradient-to-br from-[#fcf5ee]/20 to-[#ecd9ff]/10 rounded-3xl blur-xl"></div>
         <img src="./assets/logo-discordia.png"
-          class="relative rounded-3xl shadow-2xl border-4 border-[#ec5c8d]/30 w-full h-72 object-contain bg-white p-8"
+          class="relative rounded-3xl shadow-2xl border-4 border-[#ecd9ff]/30 w-full h-72 object-contain bg-white p-8"
           alt="DISCORDIA Logo">
       </div>
 
@@ -747,19 +748,19 @@
           <p class="text-xs text-white/70">Pago inmediato</p>
         </div>
         <div
-          class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#a0346e] to-[#ec5c8d] text-white rounded-2xl p-5 hover:scale-105 transition shadow-lg">
+          class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#a0346e] to-[#ecd9ff] text-white rounded-2xl p-5 hover:scale-105 transition shadow-lg">
           <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-black">D</div>
           <p class="font-bold">Daviplata</p>
           <p class="text-xs text-white/70">Transferencia móvil</p>
         </div>
         <div
-          class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] text-[#6d165a] rounded-2xl p-5 hover:scale-105 transition shadow-lg">
+          class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#fcf5ee] to-[#ffd5e3] text-[#6d165a] rounded-2xl p-5 hover:scale-105 transition shadow-lg">
           <div class="w-12 h-12 rounded-full bg-white/50 flex items-center justify-center text-xl font-black">B</div>
           <p class="font-bold">Breve</p>
           <p class="text-xs text-[#6d165a]/70">Pago bancario</p>
         </div>
         <div
-          class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] text-white rounded-2xl p-5 hover:scale-105 transition shadow-lg">
+          class="flex flex-col items-center gap-3 bg-gradient-to-br from-[#ecd9ff] to-[#a0346e] text-white rounded-2xl p-5 hover:scale-105 transition shadow-lg">
           <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-lg">
             <i class="fa-solid fa-truck"></i>
           </div>
@@ -789,7 +790,7 @@
             productos de maquillaje favoritos están aquí. ¡Muy recomendado y la atención es increíble!"</p>
           <div class="flex items-center gap-3">
             <div
-              class="w-10 h-10 rounded-full bg-gradient-to-br from-[#ffc4a6] to-[#ff8c91] flex items-center justify-center text-white font-bold text-sm">
+              class="w-10 h-10 rounded-full bg-gradient-to-br from-[#fcf5ee] to-[#ffd5e3] flex items-center justify-center text-white font-bold text-sm">
               M</div>
             <div>
               <p class="font-semibold text-gray-900 text-sm">María López</p>
@@ -804,7 +805,7 @@
             en perfectas condiciones. El rubor que pedí es exactamente lo que buscaba. Definitivamente vuelvo."</p>
           <div class="flex items-center gap-3">
             <div
-              class="w-10 h-10 rounded-full bg-gradient-to-br from-[#ec5c8d] to-[#a0346e] flex items-center justify-center text-white font-bold text-sm">
+              class="w-10 h-10 rounded-full bg-gradient-to-br from-[#ecd9ff] to-[#a0346e] flex items-center justify-center text-white font-bold text-sm">
               D</div>
             <div>
               <p class="font-semibold text-gray-900 text-sm">Daniela Ruiz</p>
@@ -843,15 +844,15 @@
             selección inteligente y atención cercana.</p>
           <div class="flex gap-3">
             <a href="https://instagram.com" target="_blank"
-              class="w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ec5c8d] hover:border-[#ec5c8d] transition flex items-center justify-center text-sm">
+              class="w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ecd9ff] hover:border-[#ecd9ff] transition flex items-center justify-center text-sm">
               <i class="fa-brands fa-instagram"></i>
             </a>
             <a href="https://tiktok.com" target="_blank"
-              class="w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ec5c8d] hover:border-[#ec5c8d] transition flex items-center justify-center text-sm">
+              class="w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ecd9ff] hover:border-[#ecd9ff] transition flex items-center justify-center text-sm">
               <i class="fa-brands fa-tiktok"></i>
             </a>
             <a href="https://wa.me/573508311346" target="_blank"
-              class="contact-whatsapp w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ec5c8d] hover:border-[#ec5c8d] transition flex items-center justify-center text-sm">
+              class="contact-whatsapp w-9 h-9 rounded-full bg-white/8 border border-white/10 hover:bg-[#ecd9ff] hover:border-[#ecd9ff] transition flex items-center justify-center text-sm">
               <i class="fa-brands fa-whatsapp"></i>
             </a>
           </div>
@@ -860,24 +861,24 @@
         <div>
           <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Navegar</h4>
           <ul class="space-y-2.5 text-sm">
-            <li><a href="#catalogo" class="hover:text-[#ec5c8d] transition">Catálogo</a></li>
-            <li><a href="#categorias" class="hover:text-[#ec5c8d] transition">Categorías</a></li>
-            <li><a href="#nosotros" class="hover:text-[#ec5c8d] transition">Nosotros</a></li>
-            <li><a href="#pagos" class="hover:text-[#ec5c8d] transition">Métodos de pago</a></li>
+            <li><a href="#catalogo" class="hover:text-[#ecd9ff] transition">Catálogo</a></li>
+            <li><a href="#categorias" class="hover:text-[#ecd9ff] transition">Categorías</a></li>
+            <li><a href="#nosotros" class="hover:text-[#ecd9ff] transition">Nosotros</a></li>
+            <li><a href="#pagos" class="hover:text-[#ecd9ff] transition">Métodos de pago</a></li>
           </ul>
         </div>
 
         <div>
           <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Contacto</h4>
           <ul class="space-y-2.5 text-sm">
-            <li class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-[#ec5c8d]"></i><a
-                href="https://wa.me/573508311346" class="contact-whatsapp hover:text-[#ec5c8d] transition">+57 350 831
+            <li class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-[#ecd9ff]"></i><a
+                href="https://wa.me/573508311346" class="contact-whatsapp hover:text-[#ecd9ff] transition">+57 350 831
                 1346</a></li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-[#ec5c8d]"></i><span
+            <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-[#ecd9ff]"></i><span
                 data-contact-email>info@discordia.com</span></li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-[#ec5c8d]"></i><span>Bogotá,
+            <li class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-[#ecd9ff]"></i><span>Bogotá,
                 Colombia</span></li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-clock text-[#ec5c8d]"></i><span>Atención
+            <li class="flex items-center gap-2"><i class="fa-solid fa-clock text-[#ecd9ff]"></i><span>Atención
                 24/7</span></li>
           </ul>
         </div>
@@ -885,10 +886,10 @@
         <div>
           <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-widest">Pagos</h4>
           <ul class="space-y-2.5 text-sm">
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ec5c8d]"></i>Nequi</li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ec5c8d]"></i>Daviplata</li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ec5c8d]"></i>Breve / Bancaria</li>
-            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ec5c8d]"></i>Contraentrega Bogotá
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ecd9ff]"></i>Nequi</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ecd9ff]"></i>Daviplata</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ecd9ff]"></i>Breve / Bancaria</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-[#ecd9ff]"></i>Contraentrega Bogotá
             </li>
           </ul>
         </div>
@@ -896,11 +897,11 @@
 
       <div
         class="border-t border-white/8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-gray-600">
-        <p>&copy; 2026 <span class="text-[#ec5c8d] font-semibold">DISCORDIA</span> · Todos los derechos reservados.</p>
+        <p>&copy; 2026 <span class="text-[#ecd9ff] font-semibold">DISCORDIA</span> · Todos los derechos reservados.</p>
         <div class="flex gap-5">
-          <a href="#" class="hover:text-[#ec5c8d] transition">Privacidad</a>
-          <a href="#" class="hover:text-[#ec5c8d] transition">Términos</a>
-          <a href="#" class="hover:text-[#ec5c8d] transition">Devoluciones</a>
+          <a href="#" class="hover:text-[#ecd9ff] transition">Privacidad</a>
+          <a href="#" class="hover:text-[#ecd9ff] transition">Términos</a>
+          <a href="#" class="hover:text-[#ecd9ff] transition">Devoluciones</a>
         </div>
       </div>
     </div>
@@ -927,12 +928,12 @@
 
   <!-- Cart -->
   <button id="openCartFloating"
-    class="open-cart-btn fixed bottom-4 right-3 sm:bottom-6 sm:right-4 bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] hover:from-[#ff8c91] hover:to-[#ffc4a6] text-white p-3 sm:p-4 rounded-full shadow-xl z-30 transition transform hover:scale-110"
+    class="open-cart-btn fixed bottom-4 right-3 sm:bottom-6 sm:right-4 bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] hover:from-[#ffd5e3] hover:to-[#fcf5ee] text-white p-3 sm:p-4 rounded-full shadow-xl z-30 transition transform hover:scale-110"
     aria-label="Abrir carrito">
     <img width="28" height="28" class="sm:w-9 sm:h-9" src="https://img.icons8.com/stickers/100/fast-cart.png"
       alt="Carrito">
     <span
-      class="cart-count-badge absolute -top-2 -right-2 bg-[#ffc4a6] text-[#6d165a] text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">0</span>
+      class="cart-count-badge absolute -top-2 -right-2 bg-[#fcf5ee] text-[#6d165a] text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">0</span>
   </button>
 
   <!-- Cart Backdrop -->
@@ -948,7 +949,7 @@
 
     <!-- Header -->
     <div
-      class="p-5 flex justify-between items-center border-b border-[#f1d7e2] bg-gradient-to-r from-[#ffc4a6] to-[#ff8c91]">
+      class="p-5 flex justify-between items-center border-b border-[#f1d7e2] bg-gradient-to-r from-[#fcf5ee] to-[#ffd5e3]">
       <div>
         <h2 class="text-xl font-bold text-white" style="font-family:'Playfair Display',serif;">Tu Carrito 🛒</h2>
         <p class="text-white/70 text-xs mt-0.5">Productos seleccionados</p>
@@ -976,7 +977,7 @@
         </div>
       </div>
       <button id="checkoutBtn"
-        class="w-full bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] hover:from-[#ff8c91] hover:to-[#ffc4a6] text-white font-bold py-3.5 rounded-xl transition hover:shadow-lg mb-2 flex items-center justify-center gap-2">
+        class="w-full bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] hover:from-[#ffd5e3] hover:to-[#fcf5ee] text-white font-bold py-3.5 rounded-xl transition hover:shadow-lg mb-2 flex items-center justify-center gap-2">
         <i class="fa-brands fa-whatsapp text-lg"></i> Finalizar por WhatsApp
       </button>
       <button id="clearCart"
@@ -1062,9 +1063,9 @@
       // Update pills
       document.querySelectorAll('.cat-pill').forEach(p => {
         const isActive = p.dataset.cat === cat;
-        p.classList.toggle('bg-[#ec5c8d]', isActive);
+        p.classList.toggle('bg-[#ecd9ff]', isActive);
         p.classList.toggle('text-white', isActive);
-        p.classList.toggle('border-[#ec5c8d]', isActive);
+        p.classList.toggle('border-[#ecd9ff]', isActive);
         p.classList.toggle('bg-white', !isActive);
         p.classList.toggle('text-gray-700', !isActive);
         p.classList.toggle('border-gray-200', !isActive);

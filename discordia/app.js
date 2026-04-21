@@ -64,12 +64,12 @@ function buildCategoryPills() {
   // Mantener el botón "Todas" y agregar el resto
   container.innerHTML = `
     <button onclick="filterByCategory('all')" data-cat="all"
-      class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-[#ec5c8d] bg-[#ec5c8d] text-white transition">
+      class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-[#ecd9ff] bg-[#ecd9ff] text-white transition">
       Todas
     </button>
     ${cats.map(cat => `
       <button onclick="filterByCategory('${cat}')" data-cat="${cat}"
-        class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-gray-200 bg-white text-gray-700 hover:border-[#ec5c8d] hover:text-[#6d165a] transition">
+        class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-gray-200 bg-white text-gray-700 hover:border-[#ecd9ff] hover:text-[#6d165a] transition">
         ${cat}
       </button>
     `).join('')}

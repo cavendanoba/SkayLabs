@@ -11,7 +11,7 @@ export function escapeHtml(unsafe) {
 
 export function createProductCard(product, placeholderSrc, imgPath) {
     const card = document.createElement('div');
-    card.className = "bg-[#F8BBD0] rounded-2xl shadow-xl p-6 text-black border border-yellow-200 flex flex-col h-full";
+    card.className = "bg-[#d0edfd] rounded-2xl shadow-xl p-6 text-black border border-[#fcf5ee] flex flex-col h-full";
     card.style.cursor = "pointer";
     card.dataset.productId = product.id;
 
@@ -35,13 +35,13 @@ export function createProductCard(product, placeholderSrc, imgPath) {
             <div>
                 <div class="flex items-center justify-between">
                     <h4 class="font-bold text-lg">${name}</h4>
-                    <span class="text-xs bg-[#fff3f6] text-[#a0346e] px-2 py-1 rounded-full font-semibold">${category}</span>
+                    <span class="text-xs bg-[#fcf5ee] text-[#5c4a6d] px-2 py-1 rounded-full font-semibold">${category}</span>
                 </div>
                 <p class="text-sm text-gray-700 mt-2">Stock: ${product.stock}</p>
-                <p class="font-bold text-xl mt-2 text-[#EC407A]">$${(product.price || 0).toLocaleString()}</p>
+                <p class="font-bold text-xl mt-2 text-[#5c4a6d]">$${(product.price || 0).toLocaleString()}</p>
                 ${reviewCount > 0 ? `<div class="flex items-center mt-2"><span class="text-yellow-400 text-sm">${stars}</span><span class="text-xs text-gray-600 ml-1">(${reviewCount} reseñas)</span></div>` : ''}
             </div>
-            <button class="w-full mt-4 add-btn bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white font-bold py-2 rounded-lg hover:from-[#ff8c91] hover:to-[#ffc4a6] transition" data-id="${product.id}">
+            <button class="w-full mt-4 add-btn bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] text-white font-bold py-2 rounded-lg hover:from-[#ffd5e3] hover:to-[#fcf5ee] transition" data-id="${product.id}">
                 Agregar al carrito
             </button>
         </div>

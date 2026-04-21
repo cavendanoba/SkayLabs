@@ -97,7 +97,7 @@ if (typeof window !== 'undefined') {
 }
 
 // Crear un placeholder borroso (blur-up effect)
-function createBlurPlaceholder(color = '#EC407A') {
+function createBlurPlaceholder(color = '#ecd9ff') {
     // Retorna un SVG base64 que actúa como placeholder borroso
     const svg = `
         <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
@@ -249,8 +249,8 @@ function spawnCartSparkles(x, y, tone = 'mixed') {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const colors = tone === 'target'
-        ? ['#ec5c8d', '#ff8c91', '#ffc4a6', '#ffffff']
-        : ['#ec5c8d', '#ff8c91', '#ffffff'];
+        ? ['#ecd9ff', '#ffd5e3', '#fcf5ee', '#ffffff']
+        : ['#ecd9ff', '#ffd5e3', '#ffffff'];
 
     const count = tone === 'target' ? 8 : 5;
 
@@ -300,7 +300,7 @@ function animateAddToCart(sourceElement) {
         fly.style.backgroundImage = `url("${sourceImg.src}")`;
     } else {
         fly.style.backgroundImage = 'none';
-        fly.style.background = 'linear-gradient(90deg, #ec5c8d, #ff8c91)';
+        fly.style.background = 'linear-gradient(90deg, #ecd9ff, #ffd5e3)';
     }
 
     document.body.appendChild(fly);
@@ -343,7 +343,7 @@ export function showProductModal(productId, cartCallback) {
                      style="max-width: 100%; max-height: 400px; border-radius: 10px; margin: 10px auto; display: block;"
                      onerror="this.src='./assets/default.png'">
                 <p style="margin: 15px 0; font-size: 14px; color: #666;">${product.description || 'Sin descripción disponible'}</p>
-                <p style="font-weight: bold; color: #a0346e; margin: 10px 0; font-size: 1.125rem;">Precio: $${product.price.toLocaleString()}</p>
+                <p style="font-weight: bold; color: #5c4a6d; margin: 10px 0; font-size: 1.125rem;">Precio: $${product.price.toLocaleString()}</p>
                 <p style="margin: 5px 0; font-size: 13px;">Stock disponible: ${product.stock}</p>
             </div>
         `,
@@ -351,7 +351,7 @@ export function showProductModal(productId, cartCallback) {
         confirmButtonText: 'Agregar al carrito',
         cancelButtonText: 'Cerrar',
         showCancelButton: true,
-        confirmButtonColor: '#ec5c8d',
+        confirmButtonColor: '#ecd9ff',
         cancelButtonColor: '#999',
     }).then((result) => {
         if (result.isConfirmed) {
@@ -362,7 +362,7 @@ export function showProductModal(productId, cartCallback) {
                 title: '¡Agregado!',
                 text: `${product.name} fue agregado al carrito`,
                 timer: 2000,
-                confirmButtonColor: '#ec5c8d'
+                confirmButtonColor: '#ecd9ff'
             });
         }
     });
@@ -414,9 +414,8 @@ export function renderCatalog(containerId) {
         const stockBadge = isOutOfStock
             ? '<span class="absolute top-3 left-3 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded-full">Agotado</span>'
             : (isLowStock
-                ? '<span class="absolute top-3 left-3 bg-[#EC407A] text-white text-xs font-bold px-2 py-1 rounded-full">Últimas unidades</span>'
-                : `<span class="absolute top-3 left-3 bg-white/90 text-[#a0346e] text-xs font-bold px-2 py-1 rounded-full">${layout.badge}</span>`);
-
+                ? '<span class="absolute top-3 left-3 bg-[#ecd9ff] text-[#5c4a6d] text-xs font-bold px-2 py-1 rounded-full">Últimas unidades</span>'
+                : `<span class="absolute top-3 left-3 bg-white/90 text-[#5c4a6d] text-xs font-bold px-2 py-1 rounded-full">${layout.badge}</span>`);
         const card = document.createElement("div");
         card.className = `bg-white rounded-2xl shadow-md hover:shadow-xl transition border border-gray-100 overflow-hidden ${layout.cardClass}`;
         card.style.cursor = "pointer";
@@ -425,7 +424,7 @@ export function renderCatalog(containerId) {
         card.innerHTML = `
             <div class="relative">
                 ${stockBadge}
-                <img src="${createBlurPlaceholder('#EC407A')}" 
+                <img src="${createBlurPlaceholder('#ecd9ff')}" 
                     data-lazy-src="${product.image || './assets/default.png'}" 
                     class="w-full object-cover cursor-pointer hover:opacity-90 transition blur-image" 
                     alt="${product.name}" 
@@ -444,7 +443,7 @@ export function renderCatalog(containerId) {
                     </div>
 
                     <div class="mt-3 flex items-end justify-between">
-                        <p class="font-extrabold ${layout.priceClass} text-[#a0346e]">$${product.price.toLocaleString()}</p>
+                        <p class="font-extrabold ${layout.priceClass} text-[#5c4a6d]">$${product.price.toLocaleString()}</p>
                         <p class="text-xs text-gray-600">Stock: ${product.stock}</p>
                     </div>
                 </div>
@@ -494,8 +493,9 @@ function onCatalogClick(e) {
                 icon: 'warning',
                 title: '¡Stock bajo!',
                 text: `Queda poco stock de ${product.name} (${product.stock} unidades)`,
-                confirmButtonColor: '#EC407A'
+                confirmButtonColor: '#ecd9ff'
             });
         }
     }
 }
+
