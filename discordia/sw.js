@@ -39,21 +39,27 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
+  // No cachear métodos no-GET
+  if (request.method !== 'GET') {
+    if (url.pathname.startsWith('/api/')) {
+      event.respondWith(fetch(request));
+      return;
+    }
+    event.respondWith(fetch(request));
+    return;
+  }
+
   // Network-first para llamadas a la API
   if (url.pathname.startsWith('/api/')) {
-    if (request.method === 'GET') {
-      event.respondWith(
-        fetch(request)
-          .then((response) => {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-            return response;
-          })
-          .catch(() => caches.match(request))
-      );
-    } else {
-      event.respondWith(fetch(request));
-    }
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
     return;
   }
 
