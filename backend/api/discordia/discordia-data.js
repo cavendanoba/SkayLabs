@@ -10,19 +10,24 @@ export default async function handler(req, res) {
 
   // ─── GET: leer catálogo, ventas y clientes ───────────────────
   if (req.method === 'GET') {
-    const [products, sales, customers] = await Promise.all([ // Ejecutamos las consultas en paralelo para optimizar el tiempo de respuesta
-      sql`SELECT * FROM products WHERE active = true ORDER BY id`,
-      sql`SELECT * FROM sales ORDER BY created_at DESC LIMIT 100`,
-      sql`SELECT * FROM customers ORDER BY name`,
-      // Aquí podríamos agregar más consultas si necesitamos traer más datos, por ejemplo, categorías de productos, detalles de ventas, etc.
-      //Se usan consultas parametrizadas para evitar inyecciones SQL, aunque en este caso no hay parámetros dinámicos, es una buena práctica usar esta sintaxis para mantener la seguridad y consistencia del código.
-    ]);
+    try {
+      const [products, sales, customers] = await Promise.all([ // Ejecutamos las consultas en paralelo para optimizar el tiempo de respuesta
+        sql`SELECT * FROM products WHERE active = true ORDER BY id`,
+        sql`SELECT * FROM sales ORDER BY created_at DESC LIMIT 100`,
+        sql`SELECT * FROM customers ORDER BY name`,
+        // Aquí podríamos agregar más consultas si necesitamos traer más datos, por ejemplo, categorías de productos, detalles de ventas, etc.
+        //Se usan consultas parametrizadas para evitar inyecciones SQL, aunque en este caso no hay parámetros dinámicos, es una buena práctica usar esta sintaxis para mantener la seguridad y consistencia del código.
+      ]);
 
-    return res.status(200).json({
-      ok: true,
-      storage: 'postgresql',
-      data: { catalog: products, sales, customers }
-    });
+      return res.status(200).json({
+        ok: true,
+        storage: 'postgresql',
+        data: { catalog: products, sales, customers }
+      });
+    } catch (error) {
+      console.error('Error en /api/discordia/discordia-data:', error);
+      return res.status(500).json({ ok: false, message: error.message || 'Error interno en la API de Discordia' });
+    }
   }
 
   // ─── POST: guardar ventas o clientes ────────────────────────
