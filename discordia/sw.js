@@ -41,15 +41,19 @@ self.addEventListener('fetch', (event) => {
 
   // Network-first para llamadas a la API
   if (url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          return response;
-        })
-        .catch(() => caches.match(request))
-    );
+    if (request.method === 'GET') {
+      event.respondWith(
+        fetch(request)
+          .then((response) => {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            return response;
+          })
+          .catch(() => caches.match(request))
+      );
+    } else {
+      event.respondWith(fetch(request));
+    }
     return;
   }
 
