@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,10 +15,25 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-    body { font-family: 'Poppins', sans-serif; }
-    h2, h3, h4 { font-family: 'Playfair Display', serif; }
-    .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
-    .no-scrollbar::-webkit-scrollbar { display:none; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    h2,
+    h3,
+    h4 {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
   </style>
 </head>
 
@@ -31,7 +47,8 @@
 
       <!-- Logo + title -->
       <div class="flex items-center gap-3">
-        <img src="./assets/logo-discordia.png" alt="DISCORDIA" class="h-9 w-9 rounded-full object-contain bg-white border border-gray-100">
+        <img src="./assets/logo-discordia.png" alt="DISCORDIA"
+          class="h-9 w-9 rounded-full object-contain bg-white border border-gray-100">
         <div>
           <p class="font-bold text-lg text-[#6d165a]" style="font-family:'Playfair Display',serif;">DISCORDIA Admin</p>
           <p class="text-xs text-gray-400 -mt-0.5">Panel interno de operación</p>
@@ -45,7 +62,7 @@
           <i class="fa-solid fa-arrow-left text-xs"></i> Tienda
         </a>
         <button id="logout-btn"
-          class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] text-white text-sm font-semibold hover:opacity-90 transition">
+          class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white text-sm font-semibold hover:opacity-90 transition">
           <i class="fa-solid fa-right-from-bracket text-xs"></i>
           <span class="hidden sm:inline">Cerrar sesión</span>
         </button>
@@ -74,4 +91,5 @@
 
   <script type="module" src="./admin.js"></script>
 </body>
+
 </html>
