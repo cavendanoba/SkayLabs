@@ -5,7 +5,7 @@
   "start_url": "/discordia/index.html",
   "display": "standalone",
   "background_color": "#faf8f7",
-  "theme_color": "#ec5c8d",
+  "theme_color": "#d0edfd",
   "icons": [
     {
       "src": "/discordia/assets/logo-discordia.png",

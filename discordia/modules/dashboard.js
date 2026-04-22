@@ -10,7 +10,7 @@ export async function renderDashboard(container) {
 
   let data;
   try {
-    const res  = await fetch('/api/dashboard');
+    const res  = await fetch('/api/discordia/dashboard');
     const json = await res.json();
     if (!json.ok) throw new Error('API error');
     data = json.data;
@@ -20,7 +20,7 @@ export async function renderDashboard(container) {
         <p class="font-bold text-lg">No se pudieron cargar las métricas</p>
         <p class="text-sm mt-1">Verifica tu conexión e intenta de nuevo.</p>
         <button onclick="location.reload()"
-          class="mt-4 px-5 py-2 bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white rounded-xl text-sm font-semibold">
+          class="mt-4 px-5 py-2 bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] text-white rounded-xl text-sm font-semibold">
           Reintentar
         </button>
       </div>`;
@@ -133,7 +133,7 @@ function buildTopProductos(productos) {
   const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
   return `
     <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div class="bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] px-5 py-4">
+      <div class="bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] px-5 py-4">
         <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">🏆 Top productos</h3>
         <p class="text-xs text-white/70 mt-0.5">Más vendidos de todos los tiempos</p>
       </div>
@@ -151,7 +151,7 @@ function buildTopProductos(productos) {
               </div>
             </div>
             <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-              <div class="bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] h-1.5 rounded-full" style="width:${Math.round(Number(p.unidades)/maxUds*100)}%"></div>
+              <div class="bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] h-1.5 rounded-full" style="width:${Math.round(Number(p.unidades)/maxUds*100)}%"></div>
             </div>
           </li>`).join('')}
       </ul>

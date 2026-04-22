@@ -6,9 +6,11 @@
 // precios, stock o productos se refleja automáticamente.
 // ---------------------------------------------
 
+import { CONFIG } from './config.js';
+
 export async function fetchProducts() {
   try {
-    const response = await fetch('/api/discordia-data');
+    const response = await fetch(CONFIG.ADMIN_API_PATH);
 
     if (!response.ok) {
       throw new Error(`Error al obtener productos: ${response.status}`);

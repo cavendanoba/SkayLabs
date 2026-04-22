@@ -178,9 +178,9 @@ function renderCatalogTab() {
       <div class="p-4 border-b border-gray-100 flex flex-wrap gap-3">
         <input id="catalog-search" value="${catalogUiState.query}"
           placeholder="Buscar por nombre, categoría o descripción..."
-          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ec5c8d]">
+          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ecd9ff]">
         <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
-          <input id="catalog-low-stock" type="checkbox" ${catalogUiState.lowStockOnly?'checked':''} class="w-3.5 h-3.5 accent-[#ec5c8d]">
+          <input id="catalog-low-stock" type="checkbox" ${catalogUiState.lowStockOnly?'checked':''} class="w-3.5 h-3.5 accent-[#ecd9ff]">
           Solo stock bajo (≤ 5)
         </label>
         <span class="self-center text-xs text-gray-400">Mostrando ${filtered.length} de ${state.catalog.length}</span>
@@ -235,7 +235,7 @@ async function showProductModal(productId) {
       <textarea id="sw-desc"  class="swal2-textarea" placeholder="Descripción">${product?.description||''}</textarea>`,
     showCancelButton: true,
     confirmButtonText: editing ? 'Guardar' : 'Agregar',
-    confirmButtonColor: '#ec5c8d',
+    confirmButtonColor: '#ecd9ff',
     preConfirm: () => {
       const name  = document.getElementById('sw-name').value.trim();
       const price = Number(document.getElementById('sw-price').value);
@@ -260,7 +260,7 @@ async function showProductModal(productId) {
 
   try {
     const method = editing ? 'PUT' : 'POST';
-    const res    = await fetch('/api/products', {
+    const res    = await fetch('/api/discordia/products', {
       method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value)
     });
     const json = await res.json();
@@ -292,12 +292,12 @@ async function deactivateProduct(productId) {
     icon: 'warning',
     showCancelButton: true,
     confirmButtonText: 'Desactivar',
-    confirmButtonColor: '#ec5c8d'
+    confirmButtonColor: '#ecd9ff'
   });
   if (!isConfirmed) return;
 
   try {
-    await fetch('/api/products', {
+    await fetch('/api/discordia/products', {
       method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: productId })
     });
     state.catalog = state.catalog.filter(p => Number(p.id) !== productId);
@@ -334,7 +334,7 @@ function renderCustomersTab() {
 
   panel.innerHTML = `
     <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div class="bg-gradient-to-r from-[#a0346e] to-[#ec5c8d] px-5 py-4">
+      <div class="bg-gradient-to-r from-[#a0346e] to-[#ecd9ff] px-5 py-4">
         <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">👥 Clientes</h3>
         <p class="text-white/70 text-xs mt-0.5">${customers.length} registrados · Ordenados por total comprado</p>
       </div>
@@ -367,7 +367,7 @@ if (logoutBtn) logoutBtn.addEventListener('click', logout);
 async function init() {
   // Hidratar state desde la API antes de renderizar
   try {
-    const res  = await fetch('/api/discordia-data');
+    const res  = await fetch(CONFIG.ADMIN_API_PATH);
     const json = await res.json();
     if (json.ok) {
       state.catalog   = json.data.catalog   || state.catalog;

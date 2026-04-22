@@ -11,7 +11,7 @@ export async function renderDeudas(container) {
 
   let ventas = [];
   try {
-    const res  = await fetch('/api/sales?status=pending&limit=200');
+    const res  = await fetch('/api/discordia/sales?status=pending&limit=200');
     const json = await res.json();
     if (!json.ok) throw new Error();
     ventas = json.data;
@@ -19,7 +19,7 @@ export async function renderDeudas(container) {
     container.innerHTML = `
       <div class="bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl p-6 text-center">
         <p class="font-bold">Error al cargar deudas</p>
-        <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-gradient-to-r from-[#ec5c8d] to-[#ff8c91] text-white rounded-xl text-sm font-semibold">Reintentar</button>
+        <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] text-white rounded-xl text-sm font-semibold">Reintentar</button>
       </div>`;
     return;
   }
@@ -139,7 +139,7 @@ async function registrarAbono(saleId, pendiente, customerName, container) {
       <input id="sw-nota" class="swal2-input" placeholder="Nota (opcional)">`,
     showCancelButton: true,
     confirmButtonText: 'Registrar abono',
-    confirmButtonColor: '#ec5c8d',
+    confirmButtonColor: '#ecd9ff',
     preConfirm: () => {
       const amount = Number(document.getElementById('sw-abono').value);
       if (!amount || amount <= 0) { Swal.showValidationMessage('Ingresa un monto válido.'); return false; }
@@ -170,7 +170,7 @@ async function marcarPagado(saleId, pendiente, customerName, container) {
 // ── SUBMIT PAYMENT ────────────────────────────────────────────
 async function submitPayment(payload, container) {
   try {
-    const res  = await fetch('/api/payments', {
+    const res  = await fetch('/api/discordia/payments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
