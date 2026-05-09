@@ -262,6 +262,5 @@ Estructura de componentes reutilizables y mantenibles:
 ---
 
 **Version**: 1.0.0  
-**License**: MIT  
-**Autor**: Generado por AI  
+**License**: MIT   
 **Última actualización**: Marzo 2026
