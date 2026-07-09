@@ -1,3 +1,7 @@
+// Modulo que funciona para: /backend/api/copcash/[...slug].js
+// Este archivo es un "catch-all" que redirige a los handlers específicos según el path.
+// Así evitamos tener que crear un archivo por cada endpoint de CopCash, y mantenemos todo organizado bajo /lib/copcash/.
+
 import { setCors, handleError } from '../../lib/copcash/_helpers.js';
 import authLogin from '../../lib/copcash/auth/login.js';
 import authRegister from '../../lib/copcash/auth/register.js';
