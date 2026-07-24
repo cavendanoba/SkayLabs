@@ -1,0 +1,8 @@
+{
+  "name": "discordia-cf-functions",
+  "private": true,
+  "dependencies": {
+    "postgres": "^3.4.4",
+    "bcryptjs": "^2.4.3"
+  }
+}

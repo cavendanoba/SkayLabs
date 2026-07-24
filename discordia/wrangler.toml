@@ -1,0 +1,13 @@
+# wrangler.toml
+# Este archivo permite probar las Functions localmente con `wrangler pages dev`.
+# El binding real en producción también debe configurarse desde el
+# Dashboard de Cloudflare: Pages → tu proyecto → Settings → Functions →
+# Hyperdrive bindings → conectar "discordia-hyperdrive" con el nombre "HYPERDRIVE".
+
+name = "discordia"
+compatibility_date = "2026-07-21"
+compatibility_flags = ["nodejs_compat"]
+
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "PON_AQUI_EL_ID_DE_HYPERDRIVE"
