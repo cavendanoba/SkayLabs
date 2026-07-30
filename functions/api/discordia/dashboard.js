@@ -7,21 +7,30 @@ export async function onRequestGet({ env }) {
   const sql = getSql(env);
 
   try {
-    const [ventasRecientes, deudasActivas, stockBajo, topProductos, ingresosMes, ingresosPrev] = await Promise.all([
-      sql`SELECT id, customer_name, customer_phone, channel, total, amount_paid, payment_status, notes, created_at
-          FROM sales
-          ORDER BY created_at DESC
+    // La base histórica y la actual no tienen exactamente las mismas
+    // columnas. to_jsonb() permite leer los campos opcionales sin que una
+    // columna ausente convierta todo el dashboard en un error 500.
+    const [ventasRecientes, deudasActivas, stockBajo, ingresosMes, ingresosPrev, saleItemsTable] = await Promise.all([
+      sql`SELECT
+            s.id,
+            COALESCE(to_jsonb(s)->>'customer_name', c.name) AS customer_name,
+            COALESCE(to_jsonb(s)->>'customer_phone', to_jsonb(c)->>'phone') AS customer_phone,
+            s.channel,
+            s.total,
+            s.amount_paid,
+            s.payment_status,
+            to_jsonb(s)->>'notes' AS notes,
+            s.created_at
+          FROM sales s
+          LEFT JOIN customers c ON c.id = s.customer_id
+          ORDER BY s.created_at DESC
           LIMIT 5`,
-      sql`SELECT id, name, phone, total_debt FROM customers WHERE total_debt > 0 ORDER BY total_debt DESC LIMIT 10`,
+      sql`SELECT id, name, to_jsonb(customers)->>'phone' AS phone, total_debt
+          FROM customers
+          WHERE total_debt > 0
+          ORDER BY total_debt DESC
+          LIMIT 10`,
       sql`SELECT id, name, stock, price FROM products WHERE stock <= 3 ORDER BY stock ASC, name ASC LIMIT 10`,
-      sql`SELECT COALESCE(p.name, si.product_name) AS product_name,
-                 SUM(si.quantity)::int AS unidades,
-                 SUM(si.quantity * si.price)::numeric AS ingresos
-          FROM sale_items si
-          LEFT JOIN products p ON p.id = si.product_id
-          GROUP BY COALESCE(p.name, si.product_name)
-          ORDER BY ingresos DESC
-          LIMIT 5`,
       sql`SELECT COUNT(*)::int AS cantidad, COALESCE(SUM(total), 0)::numeric AS total
           FROM sales
           WHERE payment_status = 'paid'
@@ -31,8 +40,22 @@ export async function onRequestGet({ env }) {
           FROM sales
           WHERE payment_status = 'paid'
             AND created_at >= date_trunc('month', now()) - interval '1 month'
-            AND created_at < date_trunc('month', now())`
+            AND created_at < date_trunc('month', now())`,
+      sql`SELECT to_regclass('public.sale_items') AS table_name`
     ]);
+
+    // sale_items aún no existe en instalaciones nuevas. En ese caso el
+    // dashboard sigue siendo utilizable y muestra el ranking vacío.
+    const topProductos = saleItemsTable[0]?.table_name
+      ? await sql`SELECT COALESCE(p.name, to_jsonb(si)->>'product_name', 'Producto sin nombre') AS product_name,
+                         SUM(si.quantity)::int AS unidades,
+                         SUM(si.quantity * si.price)::numeric AS ingresos
+                  FROM sale_items si
+                  LEFT JOIN products p ON p.id = si.product_id
+                  GROUP BY COALESCE(p.name, to_jsonb(si)->>'product_name', 'Producto sin nombre')
+                  ORDER BY ingresos DESC
+                  LIMIT 5`
+      : [];
 
     const totalActual = Number(ingresosMes[0]?.total || 0);
     const totalAnterior = Number(ingresosPrev[0]?.total || 0);
