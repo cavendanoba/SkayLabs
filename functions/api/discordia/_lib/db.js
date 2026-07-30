@@ -12,11 +12,7 @@
 
 import postgres from 'postgres';
 
-let cachedSql = null;
-
 export function getSql(env) {
-  if (cachedSql) return cachedSql;
-
   if (!env.HYPERDRIVE) {
     throw new Error(
       'El binding HYPERDRIVE no está configurado. Ve a Cloudflare Pages → ' +
@@ -25,7 +21,7 @@ export function getSql(env) {
     );
   }
 
-  cachedSql = postgres(env.HYPERDRIVE.connectionString, {
+  return postgres(env.HYPERDRIVE.connectionString, {
     // Cloudflare Workers no soporta conexiones TCP persistentes largas
     // de la misma forma que Node — estas opciones son las recomendadas
     // por Cloudflare para trabajar bien con Hyperdrive.
@@ -33,8 +29,6 @@ export function getSql(env) {
     fetch_types: false,
     prepare: false,
   });
-
-  return cachedSql;
 }
 
 // Helper para respuestas JSON consistentes (equivalente a res.status().json())
