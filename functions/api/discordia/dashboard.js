@@ -17,28 +17,41 @@ export async function onRequestGet({ env }) {
             COALESCE(to_jsonb(s)->>'customer_phone', to_jsonb(c)->>'phone') AS customer_phone,
             s.channel,
             s.total,
-            s.amount_paid,
-            s.payment_status,
+            COALESCE((to_jsonb(s)->>'amount_paid')::numeric, 0) AS amount_paid,
+            COALESCE(
+              to_jsonb(s)->>'payment_status',
+              CASE WHEN lower(COALESCE(to_jsonb(s)->>'status', '')) IN ('paid', 'completed') THEN 'paid' ELSE 'pending' END
+            ) AS payment_status,
             to_jsonb(s)->>'notes' AS notes,
             s.created_at
           FROM sales s
           LEFT JOIN customers c ON c.id = s.customer_id
           ORDER BY s.created_at DESC
           LIMIT 5`,
-      sql`SELECT id, name, to_jsonb(customers)->>'phone' AS phone, total_debt
+      sql`SELECT
+            id,
+            name,
+            to_jsonb(customers)->>'phone' AS phone,
+            COALESCE(NULLIF(to_jsonb(customers)->>'total_debt', '')::numeric, 0) AS total_debt
           FROM customers
-          WHERE total_debt > 0
-          ORDER BY total_debt DESC
+          WHERE COALESCE(NULLIF(to_jsonb(customers)->>'total_debt', '')::numeric, 0) > 0
+          ORDER BY COALESCE(NULLIF(to_jsonb(customers)->>'total_debt', '')::numeric, 0) DESC
           LIMIT 10`,
       sql`SELECT id, name, stock, price FROM products WHERE stock <= 3 ORDER BY stock ASC, name ASC LIMIT 10`,
       sql`SELECT COUNT(*)::int AS cantidad, COALESCE(SUM(total), 0)::numeric AS total
-          FROM sales
-          WHERE payment_status = 'paid'
+          FROM sales s
+          WHERE COALESCE(
+                  to_jsonb(s)->>'payment_status',
+                  CASE WHEN lower(COALESCE(to_jsonb(s)->>'status', '')) IN ('paid', 'completed') THEN 'paid' ELSE 'pending' END
+                ) = 'paid'
             AND created_at >= date_trunc('month', now())
             AND created_at < date_trunc('month', now()) + interval '1 month'`,
       sql`SELECT COALESCE(SUM(total), 0)::numeric AS total
-          FROM sales
-          WHERE payment_status = 'paid'
+          FROM sales s
+          WHERE COALESCE(
+                  to_jsonb(s)->>'payment_status',
+                  CASE WHEN lower(COALESCE(to_jsonb(s)->>'status', '')) IN ('paid', 'completed') THEN 'paid' ELSE 'pending' END
+                ) = 'paid'
             AND created_at >= date_trunc('month', now()) - interval '1 month'
             AND created_at < date_trunc('month', now())`,
       sql`SELECT to_regclass('public.sale_items') AS table_name`
