@@ -155,87 +155,141 @@ async function showNuevaVentaModal(container) {
       ${p.name} — $${p.price.toLocaleString('es-CO')} (stock: ${p.stock})
     </option>`
   ).join('');
-
+ 
   const { value: formValues, isConfirmed } = await Swal.fire({
     title: 'Registrar nueva venta',
-    width: 620,
+    width: 720,
+    padding: '28px',
     html: `
-      <div style="text-align:left;display:flex;flex-direction:column;gap:10px;">
-        <div>
-          <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:4px;">CLIENTE</label>
-          <input id="sw-customer-name" class="swal2-input" style="margin:0;width:100%;" placeholder="Nombre de la clienta">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div>
-            <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:4px;">TELÉFONO</label>
-            <input id="sw-customer-phone" class="swal2-input" style="margin:0;width:100%;" placeholder="WhatsApp / Celular">
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:4px;">CANAL</label>
-            <select id="sw-channel" class="swal2-input" style="margin:0;width:100%;">
-              <option value="WhatsApp">WhatsApp</option>
-              <option value="Instagram">Instagram</option>
-              <option value="Efectivo">Efectivo</option>
-              <option value="Nequi">Nequi</option>
-              <option value="Daviplata">Daviplata</option>
-              <option value="Presencial">Presencial</option>
-            </select>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div>
-            <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:4px;">ESTADO DE PAGO</label>
-            <select id="sw-payment" class="swal2-input" style="margin:0;width:100%;">
-              <option value="paid">Pagado ✅</option>
-              <option value="pending">Pendiente ⚠️</option>
-            </select>
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:4px;">NOTAS</label>
-            <input id="sw-notes" class="swal2-input" style="margin:0;width:100%;" placeholder="Opcional">
-          </div>
-        </div>
-        <hr style="border-color:#f1d7e2;margin:4px 0;">
-        <div>
-          <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:4px;">PRODUCTO</label>
-          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;">
-            <select id="sw-product" class="swal2-input" style="margin:0;width:100%;">
-              ${productOptions}
-            </select>
+      <div style="text-align:left;display:flex;flex-direction:column;gap:20px;font-family:inherit;">
+ 
+        <!-- SECCIÓN: DATOS DEL CLIENTE -->
+        <section>
+          <h3 style="font-size:13px;font-weight:800;color:#a0346e;text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
+            Datos del cliente
+          </h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
             <div>
-              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:4px;">CANT</label>
-              <input id="sw-qty" type="number" min="1" value="1" class="swal2-input" style="margin:0;width:70px;">
+              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Cliente</label>
+              <input id="sw-customer-name" class="swal2-input" style="margin:0;width:100%;height:44px;" placeholder="Nombre de la clienta">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Teléfono</label>
+                <input id="sw-customer-phone" class="swal2-input" style="margin:0;width:100%;height:44px;" placeholder="WhatsApp / Celular">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Canal</label>
+                <select id="sw-channel" class="swal2-input" style="margin:0;width:100%;height:44px;">
+                  <option value="WhatsApp">WhatsApp</option>
+                  <option value="Instagram">Instagram</option>
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Nequi">Nequi</option>
+                  <option value="Daviplata">Daviplata</option>
+                  <option value="Presencial">Presencial</option>
+                </select>
+              </div>
             </div>
           </div>
-        </div>
-        <div id="sw-items-list" style="min-height:40px;background:#fdf2f7;border-radius:10px;padding:8px;font-size:13px;"></div>
-        <button id="sw-add-item" type="button"
-          style="background:linear-gradient(90deg,#ecd9ff,#ffd5e3);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-weight:700;cursor:pointer;width:100%;">
-          + Agregar producto a la venta
-        </button>
-        <div style="font-size:14px;font-weight:700;color:#a0346e;text-align:right;">
-          Total: <span id="sw-total">$0</span>
-        </div>
+        </section>
+ 
+        <hr style="border:none;border-top:1px solid #f1d7e2;margin:0;">
+ 
+        <!-- SECCIÓN: PAGO -->
+        <section>
+          <h3 style="font-size:13px;font-weight:800;color:#a0346e;text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
+            Pago
+          </h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Estado de pago</label>
+              <select id="sw-payment" class="swal2-input" style="margin:0;width:100%;height:44px;">
+                <option value="paid">Pagado ✅</option>
+                <option value="pending">Pendiente ⚠️</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Notas</label>
+              <input id="sw-notes" class="swal2-input" style="margin:0;width:100%;height:44px;" placeholder="Opcional">
+            </div>
+          </div>
+        </section>
+ 
+        <hr style="border:none;border-top:1px solid #f1d7e2;margin:0;">
+ 
+        <!-- SECCIÓN: PRODUCTOS -->
+        <section>
+          <h3 style="font-size:13px;font-weight:800;color:#a0346e;text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
+            Productos de la venta
+          </h3>
+ 
+          <input id="sw-product-search" type="text"
+            placeholder="🔍 Buscar producto por nombre o código..."
+            class="swal2-input" style="margin:0 0 10px;width:100%;height:42px;font-size:14px;">
+ 
+          <div style="display:grid;grid-template-columns:1fr 90px;gap:10px;align-items:end;">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Producto</label>
+              <select id="sw-product" class="swal2-input" style="margin:0;width:100%;height:44px;">
+                ${productOptions}
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Cant.</label>
+              <input id="sw-qty" type="number" min="1" value="1" class="swal2-input" style="margin:0;width:100%;height:44px;text-align:center;">
+            </div>
+          </div>
+ 
+          <button id="sw-add-item" type="button"
+            style="margin-top:12px;background:linear-gradient(90deg,#ecd9ff,#ffd5e3);color:#7a1f57;border:none;border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;width:100%;">
+            + Agregar producto a la venta
+          </button>
+ 
+          <div id="sw-items-list"
+            style="margin-top:14px;min-height:48px;background:#fdf2f7;border-radius:12px;padding:12px;font-size:13px;">
+          </div>
+ 
+          <div style="margin-top:14px;padding-top:14px;border-top:2px solid #f1d7e2;font-size:17px;font-weight:800;color:#a0346e;text-align:right;">
+            Total: <span id="sw-total">$0</span>
+          </div>
+        </section>
+ 
       </div>`,
     showCancelButton: true,
     confirmButtonText: 'Guardar venta',
-    confirmButtonColor: '#ecd9ff',
+    confirmButtonColor: '#a0346e',
     cancelButtonText: 'Cancelar',
     didOpen: () => {
       window._swItems = [];
+ 
+      // Filtro en vivo del selector de productos
+      const allOptionsHTML = productOptions;
+      document.getElementById('sw-product-search').addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        const filtered = catalog
+          .filter(p => p.name.toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q))
+          .map(p =>
+            `<option value="${p.id}" data-price="${p.price}" data-name="${p.name}" data-stock="${p.stock}">
+              ${p.name} — $${p.price.toLocaleString('es-CO')} (stock: ${p.stock})
+            </option>`
+          ).join('');
+        document.getElementById('sw-product').innerHTML = filtered || allOptionsHTML;
+      });
+ 
       window._swUpdateTotal = () => {
         const t = window._swItems.reduce((s,i) => s+i.price*i.qty, 0);
         document.getElementById('sw-total').textContent = `$${t.toLocaleString('es-CO')}`;
         document.getElementById('sw-items-list').innerHTML = window._swItems.length
           ? window._swItems.map((i,idx) =>
-              `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f1d7e2;">
-                <span>${i.name} x${i.qty}</span>
-                <span style="color:#a0346e;font-weight:700;">$${(i.price*i.qty).toLocaleString('es-CO')}
-                  <button data-idx="${idx}" style="background:none;border:none;color:#ecd9ff;cursor:pointer;margin-left:8px;font-size:16px;">✕</button>
+              `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #f1d7e2;">
+                <span style="font-weight:500;">${i.name} <span style="color:#c48bb0;">×${i.qty}</span></span>
+                <span style="color:#a0346e;font-weight:700;display:flex;align-items:center;gap:8px;">
+                  $${(i.price*i.qty).toLocaleString('es-CO')}
+                  <button data-idx="${idx}" style="background:#fff;border:1px solid #f1d7e2;color:#a0346e;cursor:pointer;width:24px;height:24px;border-radius:50%;font-size:13px;line-height:1;">✕</button>
                 </span>
               </div>`).join('')
-          : '<span style="color:#9ca3af;font-size:12px;">Sin productos aún</span>';
-
+          : '<span style="color:#9ca3af;font-size:13px;">Sin productos aún</span>';
+ 
         document.getElementById('sw-items-list').querySelectorAll('button[data-idx]').forEach(btn => {
           btn.addEventListener('click', () => {
             window._swItems.splice(Number(btn.dataset.idx), 1);
@@ -243,7 +297,7 @@ async function showNuevaVentaModal(container) {
           });
         });
       };
-
+ 
       document.getElementById('sw-add-item').addEventListener('click', () => {
         const sel   = document.getElementById('sw-product');
         const opt   = sel.options[sel.selectedIndex];
