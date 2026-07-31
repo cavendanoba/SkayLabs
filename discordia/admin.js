@@ -11,9 +11,9 @@
 // ─────────────────────────────────────────────────────────────
 
 import { requireAuth, getAdminUser, logout } from './auth.js';
-import { renderDashboard }                   from './dashboard.js';
-import { renderVentas }                      from './ventas.js';
-import { renderDeudas }                      from './deudas.js';
+import { renderDashboard }                   from './modules/dashboard.js';
+import { renderVentas }                      from './modules/ventas.js';
+import { renderDeudas }                      from './modules/deudas.js';
 import { fetchProducts }                     from './products.js';
 import { CONFIG }                            from './config.js';
 
