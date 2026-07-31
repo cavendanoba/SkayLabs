@@ -6,7 +6,7 @@
 // - Filtros por estado, canal y búsqueda
 // ─────────────────────────────────────────────────────────────
 
-import { getCatalog } from './catalog.js';
+import { getCatalog } from '../catalog.js';
 
 let allSales = [];
 
