@@ -1,68 +1,77 @@
-// backend/api/discordia/products.js
-// CRUD completo de productos para el panel admin.
-// GET    → listar todos (incluyendo inactivos para el admin)
+// functions/api/discordia/products.js
+// GET    → listar todos (incluyendo inactivos, para el admin)
 // POST   → crear producto nuevo
 // PUT    → editar producto existente
 // DELETE → desactivar producto (nunca borramos, solo active=false)
-import { sql } from '../lib/db.js';
 
-export default async function handler(req, res) {
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+import { getSql, json } from './_lib/db.js';
 
-  // ── GET: todos los productos (admin ve inactivos también) ──
-  if (req.method === 'GET') {
-    const products = await sql`
-      SELECT * FROM products ORDER BY active DESC, category, name
-    `;
-    return res.status(200).json({ ok: true, data: products });
+export async function onRequestGet({ env }) {
+  const sql = getSql(env);
+  const products = await sql`
+    SELECT * FROM products ORDER BY active DESC, category, name
+  `;
+  return json({ ok: true, data: products });
+}
+
+export async function onRequestPost({ request, env }) {
+  const sql = getSql(env);
+  const body = await request.json();
+  const { name, code, price, costPrice, stock, category, image, description } = body;
+
+  if (!name || !price || stock === undefined || !category) {
+    return json({ ok: false, message: 'Faltan campos obligatorios.' }, 400);
   }
 
-  // ── POST: crear producto ───────────────────────────────────
-  if (req.method === 'POST') {
-    const { name, price, stock, category, image, description } = req.body;
+  const [product] = await sql`
+    INSERT INTO products (name, code, price, cost_price, stock, category, image, description)
+    VALUES (
+      ${name},
+      ${code || null},
+      ${Number(price)},
+      ${costPrice !== undefined && costPrice !== null ? Number(costPrice) : null},
+      ${Number(stock)},
+      ${category},
+      ${image || null},
+      ${description || null}
+    )
+    RETURNING *
+  `;
+  return json({ ok: true, data: product }, 201);
+}
 
-    if (!name || !price || stock === undefined || !category) {
-      return res.status(400).json({ ok: false, message: 'Faltan campos obligatorios.' });
-    }
+export async function onRequestPut({ request, env }) {
+  const sql = getSql(env);
+  const body = await request.json();
+  const { id, name, code, price, costPrice, stock, category, image, description, active } = body;
 
-    const [product] = await sql`
-      INSERT INTO products (name, price, stock, category, image, description)
-      VALUES (${name}, ${Number(price)}, ${Number(stock)}, ${category}, ${image || null}, ${description || null})
-      RETURNING *
-    `;
-    return res.status(201).json({ ok: true, data: product });
-  }
+  if (!id) return json({ ok: false, message: 'ID requerido.' }, 400);
 
-  // ── PUT: editar producto ───────────────────────────────────
-  if (req.method === 'PUT') {
-    const { id, name, price, stock, category, image, description, active } = req.body;
+  const [product] = await sql`
+    UPDATE products SET
+      name        = ${name},
+      code        = ${code || null},
+      price       = ${Number(price)},
+      cost_price  = ${costPrice !== undefined && costPrice !== null ? Number(costPrice) : null},
+      stock       = ${Number(stock)},
+      category    = ${category},
+      image       = ${image || null},
+      description = ${description || null},
+      active      = ${active !== undefined ? active : true},
+      updated_at  = NOW()
+    WHERE id = ${Number(id)}
+    RETURNING *
+  `;
+  return json({ ok: true, data: product });
+}
 
-    if (!id) return res.status(400).json({ ok: false, message: 'ID requerido.' });
+export async function onRequestDelete({ request, env }) {
+  const sql = getSql(env);
+  const body = await request.json();
+  const { id } = body;
 
-    const [product] = await sql`
-      UPDATE products SET
-        name        = ${name},
-        price       = ${Number(price)},
-        stock       = ${Number(stock)},
-        category    = ${category},
-        image       = ${image || null},
-        description = ${description || null},
-        active      = ${active !== undefined ? active : true},
-        updated_at  = NOW()
-      WHERE id = ${Number(id)}
-      RETURNING *
-    `;
-    return res.status(200).json({ ok: true, data: product });
-  }
+  if (!id) return json({ ok: false, message: 'ID requerido.' }, 400);
 
-  // ── DELETE: desactivar producto ───────────────────────────
-  if (req.method === 'DELETE') {
-    const { id } = req.body;
-    if (!id) return res.status(400).json({ ok: false, message: 'ID requerido.' });
-
-    await sql`UPDATE products SET active = false, updated_at = NOW() WHERE id = ${Number(id)}`;
-    return res.status(200).json({ ok: true, message: 'Producto desactivado.' });
-  }
-
-  return res.status(405).json({ ok: false, message: 'Método no permitido.' });
+  await sql`UPDATE products SET active = false, updated_at = NOW() WHERE id = ${Number(id)}`;
+  return json({ ok: true, message: 'Producto desactivado.' });
 }
