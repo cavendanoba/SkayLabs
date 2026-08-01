@@ -592,8 +592,18 @@ async function showEditVentaModal(container, saleId) {
 
     const closeBtn = modal.querySelectorAll('.close-modal');
     closeBtn.forEach(btn => btn.addEventListener('click', closeModal));
+    
+    // Evitar cerrar modal al hacer clic en elementos del formulario
     overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) closeModal();
+      if (e.target === overlay && !e.target.closest('select') && !e.target.closest('input') && !e.target.closest('textarea')) {
+        closeModal();
+      }
+    });
+    
+    // Prevenir cierre accidental en selects, inputs y textareas
+    modal.querySelectorAll('select, input, textarea').forEach(el => {
+      el.addEventListener('click', (e) => e.stopPropagation());
+      el.addEventListener('change', (e) => e.stopPropagation());
     });
 
     const addProductBtn = modal.querySelector('#modal-add-product');
