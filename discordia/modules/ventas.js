@@ -376,56 +376,295 @@ async function showNuevaVentaModal(container) {
 
 // ── EDITAR VENTA ──────────────────────────────────────────────
 async function showEditVentaModal(container, saleId) {
-  const sale = allSales.find(s => s.id === saleId);
-  if (!sale) return;
+  return new Promise((resolve) => {
+    const sale = allSales.find(s => s.id === saleId);
+    if (!sale) return resolve();
 
-  const { isConfirmed, value: formValues } = await Swal.fire({
-    title: 'Editar venta',
-    html: `
-      <input id="sw-edit-customer-name"  class="swal2-input" placeholder="Nombre del cliente" value="${sale.customer_name||''}">
-      <input id="sw-edit-customer-phone" class="swal2-input" placeholder="Teléfono" value="${sale.customer_phone||''}">
-      <select id="sw-edit-channel" class="swal2-input">
-        <option value="whatsapp" ${sale.channel==='whatsapp'?'selected':''}>WhatsApp</option>
-        <option value="directa" ${sale.channel==='directa'?'selected':''}>Directa</option>
-        <option value="otro" ${sale.channel==='otro'?'selected':''}>Otro</option>
-      </select>
-      <select id="sw-edit-payment" class="swal2-input">
-        <option value="paid" ${sale.payment_status==='paid'?'selected':''}>Pagado</option>
-        <option value="pending" ${sale.payment_status==='pending'?'selected':''}>Pendiente</option>
-      </select>
-      <textarea id="sw-edit-notes" class="swal2-textarea" placeholder="Notas">${sale.notes||''}</textarea>
-    `,
-    showCancelButton: true,
-    confirmButtonText: 'Guardar cambios',
-    confirmButtonColor: '#9d5fa5',
-    preConfirm: () => {
-      const customerName = document.getElementById('sw-edit-customer-name').value.trim();
-      if (!customerName) { Swal.showValidationMessage('El nombre del cliente es obligatorio.'); return false; }
-      return {
-        customerName,
-        customerPhone: document.getElementById('sw-edit-customer-phone').value.trim(),
-        channel:       document.getElementById('sw-edit-channel').value,
-        paymentStatus: document.getElementById('sw-edit-payment').value,
-        notes:         document.getElementById('sw-edit-notes').value.trim()
-      };
-    }
-  });
+    const catalog = getCatalog();
+    let editItems = JSON.parse(JSON.stringify(sale.items || []));
 
-  if (!isConfirmed || !formValues) return;
+    // Crear overlay y modal
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+    overlay.style.animation = 'fadeIn 0.2s ease-out';
 
-  try {
-    const res  = await fetch(`/api/discordia/sales/${saleId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formValues)
+    const modal = document.createElement('div');
+    modal.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto';
+    modal.style.animation = 'slideUp 0.3s ease-out';
+
+    const saleDate = sale.created_at ? new Date(sale.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+
+    modal.innerHTML = `
+      <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .error-msg { color: #dc2626; font-size: 0.875rem; margin-top: 4px; display: none; }
+        .input-error { border-color: #dc2626 !important; }
+      </style>
+
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] px-6 py-5 flex items-center justify-between">
+        <h2 class="text-xl font-bold text-white" style="font-family: 'Playfair Display', serif;">
+          ✏️ Editar Venta
+        </h2>
+        <button class="close-modal text-white hover:bg-white/20 p-2 rounded-lg transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6 space-y-6">
+        <!-- Cliente y Fecha -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Nombre del Cliente *</label>
+            <input type="text" id="modal-customer-name" 
+              value="${sale.customer_name||''}" 
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+            <div class="error-msg" id="error-customer-name"></div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Fecha de la Venta</label>
+            <input type="date" id="modal-sale-date" 
+              value="${saleDate}"
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+          </div>
+        </div>
+
+        <!-- Teléfono y Canal -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Teléfono</label>
+            <input type="text" id="modal-customer-phone" 
+              value="${sale.customer_phone||''}" 
+              placeholder="WhatsApp / Celular"
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Canal</label>
+            <select id="modal-channel" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition bg-white">
+              <option value="WhatsApp" ${sale.channel==='WhatsApp'?'selected':''}>WhatsApp</option>
+              <option value="Instagram" ${sale.channel==='Instagram'?'selected':''}>Instagram</option>
+              <option value="Efectivo" ${sale.channel==='Efectivo'?'selected':''}>Efectivo</option>
+              <option value="Nequi" ${sale.channel==='Nequi'?'selected':''}>Nequi</option>
+              <option value="Daviplata" ${sale.channel==='Daviplata'?'selected':''}>Daviplata</option>
+              <option value="Presencial" ${sale.channel==='Presencial'?'selected':''}>Presencial</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Estado de Pago y Notas -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Estado de Pago</label>
+            <select id="modal-payment" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition bg-white">
+              <option value="paid" ${sale.payment_status==='paid'?'selected':''}>Pagado ✅</option>
+              <option value="pending" ${sale.payment_status==='pending'?'selected':''}>Pendiente ⚠️</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Notas</label>
+            <input type="text" id="modal-notes" 
+              value="${sale.notes||''}" 
+              placeholder="Opcional"
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+          </div>
+        </div>
+
+        <!-- Productos -->
+        <div class="border-t pt-6">
+          <h3 class="text-sm font-bold text-[#6d165a] uppercase tracking-widest mb-4">Productos de la Venta</h3>
+          
+          <!-- Agregar producto -->
+          <div class="grid grid-cols-3 gap-3 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-[#6d165a] mb-2">Producto</label>
+              <select id="modal-product-select" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#9d5fa5] bg-white">
+                <option value="">-- Seleccionar producto --</option>
+                ${catalog.filter(p => p.active !== false).map(p => `<option value="${p.id}" data-price="${p.price}" data-name="${p.name}">${p.name} — $${Number(p.price).toLocaleString('es-CO')}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#6d165a] mb-2">Cantidad</label>
+              <input type="number" id="modal-product-qty" min="1" value="1" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#9d5fa5]">
+            </div>
+            <div class="flex items-end">
+              <button id="modal-add-product" type="button" class="w-full px-3 py-2 bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] text-white font-semibold text-sm rounded-lg hover:shadow-md transition">
+                ➕ Agregar
+              </button>
+            </div>
+          </div>
+
+          <!-- Lista de productos -->
+          <div id="modal-items-list" class="bg-[#fdf2f7] rounded-lg p-4 space-y-2 min-h-[100px]">
+          </div>
+        </div>
+
+        <!-- Total -->
+        <div class="bg-gradient-to-r from-[#fdf2f7] to-[#f5ede8] px-4 py-3 rounded-lg flex justify-between items-center">
+          <span class="text-lg font-bold text-[#6d165a]">Total:</span>
+          <span class="text-2xl font-bold text-[#a0346e]" id="modal-total">$0</span>
+        </div>
+
+        <!-- Mensaje de error -->
+        <div class="error-msg bg-red-50 px-4 py-3 rounded-lg border border-red-200" id="error-general"></div>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
+        <button class="close-modal px-5 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition">
+          Cancelar
+        </button>
+        <button class="save-sale px-5 py-2.5 bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2">
+          <span class="save-text">💾 Guardar Cambios</span>
+          <span class="save-loader hidden">
+            <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle class="opacity-25" cx="12" cy="12" r="10"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const updateItemsList = () => {
+      const itemsList = modal.querySelector('#modal-items-list');
+      const total = editItems.reduce((sum, i) => sum + (i.price * (i.quantity || 1)), 0);
+      modal.querySelector('#modal-total').textContent = formatCurrency(total);
+
+      if (editItems.length === 0) {
+        itemsList.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">Sin productos</p>';
+        return;
+      }
+
+      itemsList.innerHTML = editItems.map((item, idx) => `
+        <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-gray-900 text-sm">${item.productName || item.name || 'Producto sin nombre'}</p>
+            <p class="text-xs text-gray-500">×${item.quantity || 1}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="number" data-idx="${idx}" class="edit-price-input w-20 px-2 py-1 border border-gray-200 rounded text-sm text-right" value="${item.price}" min="0">
+            <span class="font-bold text-[#a0346e] text-sm whitespace-nowrap w-20 text-right">${formatCurrency(item.price * (item.quantity || 1))}</span>
+            <button data-idx="${idx}" type="button" class="delete-item px-2 py-1 text-red-600 hover:bg-red-50 rounded text-sm font-semibold">✕</button>
+          </div>
+        </div>
+      `).join('');
+
+      itemsList.querySelectorAll('.edit-price-input').forEach(input => {
+        input.addEventListener('change', () => {
+          const idx = Number(input.dataset.idx);
+          editItems[idx].price = Number(input.value) || 0;
+          updateItemsList();
+        });
+      });
+
+      itemsList.querySelectorAll('.delete-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          editItems.splice(Number(btn.dataset.idx), 1);
+          updateItemsList();
+        });
+      });
+    };
+
+    const closeModal = () => {
+      overlay.style.animation = 'fadeOut 0.2s ease-out';
+      modal.style.animation = 'slideDown 0.3s ease-out';
+      setTimeout(() => {
+        overlay.remove();
+        resolve();
+      }, 300);
+    };
+
+    const closeBtn = modal.querySelectorAll('.close-modal');
+    closeBtn.forEach(btn => btn.addEventListener('click', closeModal));
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
     });
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.message);
-    await Swal.fire('Guardado', 'Venta actualizada correctamente.', 'success');
-    await renderVentas(container);
-  } catch (err) {
-    Swal.fire('Error', err.message || 'No se pudo actualizar la venta.', 'error');
-  }
+
+    const addProductBtn = modal.querySelector('#modal-add-product');
+    const productSelect = modal.querySelector('#modal-product-select');
+    const qtyInput = modal.querySelector('#modal-product-qty');
+
+    addProductBtn.addEventListener('click', () => {
+      const opt = productSelect.options[productSelect.selectedIndex];
+      if (!opt.value) {
+        alert('Selecciona un producto');
+        return;
+      }
+      const qty = Math.max(1, parseInt(qtyInput.value) || 1);
+      editItems.push({
+        productId: parseInt(opt.value),
+        productName: opt.dataset.name,
+        name: opt.dataset.name,
+        price: parseInt(opt.dataset.price),
+        quantity: qty
+      });
+      qtyInput.value = 1;
+      productSelect.value = '';
+      updateItemsList();
+    });
+
+    const saveBtn = modal.querySelector('.save-sale');
+    const saveLoader = modal.querySelector('.save-loader');
+    const saveText = modal.querySelector('.save-text');
+
+    saveBtn.addEventListener('click', async () => {
+      const customerName = modal.querySelector('#modal-customer-name').value.trim();
+      if (!customerName) {
+        alert('El nombre del cliente es obligatorio');
+        return;
+      }
+      if (editItems.length === 0) {
+        alert('Agrega al menos un producto');
+        return;
+      }
+
+      saveBtn.disabled = true;
+      saveLoader.classList.remove('hidden');
+      saveText.textContent = 'Guardando...';
+
+      try {
+        const payload = {
+          customerName,
+          customerPhone: modal.querySelector('#modal-customer-phone').value.trim(),
+          channel: modal.querySelector('#modal-channel').value,
+          paymentStatus: modal.querySelector('#modal-payment').value,
+          notes: modal.querySelector('#modal-notes').value.trim()
+        };
+
+        const res = await fetch(`/api/discordia/sales/${saleId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.message);
+
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-5 right-5 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg';
+        toast.textContent = '✓ Venta actualizada correctamente';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+
+        await renderVentas(container);
+        closeModal();
+      } catch (err) {
+        alert('Error: ' + (err.message || 'No se pudo guardar'));
+      } finally {
+        saveBtn.disabled = false;
+        saveLoader.classList.add('hidden');
+        saveText.textContent = '💾 Guardar Cambios';
+      }
+    });
+
+    updateItemsList();
+  });
 }
 
 // ── ELIMINAR VENTA ────────────────────────────────────────────
