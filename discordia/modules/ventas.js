@@ -446,10 +446,18 @@ async function deleteSale(container, saleId) {
 
   try {
     const res  = await fetch(`/api/discordia/sales/${saleId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
     });
+
+    if (!res.ok) {
+      const error = await res.text();
+      throw new Error(error || `HTTP ${res.status}`);
+    }
+
     const json = await res.json();
     if (!json.ok) throw new Error(json.message);
+    
     await Swal.fire('Eliminada', 'Venta eliminada correctamente.', 'success');
     await renderVentas(container);
   } catch (err) {
