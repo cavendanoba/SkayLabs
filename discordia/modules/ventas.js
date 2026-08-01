@@ -644,7 +644,13 @@ async function showEditVentaModal(container, saleId) {
           customerPhone: modal.querySelector('#modal-customer-phone').value.trim(),
           channel: modal.querySelector('#modal-channel').value,
           paymentStatus: modal.querySelector('#modal-payment').value,
-          notes: modal.querySelector('#modal-notes').value.trim()
+          notes: modal.querySelector('#modal-notes').value.trim(),
+          items: editItems.map(i => ({
+            productId: i.productId,
+            name: i.name || i.productName,
+            quantity: i.quantity,
+            price: i.price
+          }))
         };
 
         const res = await fetch(`/api/discordia/sales/${saleId}`, {

@@ -15,8 +15,9 @@ export async function onRequestPut({ request, env, params }) {
 
   try {
     const body = await request.json();
-    const { customerName, customerPhone, channel, paymentStatus, notes } = body || {};
+    const { customerName, customerPhone, channel, paymentStatus, notes, items = [] } = body || {};
 
+    // Actualizar datos de la venta
     const updated = await sql`
       UPDATE sales
       SET
@@ -32,6 +33,34 @@ export async function onRequestPut({ request, env, params }) {
 
     if (!updated.length) {
       return json({ ok: false, message: 'Venta no encontrada.' }, 404);
+    }
+
+    // Actualizar items si fueron enviados
+    if (items && items.length > 0) {
+      // Eliminar items anteriores
+      await sql`DELETE FROM sale_items WHERE sale_id = ${Number(saleId)}`;
+
+      // Insertar nuevos items
+      for (const item of items) {
+        await sql`
+          INSERT INTO sale_items (sale_id, product_id, name, quantity, price)
+          VALUES (
+            ${Number(saleId)},
+            ${item.productId || null},
+            ${item.name || item.productName || 'Producto'},
+            ${item.quantity},
+            ${item.price}
+          )
+        `;
+      }
+
+      // Recalcular total de la venta
+      const newTotal = items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+      await sql`
+        UPDATE sales
+        SET total = ${newTotal}
+        WHERE id = ${Number(saleId)}
+      `;
     }
 
     return json({ ok: true, data: updated[0] });
