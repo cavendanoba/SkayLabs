@@ -78,8 +78,9 @@ function paintVentas(container, filtros = {}) {
         <td class="p-3 text-xs text-gray-400 max-w-[200px] truncate">${s.notes||'—'}</td>
         <td class="p-3">
           <div class="flex gap-2">
-            <button class="edit-sale px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-semibold text-xs hover:bg-amber-200 transition" data-id="${s.id}">Editar</button>
-            <button class="delete-sale px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-semibold text-xs hover:bg-rose-200 transition" data-id="${s.id}">Eliminar</button>
+            <button class="view-sale px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 font-semibold text-xs hover:bg-blue-200 transition" data-id="${s.id}">👁️ Ver</button>
+            <button class="edit-sale px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-semibold text-xs hover:bg-amber-200 transition" data-id="${s.id}">✏️ Editar</button>
+            <button class="delete-sale px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-semibold text-xs hover:bg-rose-200 transition" data-id="${s.id}">🗑️ Eliminar</button>
           </div>
         </td>
       </tr>`;
@@ -160,7 +161,10 @@ function paintVentas(container, filtros = {}) {
   // Botón nueva venta
   container.querySelector('#btn-nueva-venta').addEventListener('click', () => showNuevaVentaModal(container));
 
-  // Botones de editar/eliminar ventas
+  // Botones de ver/editar/eliminar ventas
+  container.querySelectorAll('.view-sale').forEach(btn => 
+    btn.addEventListener('click', () => showVentaDetailsModal(Number(btn.dataset.id)))
+  );
   container.querySelectorAll('.edit-sale').forEach(btn => 
     btn.addEventListener('click', () => showEditVentaModal(container, Number(btn.dataset.id)))
   );
@@ -415,13 +419,14 @@ async function showEditVentaModal(container, saleId) {
       </div>
 
       <!-- Content -->
-      <div class="p-6 space-y-6">
+      <div class="p-6 space-y-6" onclick="event.stopPropagation()">
         <!-- Cliente y Fecha -->
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-[#6d165a] mb-2">Nombre del Cliente *</label>
             <input type="text" id="modal-customer-name" 
               value="${sale.customer_name||''}" 
+              onclick="event.stopPropagation()"
               class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
             <div class="error-msg" id="error-customer-name"></div>
           </div>
@@ -429,6 +434,7 @@ async function showEditVentaModal(container, saleId) {
             <label class="block text-sm font-semibold text-[#6d165a] mb-2">Fecha de la Venta</label>
             <input type="date" id="modal-sale-date" 
               value="${saleDate}"
+              onclick="event.stopPropagation()"
               class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
           </div>
         </div>
@@ -440,11 +446,12 @@ async function showEditVentaModal(container, saleId) {
             <input type="text" id="modal-customer-phone" 
               value="${sale.customer_phone||''}" 
               placeholder="WhatsApp / Celular"
+              onclick="event.stopPropagation()"
               class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
           </div>
           <div>
             <label class="block text-sm font-semibold text-[#6d165a] mb-2">Canal</label>
-            <select id="modal-channel" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition bg-white">
+            <select id="modal-channel" onclick="event.stopPropagation()" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition bg-white">
               <option value="WhatsApp" ${sale.channel==='WhatsApp'?'selected':''}>WhatsApp</option>
               <option value="Instagram" ${sale.channel==='Instagram'?'selected':''}>Instagram</option>
               <option value="Efectivo" ${sale.channel==='Efectivo'?'selected':''}>Efectivo</option>
@@ -459,7 +466,7 @@ async function showEditVentaModal(container, saleId) {
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-[#6d165a] mb-2">Estado de Pago</label>
-            <select id="modal-payment" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition bg-white">
+            <select id="modal-payment" onclick="event.stopPropagation()" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition bg-white">
               <option value="paid" ${sale.payment_status==='paid'?'selected':''}>Pagado ✅</option>
               <option value="pending" ${sale.payment_status==='pending'?'selected':''}>Pendiente ⚠️</option>
             </select>
@@ -469,6 +476,7 @@ async function showEditVentaModal(container, saleId) {
             <input type="text" id="modal-notes" 
               value="${sale.notes||''}" 
               placeholder="Opcional"
+              onclick="event.stopPropagation()"
               class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
           </div>
         </div>
@@ -481,17 +489,17 @@ async function showEditVentaModal(container, saleId) {
           <div class="grid grid-cols-3 gap-3 mb-4">
             <div>
               <label class="block text-xs font-semibold text-[#6d165a] mb-2">Producto</label>
-              <select id="modal-product-select" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#9d5fa5] bg-white">
+              <select id="modal-product-select" onclick="event.stopPropagation()" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#9d5fa5] bg-white">
                 <option value="">-- Seleccionar producto --</option>
                 ${catalog.filter(p => p.active !== false).map(p => `<option value="${p.id}" data-price="${p.price}" data-name="${p.name}">${p.name} — $${Number(p.price).toLocaleString('es-CO')}</option>`).join('')}
               </select>
             </div>
             <div>
               <label class="block text-xs font-semibold text-[#6d165a] mb-2">Cantidad</label>
-              <input type="number" id="modal-product-qty" min="1" value="1" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#9d5fa5]">
+              <input type="number" id="modal-product-qty" onclick="event.stopPropagation()" min="1" value="1" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#9d5fa5]">
             </div>
             <div class="flex items-end">
-              <button id="modal-add-product" type="button" class="w-full px-3 py-2 bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] text-white font-semibold text-sm rounded-lg hover:shadow-md transition">
+              <button id="modal-add-product" type="button" onclick="event.stopPropagation()" class="w-full px-3 py-2 bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] text-white font-semibold text-sm rounded-lg hover:shadow-md transition">
                 ➕ Agregar
               </button>
             </div>
@@ -514,10 +522,10 @@ async function showEditVentaModal(container, saleId) {
 
       <!-- Footer -->
       <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
-        <button class="close-modal px-5 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition">
+        <button class="close-modal px-5 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition" onclick="event.stopPropagation()">
           Cancelar
         </button>
-        <button class="save-sale px-5 py-2.5 bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2">
+        <button class="save-sale px-5 py-2.5 bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2" onclick="event.stopPropagation()">
           <span class="save-text">💾 Guardar Cambios</span>
           <span class="save-loader hidden">
             <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -549,9 +557,9 @@ async function showEditVentaModal(container, saleId) {
             <p class="text-xs text-gray-500">×${item.quantity || 1}</p>
           </div>
           <div class="flex items-center gap-2">
-            <input type="number" data-idx="${idx}" class="edit-price-input w-20 px-2 py-1 border border-gray-200 rounded text-sm text-right" value="${item.price}" min="0">
+            <input type="number" data-idx="${idx}" class="edit-price-input w-20 px-2 py-1 border border-gray-200 rounded text-sm text-right" value="${item.price}" min="0" onclick="event.stopPropagation()">
             <span class="font-bold text-[#a0346e] text-sm whitespace-nowrap w-20 text-right">${formatCurrency(item.price * (item.quantity || 1))}</span>
-            <button data-idx="${idx}" type="button" class="delete-item px-2 py-1 text-red-600 hover:bg-red-50 rounded text-sm font-semibold">✕</button>
+            <button data-idx="${idx}" type="button" class="delete-item px-2 py-1 text-red-600 hover:bg-red-50 rounded text-sm font-semibold" onclick="event.stopPropagation()">✕</button>
           </div>
         </div>
       `).join('');
@@ -664,6 +672,149 @@ async function showEditVentaModal(container, saleId) {
     });
 
     updateItemsList();
+  });
+}
+
+// ── VER DETALLES DE VENTA (COMPRAS) ────────────────────────────
+function showVentaDetailsModal(saleId) {
+  const sale = allSales.find(s => s.id === saleId);
+  if (!sale) return;
+
+  const items = sale.items || [];
+  const fecha = new Date(sale.created_at).toLocaleDateString('es-CO', { 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  const overlay = document.createElement('div');
+  overlay.className = 'fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50';
+  overlay.style.animation = 'fadeIn 0.3s ease-out';
+
+  const modal = document.createElement('div');
+  modal.className = 'bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto';
+  modal.style.animation = 'slideUp 0.3s ease-out';
+  modal.onclick = (e) => e.stopPropagation();
+
+  modal.innerHTML = `
+    <style>
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+      @keyframes slideDown { from { transform: translateY(0); opacity: 1; } to { transform: translateY(20px); opacity: 0; } }
+    </style>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] px-6 py-5 flex items-center justify-between sticky top-0 z-10">
+      <div class="flex-1">
+        <h2 class="text-xl font-bold text-white" style="font-family: 'Playfair Display', serif;">
+          👁️ Detalles de Compra
+        </h2>
+        <p class="text-white/80 text-sm mt-1">${fecha}</p>
+      </div>
+      <button class="close-modal text-white hover:bg-white/20 p-2 rounded-lg transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6 space-y-6">
+      <!-- Información de la Cliente -->
+      <div class="bg-[#fdf2f7] rounded-lg p-4 space-y-3">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Cliente</p>
+            <p class="text-lg font-bold text-[#6d165a]">${sale.customer_name || 'Sin nombre'}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Teléfono</p>
+            <p class="text-sm font-semibold text-gray-900">${sale.customer_phone || '—'}</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Canal</p>
+            <p class="text-sm font-semibold text-gray-900">${sale.channel || '—'}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Estado de Pago</p>
+            <p class="text-sm font-semibold">
+              ${sale.payment_status === 'paid' 
+                ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">✅ Pagado</span>' 
+                : '<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-xs font-bold">⏳ Pendiente</span>'}
+            </p>
+          </div>
+        </div>
+        ${sale.notes ? `<div class="pt-2 border-t border-[#f1d7e2]">
+          <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-1">Notas</p>
+          <p class="text-sm text-gray-700">${sale.notes}</p>
+        </div>` : ''}
+      </div>
+
+      <!-- Productos Comprados -->
+      <div>
+        <h3 class="text-sm font-bold text-[#6d165a] uppercase tracking-widest mb-4">📦 Productos Comprados</h3>
+        
+        ${items.length === 0 
+          ? `<div class="bg-gray-50 rounded-lg p-6 text-center text-gray-500">
+              <p>No hay productos registrados para esta venta</p>
+            </div>`
+          : `<div class="space-y-3">
+              ${items.map((item, idx) => `
+                <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition">
+                  <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-gray-900">${item.name || item.productName || 'Producto sin nombre'}</p>
+                    <p class="text-sm text-gray-500">Cantidad: ${item.quantity || 1}</p>
+                  </div>
+                  <div class="text-right ml-4">
+                    <p class="text-xs text-gray-500">Precio unitario</p>
+                    <p class="font-bold text-gray-900">${formatCurrency(item.price)}</p>
+                  </div>
+                  <div class="text-right ml-4 pl-4 border-l border-gray-200 min-w-[100px]">
+                    <p class="text-xs text-gray-500">Subtotal</p>
+                    <p class="text-lg font-bold text-[#a0346e]">${formatCurrency(item.price * (item.quantity || 1))}</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>`
+        }
+      </div>
+
+      <!-- Total -->
+      <div class="bg-gradient-to-r from-[#fdf2f7] to-[#f5ede8] px-6 py-4 rounded-lg flex justify-between items-center border-2 border-[#e8c1d8]">
+        <span class="text-lg font-bold text-[#6d165a]">Total de la Compra:</span>
+        <span class="text-3xl font-bold text-[#a0346e]">${formatCurrency(Number(sale.total) || items.reduce((sum, i) => sum + (i.price * (i.quantity || 1)), 0))}</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end">
+      <button class="close-modal px-6 py-2.5 bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] text-white font-semibold rounded-lg hover:shadow-lg transition" onclick="event.stopPropagation()">
+        Cerrar
+      </button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  const closeBtn = modal.querySelectorAll('.close-modal');
+  closeBtn.forEach(btn => btn.addEventListener('click', () => {
+    overlay.style.animation = 'fadeOut 0.2s ease-out';
+    modal.style.animation = 'slideDown 0.3s ease-out';
+    setTimeout(() => overlay.remove(), 300);
+  }));
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.style.animation = 'fadeOut 0.2s ease-out';
+      modal.style.animation = 'slideDown 0.3s ease-out';
+      setTimeout(() => overlay.remove(), 300);
+    }
   });
 }
 

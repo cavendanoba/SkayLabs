@@ -277,12 +277,13 @@ async function showProductModal(productId) {
       </div>
 
       <!-- Content -->
-      <div class="p-6 space-y-5">
+      <div class="p-6 space-y-5" onclick="event.stopPropagation()">
         <!-- Nombre -->
         <div>
           <label class="block text-sm font-semibold text-[#6d165a] mb-2">Nombre del Producto *</label>
           <input type="text" id="modal-name" placeholder="Ej: Labial Rojo Pasión" 
             value="${product?.name||''}" 
+            onclick="event.stopPropagation()"
             class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
           <div class="error-msg" id="error-name"></div>
         </div>
@@ -293,12 +294,14 @@ async function showProductModal(productId) {
             <label class="block text-sm font-semibold text-[#6d165a] mb-2">Código</label>
             <input type="text" id="modal-code" placeholder="Ej: PROD001" 
               value="${product?.code||''}" 
+              onclick="event.stopPropagation()"
               class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
           </div>
           <div>
             <label class="block text-sm font-semibold text-[#6d165a] mb-2">Categoría *</label>
             <input type="text" id="modal-category" placeholder="Ej: Maquillaje" 
               value="${product?.category||''}" 
+              onclick="event.stopPropagation()"
               class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
             <div class="error-msg" id="error-category"></div>
           </div>
@@ -310,6 +313,7 @@ async function showProductModal(productId) {
             <label class="block text-sm font-semibold text-[#6d165a] mb-2">Precio (COP) *</label>
             <input type="number" id="modal-price" placeholder="0" min="0" 
               value="${product?.price??''}" 
+              onclick="event.stopPropagation()"
               class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
             <div class="error-msg" id="error-price"></div>
           </div>
@@ -317,6 +321,7 @@ async function showProductModal(productId) {
             <label class="block text-sm font-semibold text-[#6d165a] mb-2">Stock *</label>
             <input type="number" id="modal-stock" placeholder="0" min="0" 
               value="${product?.stock??0}" 
+              onclick="event.stopPropagation()"
               class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
             <div class="error-msg" id="error-stock"></div>
           </div>
@@ -327,6 +332,7 @@ async function showProductModal(productId) {
           <label class="block text-sm font-semibold text-[#6d165a] mb-2">Ruta de Imagen</label>
           <input type="text" id="modal-image" placeholder="assets/producto.jpg" 
             value="${product?.image||'assets/default.png'}" 
+            onclick="event.stopPropagation()"
             class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
           <p class="text-xs text-gray-500 mt-1.5">Ej: assets/labial-rojo.jpg o URL externa</p>
         </div>
@@ -336,6 +342,7 @@ async function showProductModal(productId) {
           <label class="block text-sm font-semibold text-[#6d165a] mb-2">Descripción</label>
           <textarea id="modal-description" placeholder="Describe el producto, ingredientes, beneficios..." 
             rows="4"
+            onclick="event.stopPropagation()"
             class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition resize-none">${product?.description||''}</textarea>
         </div>
 
@@ -345,10 +352,10 @@ async function showProductModal(productId) {
 
       <!-- Footer -->
       <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
-        <button class="close-modal px-5 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition">
+        <button class="close-modal px-5 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition" onclick="event.stopPropagation()">
           Cancelar
         </button>
-        <button class="save-product px-5 py-2.5 bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2">
+        <button class="save-product px-5 py-2.5 bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2" onclick="event.stopPropagation()">
           <span class="save-text">${editing ? '💾 Guardar Cambios' : '➕ Agregar Producto'}</span>
           <span class="save-loader hidden">
             <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
