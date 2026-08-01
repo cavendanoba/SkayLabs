@@ -60,6 +60,8 @@ export function setupFilters() {
                 if (catalogSection) {
                     catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
+                // Restore focus to search input
+                searchInput.focus();
             }, 250);
         });
     }

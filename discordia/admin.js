@@ -231,127 +231,381 @@ function renderCatalogTab() {
 
 // ── MODAL PRODUCTO ────────────────────────────────────────────
 async function showProductModal(productId) {
-  const editing = productId != null;
-  const product = editing ? state.catalog.find(p => Number(p.id) === productId) : null;
+  return new Promise((resolve) => {
+    const editing = productId != null;
+    const product = editing ? state.catalog.find(p => Number(p.id) === productId) : null;
 
-  const { value, isConfirmed } = await Swal.fire({
-    title: editing ? 'Editar producto' : 'Agregar producto',
-    html: `
-      <div style="display: grid; gap: 12px; text-align: left;">
-        <div>
-          <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Nombre *</label>
-          <input id="sw-name" class="swal2-input" placeholder="Nombre del producto" value="${product?.name||''}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
-        </div>
-        <div>
-          <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Código</label>
-          <input id="sw-code" class="swal2-input" placeholder="Ej: PROD001" value="${product?.code||''}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <div>
-            <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Precio *</label>
-            <input id="sw-price" class="swal2-input" type="number" min="0" placeholder="0" value="${product?.price??''}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
-          </div>
-          <div>
-            <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Stock *</label>
-            <input id="sw-stock" class="swal2-input" type="number" min="0" placeholder="0" value="${product?.stock??0}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
-          </div>
-        </div>
-        <div>
-          <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Categoría *</label>
-          <input id="sw-category" class="swal2-input" placeholder="Ej: Maquillaje" value="${product?.category||''}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
-        </div>
-        <div>
-          <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Ruta de imagen</label>
-          <input id="sw-image" class="swal2-input" placeholder="assets/producto.jpg" value="${product?.image||'assets/default.png'}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
-        </div>
-        <div>
-          <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Descripción</label>
-          <textarea id="sw-desc" class="swal2-textarea" placeholder="Describe el producto..." style="border-radius: 8px; border: 1.5px solid #e5e7eb; resize: vertical; min-height: 80px;">${product?.description||''}</textarea>
-        </div>
+    // Crear overlay y modal
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+    overlay.style.animation = 'fadeIn 0.2s ease-out';
+
+    const modal = document.createElement('div');
+    modal.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto';
+    modal.style.animation = 'slideUp 0.3s ease-out';
+
+    modal.innerHTML = `
+      <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .error-msg { color: #dc2626; font-size: 0.875rem; margin-top: 4px; display: none; }
+        .input-error { border-color: #dc2626 !important; }
+        .success-toast { 
+          position: fixed; top: 20px; right: 20px; 
+          background: #10b981; color: white; 
+          padding: 12px 20px; border-radius: 8px; 
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+          animation: slideInRight 0.3s ease-out;
+          z-index: 60;
+        }
+        @keyframes slideInRight { 
+          from { transform: translateX(400px); } 
+          to { transform: translateX(0); } 
+        }
+      </style>
+
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] px-6 py-5 flex items-center justify-between">
+        <h2 class="text-xl font-bold text-white" style="font-family: 'Playfair Display', serif;">
+          ${editing ? '✏️ Editar Producto' : '➕ Nuevo Producto'}
+        </h2>
+        <button class="close-modal text-white hover:bg-white/20 p-2 rounded-lg transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
       </div>
-    `,
-    showCancelButton: true,
-    confirmButtonText: editing ? 'Guardar cambios' : 'Agregar producto',
-    confirmButtonColor: '#9d5fa5',
-    cancelButtonColor: '#9ca3af',
-    customClass: {
-      confirmButton: 'swal-btn-confirm',
-      cancelButton: 'swal-btn-cancel'
-    },
-    preConfirm: () => {
-      const name  = document.getElementById('sw-name').value.trim();
-      const price = Number(document.getElementById('sw-price').value);
-      const stock = Number(document.getElementById('sw-stock').value);
-      const cat   = document.getElementById('sw-category').value.trim();
-      if (!name || !cat || isNaN(price) || price < 0 || isNaN(stock) || stock < 0) {
-        Swal.showValidationMessage('Nombre, precio, stock y categoría son obligatorios.');
-        return false;
-      }
-      return {
-        id:          productId,
-        name, 
-        code:        document.getElementById('sw-code').value.trim() || null,
-        price, 
-        stock,
-        category:    cat,
-        image:       document.getElementById('sw-image').value.trim() || 'assets/default.png',
-        description: document.getElementById('sw-desc').value.trim(),
-        active:      true
-      };
-    }
-  });
 
-  if (!isConfirmed || !value) return;
+      <!-- Content -->
+      <div class="p-6 space-y-5">
+        <!-- Nombre -->
+        <div>
+          <label class="block text-sm font-semibold text-[#6d165a] mb-2">Nombre del Producto *</label>
+          <input type="text" id="modal-name" placeholder="Ej: Labial Rojo Pasión" 
+            value="${product?.name||''}" 
+            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+          <div class="error-msg" id="error-name"></div>
+        </div>
 
-  try {
-    const method = editing ? 'PUT' : 'POST';
-    const res    = await fetch('/api/discordia/products', {
-      method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value)
+        <!-- Código y Categoría -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Código</label>
+            <input type="text" id="modal-code" placeholder="Ej: PROD001" 
+              value="${product?.code||''}" 
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Categoría *</label>
+            <input type="text" id="modal-category" placeholder="Ej: Maquillaje" 
+              value="${product?.category||''}" 
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+            <div class="error-msg" id="error-category"></div>
+          </div>
+        </div>
+
+        <!-- Precio y Stock -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Precio (COP) *</label>
+            <input type="number" id="modal-price" placeholder="0" min="0" 
+              value="${product?.price??''}" 
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+            <div class="error-msg" id="error-price"></div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Stock *</label>
+            <input type="number" id="modal-stock" placeholder="0" min="0" 
+              value="${product?.stock??0}" 
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+            <div class="error-msg" id="error-stock"></div>
+          </div>
+        </div>
+
+        <!-- Imagen -->
+        <div>
+          <label class="block text-sm font-semibold text-[#6d165a] mb-2">Ruta de Imagen</label>
+          <input type="text" id="modal-image" placeholder="assets/producto.jpg" 
+            value="${product?.image||'assets/default.png'}" 
+            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+          <p class="text-xs text-gray-500 mt-1.5">Ej: assets/labial-rojo.jpg o URL externa</p>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label class="block text-sm font-semibold text-[#6d165a] mb-2">Descripción</label>
+          <textarea id="modal-description" placeholder="Describe el producto, ingredientes, beneficios..." 
+            rows="4"
+            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition resize-none">${product?.description||''}</textarea>
+        </div>
+
+        <!-- Mensaje de error general -->
+        <div class="error-msg bg-red-50 px-4 py-3 rounded-lg border border-red-200" id="error-general"></div>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
+        <button class="close-modal px-5 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition">
+          Cancelar
+        </button>
+        <button class="save-product px-5 py-2.5 bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2">
+          <span class="save-text">${editing ? '💾 Guardar Cambios' : '➕ Agregar Producto'}</span>
+          <span class="save-loader hidden">
+            <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle class="opacity-25" cx="12" cy="12" r="10"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    // Elementos del modal
+    const nameInput = modal.querySelector('#modal-name');
+    const codeInput = modal.querySelector('#modal-code');
+    const categoryInput = modal.querySelector('#modal-category');
+    const priceInput = modal.querySelector('#modal-price');
+    const stockInput = modal.querySelector('#modal-stock');
+    const imageInput = modal.querySelector('#modal-image');
+    const descInput = modal.querySelector('#modal-description');
+    const saveBtn = modal.querySelector('.save-product');
+    const closeBtn = modal.querySelectorAll('.close-modal');
+    const saveLoader = modal.querySelector('.save-loader');
+    const saveText = modal.querySelector('.save-text');
+
+    // Cerrar modal
+    const closeModal = () => {
+      overlay.style.animation = 'fadeOut 0.2s ease-out';
+      modal.style.animation = 'slideDown 0.3s ease-out';
+      setTimeout(() => {
+        overlay.remove();
+        resolve();
+      }, 300);
+    };
+
+    closeBtn.forEach(btn => btn.addEventListener('click', closeModal));
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
     });
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.message);
 
-    // Actualizar state local
-    if (editing) {
-      const idx = state.catalog.findIndex(p => Number(p.id) === productId);
-      if (idx >= 0) state.catalog[idx] = json.data;
-    } else {
-      state.catalog.push(json.data);
-    }
-    saveToStorage(STORAGE_KEYS.catalog, state.catalog);
-    renderSummary();
-    renderCatalogTab();
-    Swal.fire('Guardado', 'Catálogo actualizado.', 'success');
-  } catch (err) {
-    Swal.fire('Error', err.message || 'No se pudo guardar.', 'error');
-  }
+    // Validación
+    const clearError = (fieldId) => {
+      const errorEl = modal.querySelector(`#error-${fieldId}`);
+      if (errorEl) errorEl.style.display = 'none';
+      const input = modal.querySelector(`#modal-${fieldId}`);
+      if (input) input.classList.remove('input-error');
+    };
+
+    const showError = (fieldId, message) => {
+      const errorEl = modal.querySelector(`#error-${fieldId}`);
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+      const input = modal.querySelector(`#modal-${fieldId}`);
+      if (input) input.classList.add('input-error');
+    };
+
+    // Guardar
+    saveBtn.addEventListener('click', async () => {
+      // Limpiar errores previos
+      ['name', 'category', 'price', 'stock'].forEach(f => clearError(f));
+      modal.querySelector('#error-general').style.display = 'none';
+
+      // Validar
+      const name = nameInput.value.trim();
+      const category = categoryInput.value.trim();
+      const price = Number(priceInput.value);
+      const stock = Number(stockInput.value);
+
+      let hasError = false;
+      if (!name) { showError('name', 'El nombre es obligatorio'); hasError = true; }
+      if (!category) { showError('category', 'La categoría es obligatoria'); hasError = true; }
+      if (isNaN(price) || price < 0) { showError('price', 'Ingresa un precio válido'); hasError = true; }
+      if (isNaN(stock) || stock < 0) { showError('stock', 'Ingresa un stock válido'); hasError = true; }
+
+      if (hasError) return;
+
+      // Preparar datos
+      const payload = {
+        id: productId,
+        name,
+        code: codeInput.value.trim() || null,
+        price,
+        stock,
+        category,
+        image: imageInput.value.trim() || 'assets/default.png',
+        description: descInput.value.trim(),
+        active: true
+      };
+
+      // Enviar
+      saveBtn.disabled = true;
+      saveLoader.classList.remove('hidden');
+      saveText.textContent = editing ? 'Guardando...' : 'Agregando...';
+
+      try {
+        const method = editing ? 'PUT' : 'POST';
+        const res = await fetch('/api/discordia/products', {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.message);
+
+        // Actualizar state
+        if (editing) {
+          const idx = state.catalog.findIndex(p => Number(p.id) === productId);
+          if (idx >= 0) state.catalog[idx] = json.data;
+        } else {
+          state.catalog.push(json.data);
+        }
+        saveToStorage(STORAGE_KEYS.catalog, state.catalog);
+        renderSummary();
+        renderCatalogTab();
+
+        // Toast de éxito
+        const toast = document.createElement('div');
+        toast.className = 'success-toast';
+        toast.textContent = editing ? '✓ Producto actualizado correctamente' : '✓ Producto agregado correctamente';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+
+        closeModal();
+      } catch (err) {
+        const errorEl = modal.querySelector('#error-general');
+        errorEl.textContent = err.message || 'No se pudo guardar el producto';
+        errorEl.style.display = 'block';
+      } finally {
+        saveBtn.disabled = false;
+        saveLoader.classList.add('hidden');
+        saveText.textContent = editing ? '💾 Guardar Cambios' : '➕ Agregar Producto';
+      }
+    });
+
+    // Focus al nombre
+    nameInput.focus();
+  });
 }
 
 async function deactivateProduct(productId) {
-  const product = state.catalog.find(p => Number(p.id) === productId);
-  if (!product) return;
+  return new Promise((resolve) => {
+    const product = state.catalog.find(p => Number(p.id) === productId);
+    if (!product) return resolve();
 
-  const { isConfirmed } = await Swal.fire({
-    title: '¿Desactivar producto?',
-    text: product.name,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Desactivar',
-    confirmButtonColor: '#ecd9ff'
-  });
-  if (!isConfirmed) return;
+    // Crear modal de confirmación
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+    overlay.style.animation = 'fadeIn 0.2s ease-out';
 
-  try {
-    await fetch('/api/discordia/products', {
-      method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: productId })
+    const modal = document.createElement('div');
+    modal.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-md';
+    modal.style.animation = 'slideUp 0.3s ease-out';
+
+    modal.innerHTML = `
+      <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      </style>
+
+      <!-- Header de advertencia -->
+      <div class="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-5 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          ⚠️ Desactivar Producto
+        </h3>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6 space-y-4">
+        <p class="text-gray-600">¿Estás seguro de que deseas desactivar este producto?</p>
+        
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <p class="text-sm font-semibold text-amber-900">${product.name}</p>
+          <p class="text-xs text-amber-700 mt-1">SKU: ${product.code || 'Sin código'}</p>
+          <p class="text-xs text-amber-700">Precio: $${Number(product.price).toLocaleString('es-CO')}</p>
+        </div>
+
+        <p class="text-sm text-gray-500 italic">
+          El producto será ocultado del catálogo, pero los datos se mantendrán en el sistema.
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
+        <button class="cancel-btn px-5 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition">
+          Cancelar
+        </button>
+        <button class="confirm-delete px-5 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2">
+          <span class="delete-text">🗑️ Desactivar</span>
+          <span class="delete-loader hidden">
+            <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle class="opacity-25" cx="12" cy="12" r="10"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const cancelBtn = modal.querySelector('.cancel-btn');
+    const deleteBtn = modal.querySelector('.confirm-delete');
+    const deleteLoader = modal.querySelector('.delete-loader');
+    const deleteText = modal.querySelector('.delete-text');
+
+    const closeModal = () => {
+      overlay.style.animation = 'fadeOut 0.2s ease-out';
+      modal.style.animation = 'slideDown 0.3s ease-out';
+      setTimeout(() => {
+        overlay.remove();
+        resolve();
+      }, 300);
+    };
+
+    cancelBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
     });
-    state.catalog = state.catalog.filter(p => Number(p.id) !== productId);
-    saveToStorage(STORAGE_KEYS.catalog, state.catalog);
-    renderSummary();
-    renderCatalogTab();
-  } catch {
-    Swal.fire('Error', 'No se pudo desactivar.', 'error');
-  }
+
+    deleteBtn.addEventListener('click', async () => {
+      deleteBtn.disabled = true;
+      deleteLoader.classList.remove('hidden');
+      deleteText.textContent = 'Desactivando...';
+
+      try {
+        await fetch('/api/discordia/products', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: productId })
+        });
+
+        state.catalog = state.catalog.filter(p => Number(p.id) !== productId);
+        saveToStorage(STORAGE_KEYS.catalog, state.catalog);
+        renderSummary();
+        renderCatalogTab();
+
+        // Toast de éxito
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-5 right-5 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg';
+        toast.textContent = '✓ Producto desactivado correctamente';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+
+        closeModal();
+      } catch (err) {
+        alert('Error al desactivar: ' + (err.message || 'Intenta de nuevo'));
+        deleteBtn.disabled = false;
+        deleteLoader.classList.add('hidden');
+        deleteText.textContent = '🗑️ Desactivar';
+      }
+    });
+  });
 }
 
 // ── CLIENTES ──────────────────────────────────────────────────
