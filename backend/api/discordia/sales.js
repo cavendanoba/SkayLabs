@@ -1,6 +1,8 @@
 // ENDPOINT: backend/api/discordia/sales.js
 // GET    → listar todas las ventas (soporta status=paid|pending&limit=N)
 // POST   → crear una venta nueva desde el panel admin
+// PUT    → actualizar venta existente (requiere body.id)
+// DELETE → eliminar venta (requiere body.id)
 import { sql } from '../lib/db.js';
 
 export default async function handler(req, res) {
@@ -78,6 +80,99 @@ export default async function handler(req, res) {
       ok: true,
       data: sale
     });
+  }
+
+  // ─── PUT: actualizar venta ────────────────────────────────
+  if (req.method === 'PUT') {
+    const saleId = req.url.split('/').pop(); // Obtener ID de la URL: /api/discordia/sales/123
+    const {
+      customerName,
+      customerPhone,
+      channel,
+      paymentStatus,
+      notes
+    } = req.body || {};
+
+    if (!saleId || isNaN(saleId)) {
+      return res.status(400).json({
+        ok: false,
+        message: 'ID de venta inválido.'
+      });
+    }
+
+    try {
+      const [updated] = await sql`
+        UPDATE sales
+        SET
+          customer_name = ${customerName},
+          customer_phone = ${customerPhone || null},
+          channel = ${channel},
+          payment_status = ${paymentStatus},
+          notes = ${notes || null}
+        WHERE id = ${Number(saleId)}
+        RETURNING id, customer_name, customer_phone, channel,
+                  total, amount_paid, payment_status, notes, created_at
+      `;
+
+      if (!updated) {
+        return res.status(404).json({
+          ok: false,
+          message: 'Venta no encontrada.'
+        });
+      }
+
+      return res.status(200).json({
+        ok: true,
+        data: updated
+      });
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        message: 'Error al actualizar la venta.'
+      });
+    }
+  }
+
+  // ─── DELETE: eliminar venta ────────────────────────────────
+  if (req.method === 'DELETE') {
+    const saleId = req.url.split('/').pop(); // Obtener ID de la URL: /api/discordia/sales/123
+
+    if (!saleId || isNaN(saleId)) {
+      return res.status(400).json({
+        ok: false,
+        message: 'ID de venta inválido.'
+      });
+    }
+
+    try {
+      // Primero eliminar items de la venta
+      await sql`
+        DELETE FROM sale_items WHERE sale_id = ${Number(saleId)}
+      `;
+
+      // Luego eliminar la venta
+      const result = await sql`
+        DELETE FROM sales WHERE id = ${Number(saleId)}
+        RETURNING id
+      `;
+
+      if (result.length === 0) {
+        return res.status(404).json({
+          ok: false,
+          message: 'Venta no encontrada.'
+        });
+      }
+
+      return res.status(200).json({
+        ok: true,
+        message: 'Venta eliminada correctamente.'
+      });
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        message: 'Error al eliminar la venta.'
+      });
+    }
   }
 
   return res.status(405).json({ ok: false, message: 'Method not allowed' });

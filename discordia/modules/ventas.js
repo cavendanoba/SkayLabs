@@ -76,6 +76,12 @@ function paintVentas(container, filtros = {}) {
         <td class="p-3 text-sm text-gray-600">${s.channel||'—'}</td>
         <td class="p-3">${badge}</td>
         <td class="p-3 text-xs text-gray-400 max-w-[200px] truncate">${s.notes||'—'}</td>
+        <td class="p-3">
+          <div class="flex gap-2">
+            <button class="edit-sale px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-semibold text-xs hover:bg-amber-200 transition" data-id="${s.id}">Editar</button>
+            <button class="delete-sale px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-semibold text-xs hover:bg-rose-200 transition" data-id="${s.id}">Eliminar</button>
+          </div>
+        </td>
       </tr>`;
   }).join('');
 
@@ -133,10 +139,11 @@ function paintVentas(container, filtros = {}) {
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Canal</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Estado</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Notas</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            ${rows || `<tr><td colspan="7" class="p-6 text-center text-gray-400">No hay ventas que coincidan.</td></tr>`}
+            ${rows || `<tr><td colspan="8" class="p-6 text-center text-gray-400">No hay ventas que coincidan.</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -152,6 +159,14 @@ function paintVentas(container, filtros = {}) {
 
   // Botón nueva venta
   container.querySelector('#btn-nueva-venta').addEventListener('click', () => showNuevaVentaModal(container));
+
+  // Botones de editar/eliminar ventas
+  container.querySelectorAll('.edit-sale').forEach(btn => 
+    btn.addEventListener('click', () => showEditVentaModal(container, Number(btn.dataset.id)))
+  );
+  container.querySelectorAll('.delete-sale').forEach(btn => 
+    btn.addEventListener('click', () => deleteSale(container, Number(btn.dataset.id)))
+  );
 }
 
 // ── MODAL NUEVA VENTA ─────────────────────────────────────────
@@ -356,5 +371,88 @@ async function showNuevaVentaModal(container) {
     await renderVentas(container);
   } catch (err) {
     Swal.fire('Error', err.message || 'No se pudo guardar la venta.', 'error');
+  }
+}
+
+// ── EDITAR VENTA ──────────────────────────────────────────────
+async function showEditVentaModal(container, saleId) {
+  const sale = allSales.find(s => s.id === saleId);
+  if (!sale) return;
+
+  const { isConfirmed, value: formValues } = await Swal.fire({
+    title: 'Editar venta',
+    html: `
+      <input id="sw-edit-customer-name"  class="swal2-input" placeholder="Nombre del cliente" value="${sale.customer_name||''}">
+      <input id="sw-edit-customer-phone" class="swal2-input" placeholder="Teléfono" value="${sale.customer_phone||''}">
+      <select id="sw-edit-channel" class="swal2-input">
+        <option value="whatsapp" ${sale.channel==='whatsapp'?'selected':''}>WhatsApp</option>
+        <option value="directa" ${sale.channel==='directa'?'selected':''}>Directa</option>
+        <option value="otro" ${sale.channel==='otro'?'selected':''}>Otro</option>
+      </select>
+      <select id="sw-edit-payment" class="swal2-input">
+        <option value="paid" ${sale.payment_status==='paid'?'selected':''}>Pagado</option>
+        <option value="pending" ${sale.payment_status==='pending'?'selected':''}>Pendiente</option>
+      </select>
+      <textarea id="sw-edit-notes" class="swal2-textarea" placeholder="Notas">${sale.notes||''}</textarea>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Guardar cambios',
+    confirmButtonColor: '#9d5fa5',
+    preConfirm: () => {
+      const customerName = document.getElementById('sw-edit-customer-name').value.trim();
+      if (!customerName) { Swal.showValidationMessage('El nombre del cliente es obligatorio.'); return false; }
+      return {
+        customerName,
+        customerPhone: document.getElementById('sw-edit-customer-phone').value.trim(),
+        channel:       document.getElementById('sw-edit-channel').value,
+        paymentStatus: document.getElementById('sw-edit-payment').value,
+        notes:         document.getElementById('sw-edit-notes').value.trim()
+      };
+    }
+  });
+
+  if (!isConfirmed || !formValues) return;
+
+  try {
+    const res  = await fetch(`/api/discordia/sales/${saleId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formValues)
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.message);
+    await Swal.fire('Guardado', 'Venta actualizada correctamente.', 'success');
+    await renderVentas(container);
+  } catch (err) {
+    Swal.fire('Error', err.message || 'No se pudo actualizar la venta.', 'error');
+  }
+}
+
+// ── ELIMINAR VENTA ────────────────────────────────────────────
+async function deleteSale(container, saleId) {
+  const sale = allSales.find(s => s.id === saleId);
+  if (!sale) return;
+
+  const { isConfirmed } = await Swal.fire({
+    title: '¿Eliminar venta?',
+    text: `${sale.customer_name} - ${formatCurrency(Number(sale.total))}`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Eliminar',
+    confirmButtonColor: '#9d5fa5'
+  });
+
+  if (!isConfirmed) return;
+
+  try {
+    const res  = await fetch(`/api/discordia/sales/${saleId}`, {
+      method: 'DELETE'
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.message);
+    await Swal.fire('Eliminada', 'Venta eliminada correctamente.', 'success');
+    await renderVentas(container);
+  } catch (err) {
+    Swal.fire('Error', err.message || 'No se pudo eliminar la venta.', 'error');
   }
 }

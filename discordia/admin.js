@@ -144,6 +144,7 @@ function renderCatalogTab() {
   const rows = filtered.map(item => `
     <tr class="border-b border-gray-100 hover:bg-[#fdf7fa]">
       <td class="p-3 text-center font-medium text-sm text-gray-500">${item.id}</td>
+      <td class="p-3 text-center font-medium text-xs text-gray-500">${item.code||'—'}</td>
       <td class="p-3">
         <div class="flex items-center gap-3">
           <img src="${item.image||'./assets/default.png'}" alt="${item.name}"
@@ -199,6 +200,7 @@ function renderCatalogTab() {
           <thead class="bg-[#fdf2f7]">
             <tr>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">ID</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Código</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Producto</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Precio</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Stock</th>
@@ -208,7 +210,7 @@ function renderCatalogTab() {
             </tr>
           </thead>
           <tbody>
-            ${rows || `<tr><td colspan="7" class="p-6 text-center text-gray-400">No hay productos que coincidan.</td></tr>`}
+            ${rows || `<tr><td colspan="8" class="p-6 text-center text-gray-400">No hay productos que coincidan.</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -235,15 +237,47 @@ async function showProductModal(productId) {
   const { value, isConfirmed } = await Swal.fire({
     title: editing ? 'Editar producto' : 'Agregar producto',
     html: `
-      <input id="sw-name"     class="swal2-input" placeholder="Nombre *"      value="${product?.name||''}">
-      <input id="sw-price"    class="swal2-input" placeholder="Precio *"      type="number" min="0" value="${product?.price??''}">
-      <input id="sw-stock"    class="swal2-input" placeholder="Stock *"       type="number" min="0" value="${product?.stock??0}">
-      <input id="sw-category" class="swal2-input" placeholder="Categoría *"   value="${product?.category||''}">
-      <input id="sw-image"    class="swal2-input" placeholder="Ruta imagen (assets/xx.jpg)" value="${product?.image||'assets/default.png'}">
-      <textarea id="sw-desc"  class="swal2-textarea" placeholder="Descripción">${product?.description||''}</textarea>`,
+      <div style="display: grid; gap: 12px; text-align: left;">
+        <div>
+          <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Nombre *</label>
+          <input id="sw-name" class="swal2-input" placeholder="Nombre del producto" value="${product?.name||''}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
+        </div>
+        <div>
+          <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Código</label>
+          <input id="sw-code" class="swal2-input" placeholder="Ej: PROD001" value="${product?.code||''}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div>
+            <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Precio *</label>
+            <input id="sw-price" class="swal2-input" type="number" min="0" placeholder="0" value="${product?.price??''}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
+          </div>
+          <div>
+            <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Stock *</label>
+            <input id="sw-stock" class="swal2-input" type="number" min="0" placeholder="0" value="${product?.stock??0}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
+          </div>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Categoría *</label>
+          <input id="sw-category" class="swal2-input" placeholder="Ej: Maquillaje" value="${product?.category||''}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
+        </div>
+        <div>
+          <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Ruta de imagen</label>
+          <input id="sw-image" class="swal2-input" placeholder="assets/producto.jpg" value="${product?.image||'assets/default.png'}" style="border-radius: 8px; border: 1.5px solid #e5e7eb;">
+        </div>
+        <div>
+          <label style="font-size: 12px; color: #6d165a; font-weight: 600; display: block; margin-bottom: 4px;">Descripción</label>
+          <textarea id="sw-desc" class="swal2-textarea" placeholder="Describe el producto..." style="border-radius: 8px; border: 1.5px solid #e5e7eb; resize: vertical; min-height: 80px;">${product?.description||''}</textarea>
+        </div>
+      </div>
+    `,
     showCancelButton: true,
-    confirmButtonText: editing ? 'Guardar' : 'Agregar',
+    confirmButtonText: editing ? 'Guardar cambios' : 'Agregar producto',
     confirmButtonColor: '#9d5fa5',
+    cancelButtonColor: '#9ca3af',
+    customClass: {
+      confirmButton: 'swal-btn-confirm',
+      cancelButton: 'swal-btn-cancel'
+    },
     preConfirm: () => {
       const name  = document.getElementById('sw-name').value.trim();
       const price = Number(document.getElementById('sw-price').value);
@@ -255,7 +289,10 @@ async function showProductModal(productId) {
       }
       return {
         id:          productId,
-        name, price, stock,
+        name, 
+        code:        document.getElementById('sw-code').value.trim() || null,
+        price, 
+        stock,
         category:    cat,
         image:       document.getElementById('sw-image').value.trim() || 'assets/default.png',
         description: document.getElementById('sw-desc').value.trim(),

@@ -34,6 +34,76 @@
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
+
+    /* ── SweetAlert2 Custom Styles ─────────────────────── */
+    .swal2-popup {
+      border-radius: 16px !important;
+      box-shadow: 0 20px 60px rgba(92, 74, 109, 0.2) !important;
+    }
+
+    .swal2-title {
+      color: #6d165a !important;
+      font-family: 'Playfair Display', serif !important;
+      font-size: 28px !important;
+      font-weight: 600 !important;
+      margin-bottom: 24px !important;
+    }
+
+    .swal2-input,
+    .swal2-textarea {
+      border: 1.5px solid #e5e7eb !important;
+      border-radius: 8px !important;
+      font-size: 14px !important;
+      font-family: 'Poppins', sans-serif !important;
+      padding: 10px 14px !important;
+    }
+
+    .swal2-input:focus,
+    .swal2-textarea:focus {
+      border-color: #9d5fa5 !important;
+      box-shadow: 0 0 0 3px rgba(157, 95, 165, 0.1) !important;
+    }
+
+    .swal2-input::placeholder,
+    .swal2-textarea::placeholder {
+      color: #9ca3af;
+    }
+
+    .swal-btn-confirm {
+      background: linear-gradient(135deg, #9d5fa5 0%, #d94a7b 100%) !important;
+      border: none !important;
+      border-radius: 8px !important;
+      color: white !important;
+      font-weight: 600 !important;
+      padding: 10px 24px !important;
+      transition: all 0.3s ease !important;
+      box-shadow: 0 4px 12px rgba(157, 95, 165, 0.3) !important;
+    }
+
+    .swal-btn-confirm:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 16px rgba(157, 95, 165, 0.4) !important;
+    }
+
+    .swal-btn-cancel {
+      background: #f3f4f6 !important;
+      border: 1px solid #e5e7eb !important;
+      border-radius: 8px !important;
+      color: #6b7280 !important;
+      font-weight: 600 !important;
+      padding: 10px 24px !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .swal-btn-cancel:hover {
+      background: #e5e7eb !important;
+      border-color: #d1d5db !important;
+    }
+
+    .swal2-actions {
+      gap: 10px !important;
+      justify-content: center !important;
+    }
   </style>
 </head>
 
