@@ -136,7 +136,7 @@ function debounceCatalogRender() {
 function renderCatalogTab() {
   const q        = catalogUiState.query.trim().toLowerCase();
   const filtered = state.catalog.filter(item => {
-    const matchQ = !q || `${item.name} ${item.category||''} ${item.description||''}`.toLowerCase().includes(q);
+    const matchQ = !q || `${item.name} ${item.code||''} ${item.category||''} ${item.description||''}`.toLowerCase().includes(q);
     const matchS = !catalogUiState.lowStockOnly || Number(item.stock||0) <= 5;
     return matchQ && matchS;
   });
@@ -186,7 +186,7 @@ function renderCatalogTab() {
 
       <div class="p-4 border-b border-gray-100 flex flex-wrap gap-3">
         <input id="catalog-search" value="${catalogUiState.query}"
-          placeholder="Buscar por nombre, categoría o descripción..."
+          placeholder="Buscar por nombre, código, categoría o descripción..."
           class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#9d5fa5]">
         <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
           <input id="catalog-low-stock" type="checkbox" ${catalogUiState.lowStockOnly?'checked':''} class="w-3.5 h-3.5 accent-[#9d5fa5]">
@@ -617,23 +617,49 @@ async function deactivateProduct(productId) {
 
 // ── CLIENTES ──────────────────────────────────────────────────
 function renderCustomersTab() {
-  const customers = state.customers.slice()
+  // Extraer clientes únicos desde las ventas
+  const customerMap = new Map();
+  state.sales.forEach(sale => {
+    const key = (sale.customer_name||'Sin nombre').toLowerCase();
+    if (!customerMap.has(key)) {
+      const totalDebt = sale.payment_status === 'pending' ? Number(sale.total) - Number(sale.amount_paid||0) : 0;
+      customerMap.set(key, {
+        name: sale.customer_name||'Sin nombre',
+        phone: sale.customer_phone||'—',
+        order_count: 1,
+        total_spent: Number(sale.total),
+        total_debt: totalDebt,
+        last_purchase_at: sale.created_at,
+        payment_status: sale.payment_status
+      });
+    } else {
+      const existing = customerMap.get(key);
+      existing.order_count += 1;
+      existing.total_spent += Number(sale.total);
+      if (sale.payment_status === 'pending') {
+        existing.total_debt += Number(sale.total) - Number(sale.amount_paid||0);
+      }
+      if (new Date(sale.created_at) > new Date(existing.last_purchase_at)) {
+        existing.last_purchase_at = sale.created_at;
+      }
+    }
+  });
+  const customers = Array.from(customerMap.values())
     .sort((a,b) => Number(b.total_spent||0) - Number(a.total_spent||0));
 
   const rows = customers.map(c => `
     <tr class="border-b border-gray-100 hover:bg-[#fdf7fa]">
       <td class="p-3">
         <p class="font-semibold text-gray-900 text-sm">${c.name||'Sin nombre'}</p>
-        <p class="text-xs text-gray-400">${c.city||'—'}</p>
+        <p class="text-xs text-gray-400">Registrado en ventas</p>
       </td>
       <td class="p-3 text-sm text-gray-600">${c.phone||'—'}</td>
-      <td class="p-3 text-sm text-gray-600">${c.email||'—'}</td>
-      <td class="p-3 text-center text-sm">${Number(c.order_count||0)}</td>
+      <td class="p-3 text-center text-sm text-gray-600">${c.order_count} compra${c.order_count!==1?'s':''}</td>
       <td class="p-3 font-bold text-[#a0346e] text-sm whitespace-nowrap">${formatCurrency(Number(c.total_spent||0))}</td>
       <td class="p-3">
         ${Number(c.total_debt||0) > 0
-          ? `<span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">${formatCurrency(Number(c.total_debt))}</span>`
-          : `<span class="text-xs text-gray-400">—</span>`}
+          ? `<span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">💰 ${formatCurrency(Number(c.total_debt))}</span>`
+          : `<span class="text-xs text-emerald-600 font-semibold">✅ Pagado</span>`}
       </td>
       <td class="p-3 text-xs text-gray-400">${c.last_purchase_at ? new Date(c.last_purchase_at).toLocaleDateString('es-CO') : '—'}</td>
     </tr>`).join('');
@@ -650,10 +676,9 @@ function renderCustomersTab() {
             <tr>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Cliente</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Teléfono</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Email</th>
               <th class="p-3 text-center text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Órdenes</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Total comprado</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Deuda</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Estado de pago</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Última compra</th>
             </tr>
           </thead>

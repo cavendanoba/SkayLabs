@@ -353,6 +353,7 @@ async function showNuevaVentaModal(container) {
         notes:         document.getElementById('sw-notes').value.trim(),
         items: window._swItems.map(i => ({
           productId:   i.productId,
+          name:        i.name || i.productName,
           productName: i.productName,
           price:       i.price,
           quantity:    i.qty

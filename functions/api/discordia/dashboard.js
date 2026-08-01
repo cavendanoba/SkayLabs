@@ -12,14 +12,19 @@ export async function onRequestGet({ env }) {
           FROM sales
           ORDER BY created_at DESC
           LIMIT 5`,
-      sql`SELECT id, name, phone, total_debt FROM customers WHERE total_debt > 0 ORDER BY total_debt DESC LIMIT 10`,
+      sql`SELECT s.id, s.customer_name, s.customer_phone, 
+                 (s.total - COALESCE(s.amount_paid, 0))::numeric AS total_debt
+          FROM sales s
+          WHERE s.payment_status = 'pending'
+          ORDER BY (s.total - COALESCE(s.amount_paid, 0)) DESC
+          LIMIT 10`,
       sql`SELECT id, name, stock, price FROM products WHERE stock <= 3 ORDER BY stock ASC, name ASC LIMIT 10`,
-      sql`SELECT COALESCE(p.name, si.product_name) AS product_name,
+      sql`SELECT COALESCE(p.name, si.name) AS product_name,
                  SUM(si.quantity)::int AS unidades,
                  SUM(si.quantity * si.price)::numeric AS ingresos
           FROM sale_items si
           LEFT JOIN products p ON p.id = si.product_id
-          GROUP BY COALESCE(p.name, si.product_name)
+          GROUP BY COALESCE(p.name, si.name)
           ORDER BY ingresos DESC
           LIMIT 5`,
       sql`SELECT COUNT(*)::int AS cantidad, COALESCE(SUM(total), 0)::numeric AS total

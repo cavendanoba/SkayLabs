@@ -1,4 +1,0 @@
-{
-  "buildCommand": "echo 'Serverless functions ready for deployment'",
-  "public": false
-}

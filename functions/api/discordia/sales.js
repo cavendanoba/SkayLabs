@@ -68,10 +68,11 @@ export async function onRequestPost({ request, env }) {
     // Insertar items y restar stock
     for (const item of items) {
       await sql`
-        INSERT INTO sale_items (sale_id, product_id, quantity, price)
+        INSERT INTO sale_items (sale_id, product_id, name, quantity, price)
         VALUES (
           ${sale.id},
           ${item.productId || null},
+          ${item.name || item.productName || 'Producto'},
           ${item.quantity},
           ${item.price}
         )

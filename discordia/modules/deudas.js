@@ -55,7 +55,10 @@ function paintDeudas(container, ventas) {
           <p class="text-xs text-gray-400">${v.customer_phone||'Sin teléfono'}</p>
         </td>
         <td class="p-3 text-xs text-gray-500 whitespace-nowrap">${fecha}</td>
-        <td class="p-3 text-xs text-gray-500 max-w-[180px] truncate" title="${itemNames}">${itemNames}</td>
+        <td class="p-3 text-xs text-gray-500 max-w-[180px]">
+          <div class="space-y-0.5">${(v.items||[]).slice(0,3).map(i=>`<p class="truncate">${i.name||i.productName||'Producto'} ×${i.quantity}</p>`).join('')}
+          ${(v.items||[]).length > 3 ? `<p class="text-gray-400">+${(v.items||[]).length-3} más</p>` : ''}</div>
+        </td>
         <td class="p-3">
           <p class="font-bold text-gray-800 text-sm">${formatCurrency(Number(v.total))}</p>
           <p class="text-xs text-emerald-600">Abonado: ${formatCurrency(Number(v.amount_paid))}</p>
