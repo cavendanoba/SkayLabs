@@ -43,7 +43,7 @@ function renderHeroProductPreview() {
       <div class="p-3">
         <p class="font-bold text-xs text-[#6d165a] line-clamp-2 min-h-[2rem] leading-snug">${product.name}</p>
         <div class="flex items-center justify-between mt-2">
-          <p class="font-extrabold text-base text-[#a0346e]">$${product.price.toLocaleString('es-CO')}</p>
+          <p class="font-extrabold text-base text-[#a0346e]">${formatCurrency(product.price)}</p>
           <span class="text-[10px] text-gray-400">Stock: ${product.stock}</span>
         </div>
       </div>
@@ -64,12 +64,12 @@ function buildCategoryPills() {
   // Mantener el botón "Todas" y agregar el resto
   container.innerHTML = `
     <button onclick="filterByCategory('all')" data-cat="all"
-      class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-[#ecd9ff] bg-[#ecd9ff] text-white transition">
+      class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-[#9d5fa5] bg-[#9d5fa5] text-white transition">
       Todas
     </button>
     ${cats.map(cat => `
       <button onclick="filterByCategory('${cat}')" data-cat="${cat}"
-        class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-gray-200 bg-white text-gray-700 hover:border-[#ecd9ff] hover:text-[#6d165a] transition">
+        class="cat-pill px-4 py-2 rounded-full text-sm font-semibold border border-gray-200 bg-white text-gray-700 hover:border-[#9d5fa5] hover:text-[#6d165a] transition">
         ${cat}
       </button>
     `).join('')}

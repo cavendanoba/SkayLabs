@@ -5,6 +5,8 @@
 // recientes y alertas de stock bajo.
 // ─────────────────────────────────────────────────────────────
 
+import { formatCurrency } from '../utils.js';
+
 export async function renderDashboard(container) {
   container.innerHTML = buildSkeleton();
 
@@ -19,8 +21,7 @@ export async function renderDashboard(container) {
       <div class="bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl p-6 text-center">
         <p class="font-bold text-lg">No se pudieron cargar las métricas</p>
         <p class="text-sm mt-1">Verifica tu conexión e intenta de nuevo.</p>
-        <button onclick="location.reload()"
-          class="mt-4 px-5 py-2 bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] text-white rounded-xl text-sm font-semibold">
+        <button onclick="location.reload()" class="mt-4 px-5 py-2 bg-gradient-to-r from-[#9d5fa5] to-[#d94a7b] text-white rounded-xl text-sm font-semibold">
           Reintentar
         </button>
       </div>`;
@@ -61,9 +62,9 @@ function buildKPICards(ingresos, deudas, stockBajo) {
     : `<span class="text-xs text-white/60 mt-2 block">Sin datos anteriores</span>`;
 
   const cards = [
-    { label:'Ingresos del mes', value:`$${Number(ingresos.total).toLocaleString('es-CO')}`, sub:varHTML, icon:'💰', bg:'bg-gradient-to-br from-[#6d165a] to-[#a0346e]', vc:'text-white', lc:'text-white/60', bc:'border-[#a0346e]/30' },
-    { label:'Ventas este mes', value:ingresos.cantidad, sub:`<span class="text-xs text-gray-500 mt-2 block">${ingresos.cantidad===1?'transacción':'transacciones'}</span>`, icon:'🛍️', bg:'bg-white', vc:'text-[#6d165a]', lc:'text-gray-400', bc:'border-gray-100' },
-    { label:'Deuda pendiente', value:`$${totalDeuda.toLocaleString('es-CO')}`, sub:`<span class="text-xs font-semibold text-amber-600 mt-2 block">${deudas.length} cliente${deudas.length!==1?'s':''} ${deudas.length!==1?'deben':'debe'}</span>`, icon:'⚠️', bg:'bg-amber-50', vc:'text-amber-800', lc:'text-amber-400', bc:'border-amber-100' },
+    { label:'Ingresos del mes', value:formatCurrency(Number(ingresos.total)), sub:varHTML, icon:'💰', bg:'bg-gradient-to-br from-[#6d165a] to-[#a0346e]', vc:'text-white', lc:'text-white/60', bc:'border-[#a0346e]/30' },
+    { label:'Ventas este mes', value:ingresos.cantidad, sub:`<span class="text-xs text-gray-500 mt-2 block">${ingresos.cantidad===1?'transacción':'transacciones'}</span>`, icon:'🛒️', bg:'bg-white', vc:'text-[#6d165a]', lc:'text-gray-400', bc:'border-gray-100' },
+    { label:'Deuda pendiente', value:formatCurrency(totalDeuda), sub:`<span class="text-xs font-semibold text-amber-600 mt-2 block">${deudas.length} cliente${deudas.length!==1?'s':''} ${deudas.length!==1?'deben':'debe'}</span>`, icon:'⚠️', bg:'bg-amber-50', vc:'text-amber-800', lc:'text-amber-400', bc:'border-amber-100' },
     { label:'Stock bajo', value:stockBajo.length, sub:`<span class="text-xs font-semibold ${stockBajo.length>0?'text-rose-600':'text-emerald-600'} mt-2 block">${stockBajo.length===0?'Todo en buen nivel ✅':`${stockBajo.length} producto${stockBajo.length!==1?'s':''} ≤ 3 uds`}</span>`, icon:'📦', bg:stockBajo.length>0?'bg-rose-50':'bg-white', vc:stockBajo.length>0?'text-rose-700':'text-[#6d165a]', lc:stockBajo.length>0?'text-rose-300':'text-gray-400', bc:stockBajo.length>0?'border-rose-100':'border-gray-100' },
   ];
 
@@ -95,7 +96,7 @@ function buildDeudas(deudas) {
     <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
       <div class="bg-gradient-to-r from-[#6d165a] to-[#a0346e] px-5 py-4 flex items-center justify-between">
         <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">⚠️ Deudas activas</h3>
-        <span class="text-xs bg-white/20 text-white px-3 py-1 rounded-full font-semibold">Total $${total.toLocaleString('es-CO')}</span>
+        <span class="text-xs bg-white/20 text-white px-3 py-1 rounded-full font-semibold">Total ${formatCurrency(total)}</span>
       </div>
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
@@ -116,7 +117,7 @@ function buildDeudas(deudas) {
                 <td class="p-3 text-center">
                   <span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">${d.ventas_pendientes} venta${Number(d.ventas_pendientes)!==1?'s':''}</span>
                 </td>
-                <td class="p-3 text-right font-bold text-[#a0346e] text-sm whitespace-nowrap">$${Number(d.total_debt).toLocaleString('es-CO')}</td>
+                <td class="p-3 text-right font-bold text-[#a0346e] text-sm whitespace-nowrap">${formatCurrency(Number(d.total_debt))}</td>
               </tr>`).join('')}
           </tbody>
         </table>
@@ -147,11 +148,11 @@ function buildTopProductos(productos) {
               </div>
               <div class="flex items-center gap-3 flex-none ml-2">
                 <span class="text-xs text-gray-400">${p.unidades} uds</span>
-                <span class="text-sm font-bold text-[#a0346e]">$${Number(p.ingresos).toLocaleString('es-CO')}</span>
+                <span class="text-sm font-bold text-[#a0346e]">${formatCurrency(Number(p.ingresos))}</span>
               </div>
             </div>
             <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-              <div class="bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] h-1.5 rounded-full" style="width:${Math.round(Number(p.unidades)/maxUds*100)}%"></div>
+              <div class="bg-gradient-to-r from-[#9d5fa5] to-[#d94a7b] h-1.5 rounded-full" style="width:${Math.round(Number(p.unidades)/maxUds*100)}%"></div>
             </div>
           </li>`).join('')}
       </ul>
@@ -188,7 +189,7 @@ function buildVentasRecientes(ventas) {
                   <td class="p-3"><p class="font-semibold text-gray-900 text-sm">${v.cliente||'Sin nombre'}</p><p class="text-xs text-gray-400">${fecha}</p></td>
                   <td class="p-3 text-center"><span title="${v.channel}">${ci[v.channel]||'🛍️'}</span></td>
                   <td class="p-3 text-center">${badge}</td>
-                  <td class="p-3 text-right font-bold text-[#a0346e] text-sm whitespace-nowrap">$${Number(v.total).toLocaleString('es-CO')}</td>
+                  <td class="p-3 text-right font-bold text-[#a0346e] text-sm whitespace-nowrap">${formatCurrency(Number(v.total))}</td>
                 </tr>`;
             }).join('')}
           </tbody>

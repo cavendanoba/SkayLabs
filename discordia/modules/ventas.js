@@ -7,8 +7,15 @@
 // ─────────────────────────────────────────────────────────────
 
 import { getCatalog } from '../catalog.js';
+import { formatCurrency } from '../utils.js';
 
 let allSales = [];
+let ventasDebounceTimer = null;
+
+function debounceVentasRender(container, filtros) {
+  clearTimeout(ventasDebounceTimer);
+  ventasDebounceTimer = setTimeout(() => paintVentas(container, filtros), 300);
+}
 
 export async function renderVentas(container) {
   container.innerHTML = buildSkeleton();
@@ -22,7 +29,7 @@ export async function renderVentas(container) {
     container.innerHTML = `
       <div class="bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl p-6 text-center">
         <p class="font-bold">Error al cargar ventas</p>
-        <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] text-white rounded-xl text-sm font-semibold">Reintentar</button>
+        <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-gradient-to-r from-[#9d5fa5] to-[#d94a7b] text-white rounded-xl text-sm font-semibold">Reintentar</button>
       </div>`;
     return;
   }
@@ -65,7 +72,7 @@ function paintVentas(container, filtros = {}) {
           <p class="text-xs text-gray-400">${s.customer_phone||'—'}</p>
         </td>
         <td class="p-3 text-center text-xs text-gray-600">${itemCount} item${itemCount!==1?'s':''}</td>
-        <td class="p-3 font-bold text-[#a0346e] text-sm whitespace-nowrap">$${Number(s.total).toLocaleString('es-CO')}</td>
+        <td class="p-3 font-bold text-[#a0346e] text-sm whitespace-nowrap">${formatCurrency(Number(s.total))}</td>
         <td class="p-3 text-sm text-gray-600">${s.channel||'—'}</td>
         <td class="p-3">${badge}</td>
         <td class="p-3 text-xs text-gray-400 max-w-[200px] truncate">${s.notes||'—'}</td>
@@ -91,11 +98,11 @@ function paintVentas(container, filtros = {}) {
           <p class="text-xs text-gray-500">Ventas</p>
         </div>
         <div class="bg-white px-4 py-3 text-center">
-          <p class="text-lg font-bold text-emerald-600">$${totalIngresos.toLocaleString('es-CO')}</p>
+          <p class="text-lg font-bold text-emerald-600">${formatCurrency(totalIngresos)}</p>
           <p class="text-xs text-gray-500">Cobrado</p>
         </div>
         <div class="bg-white px-4 py-3 text-center">
-          <p class="text-lg font-bold text-amber-600">$${totalDeuda.toLocaleString('es-CO')}</p>
+          <p class="text-lg font-bold text-amber-600">${formatCurrency(totalDeuda)}</p>
           <p class="text-xs text-gray-500">Por cobrar</p>
         </div>
       </div>
@@ -103,10 +110,10 @@ function paintVentas(container, filtros = {}) {
       <!-- Filtros -->
       <div class="p-4 border-b border-gray-100 flex flex-wrap gap-3">
         <input id="ventas-search" placeholder="Buscar cliente, canal, nota..."
-          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ecd9ff]"
+          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#9d5fa5]"
           value="${query}">
         <select id="ventas-status"
-          class="px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ecd9ff] bg-white">
+          class="px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#9d5fa5] bg-white">
           <option value="all"     ${status==='all'    ?'selected':''}>Todos</option>
           <option value="paid"    ${status==='paid'   ?'selected':''}>Pagados</option>
           <option value="pending" ${status==='pending'?'selected':''}>Pendientes</option>
@@ -137,10 +144,10 @@ function paintVentas(container, filtros = {}) {
 
   // Eventos de filtro
   container.querySelector('#ventas-search').addEventListener('input', e => {
-    paintVentas(container, { query: e.target.value, status: container.querySelector('#ventas-status').value });
+    debounceVentasRender(container, { query: e.target.value, status: container.querySelector('#ventas-status').value });
   });
   container.querySelector('#ventas-status').addEventListener('change', e => {
-    paintVentas(container, { query: container.querySelector('#ventas-search').value, status: e.target.value });
+    debounceVentasRender(container, { query: container.querySelector('#ventas-search').value, status: e.target.value });
   });
 
   // Botón nueva venta
@@ -152,7 +159,7 @@ async function showNuevaVentaModal(container) {
   const catalog = getCatalog();
   const productOptions = catalog.map(p =>
     `<option value="${p.id}" data-price="${p.price}" data-name="${p.name}" data-stock="${p.stock}">
-      ${p.name} — $${p.price.toLocaleString('es-CO')} (stock: ${p.stock})
+      ${p.name} — ${formatCurrency(p.price)} (stock: ${p.stock})
     </option>`
   ).join('');
  
@@ -241,7 +248,7 @@ async function showNuevaVentaModal(container) {
           </div>
  
           <button id="sw-add-item" type="button"
-            style="margin-top:12px;background:linear-gradient(90deg,#ecd9ff,#ffd5e3);color:#7a1f57;border:none;border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;width:100%;">
+            style="margin-top:12px;background:linear-gradient(90deg,#9d5fa5,#d94a7b);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;width:100%;">
             + Agregar producto a la venta
           </button>
  
@@ -270,7 +277,7 @@ async function showNuevaVentaModal(container) {
           .filter(p => p.name.toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q))
           .map(p =>
             `<option value="${p.id}" data-price="${p.price}" data-name="${p.name}" data-stock="${p.stock}">
-              ${p.name} — $${p.price.toLocaleString('es-CO')} (stock: ${p.stock})
+              ${p.name} — ${formatCurrency(p.price)} (stock: ${p.stock})
             </option>`
           ).join('');
         document.getElementById('sw-product').innerHTML = filtered || allOptionsHTML;
@@ -278,13 +285,13 @@ async function showNuevaVentaModal(container) {
  
       window._swUpdateTotal = () => {
         const t = window._swItems.reduce((s,i) => s+i.price*i.qty, 0);
-        document.getElementById('sw-total').textContent = `$${t.toLocaleString('es-CO')}`;
+        document.getElementById('sw-total').textContent = formatCurrency(t);
         document.getElementById('sw-items-list').innerHTML = window._swItems.length
           ? window._swItems.map((i,idx) =>
               `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #f1d7e2;">
                 <span style="font-weight:500;">${i.name} <span style="color:#c48bb0;">×${i.qty}</span></span>
                 <span style="color:#a0346e;font-weight:700;display:flex;align-items:center;gap:8px;">
-                  $${(i.price*i.qty).toLocaleString('es-CO')}
+                  ${formatCurrency(i.price*i.qty)}
                   <button data-idx="${idx}" style="background:#fff;border:1px solid #f1d7e2;color:#a0346e;cursor:pointer;width:24px;height:24px;border-radius:50%;font-size:13px;line-height:1;">✕</button>
                 </span>
               </div>`).join('')
@@ -345,7 +352,7 @@ async function showNuevaVentaModal(container) {
     });
     const json = await res.json();
     if (!json.ok) throw new Error(json.message);
-    await Swal.fire('¡Venta registrada!', `Total: $${formValues.items.reduce((s,i)=>s+i.price*i.quantity,0).toLocaleString('es-CO')}`, 'success');
+    await Swal.fire('¡Venta registrada!', `Total: ${formatCurrency(formValues.items.reduce((s,i)=>s+i.price*i.quantity,0))}`, 'success');
     await renderVentas(container);
   } catch (err) {
     Swal.fire('Error', err.message || 'No se pudo guardar la venta.', 'error');

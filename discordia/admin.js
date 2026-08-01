@@ -16,6 +16,7 @@ import { renderVentas }                      from './modules/ventas.js';
 import { renderDeudas }                      from './modules/deudas.js';
 import { fetchProducts }                     from './products.js';
 import { CONFIG }                            from './config.js';
+import { formatCurrency }                    from './utils.js';
 
 // ── GUARD ─────────────────────────────────────────────────────
 requireAuth();
@@ -109,7 +110,7 @@ function renderSummary() {
     { label: 'Productos',   value: state.catalog.length, note: 'en catálogo' },
     { label: 'Stock total', value: totalStock,            note: 'unidades disponibles' },
     { label: 'Ventas',      value: totalSales,            note: 'registradas' },
-    { label: 'Ingresos',    value: `$${totalRevenue.toLocaleString('es-CO')}`, note: `· Admin: ${user}` },
+    { label: 'Ingresos',    value: formatCurrency(totalRevenue), note: `· Admin: ${user}` },
   ];
 
   if (summaryContainer) {
@@ -124,6 +125,13 @@ function renderSummary() {
 
 // ── CATÁLOGO ──────────────────────────────────────────────────
 const catalogUiState = { query: '', lowStockOnly: false };
+let catalogDebounceTimer = null;
+
+// Debounce helper para evitar re-renders frecuentes
+function debounceCatalogRender() {
+  clearTimeout(catalogDebounceTimer);
+  catalogDebounceTimer = setTimeout(() => renderCatalogTab(), 300);
+}
 
 function renderCatalogTab() {
   const q        = catalogUiState.query.trim().toLowerCase();
@@ -147,7 +155,7 @@ function renderCatalogTab() {
           </div>
         </div>
       </td>
-      <td class="p-3 font-bold text-[#a0346e] text-sm">$${Number(item.price||0).toLocaleString('es-CO')}</td>
+      <td class="p-3 font-bold text-[#a0346e] text-sm">${formatCurrency(Number(item.price||0))}</td>
       <td class="p-3">
         <span class="text-sm font-semibold ${Number(item.stock)<=3?'text-rose-600':Number(item.stock)<=5?'text-amber-600':'text-gray-800'}">${item.stock}</span>
       </td>
@@ -178,9 +186,9 @@ function renderCatalogTab() {
       <div class="p-4 border-b border-gray-100 flex flex-wrap gap-3">
         <input id="catalog-search" value="${catalogUiState.query}"
           placeholder="Buscar por nombre, categoría o descripción..."
-          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ecd9ff]">
+          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#9d5fa5]">
         <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
-          <input id="catalog-low-stock" type="checkbox" ${catalogUiState.lowStockOnly?'checked':''} class="w-3.5 h-3.5 accent-[#ecd9ff]">
+          <input id="catalog-low-stock" type="checkbox" ${catalogUiState.lowStockOnly?'checked':''} class="w-3.5 h-3.5 accent-[#9d5fa5]">
           Solo stock bajo (≤ 5)
         </label>
         <span class="self-center text-xs text-gray-400">Mostrando ${filtered.length} de ${state.catalog.length}</span>
@@ -208,7 +216,7 @@ function renderCatalogTab() {
 
   panel.querySelector('#catalog-search').addEventListener('input', e => {
     catalogUiState.query = e.target.value;
-    renderCatalogTab();
+    debounceCatalogRender();
   });
   panel.querySelector('#catalog-low-stock').addEventListener('change', e => {
     catalogUiState.lowStockOnly = e.target.checked;
@@ -235,7 +243,7 @@ async function showProductModal(productId) {
       <textarea id="sw-desc"  class="swal2-textarea" placeholder="Descripción">${product?.description||''}</textarea>`,
     showCancelButton: true,
     confirmButtonText: editing ? 'Guardar' : 'Agregar',
-    confirmButtonColor: '#ecd9ff',
+    confirmButtonColor: '#9d5fa5',
     preConfirm: () => {
       const name  = document.getElementById('sw-name').value.trim();
       const price = Number(document.getElementById('sw-price').value);
@@ -323,10 +331,10 @@ function renderCustomersTab() {
       <td class="p-3 text-sm text-gray-600">${c.phone||'—'}</td>
       <td class="p-3 text-sm text-gray-600">${c.email||'—'}</td>
       <td class="p-3 text-center text-sm">${Number(c.order_count||0)}</td>
-      <td class="p-3 font-bold text-[#a0346e] text-sm whitespace-nowrap">$${Number(c.total_spent||0).toLocaleString('es-CO')}</td>
+      <td class="p-3 font-bold text-[#a0346e] text-sm whitespace-nowrap">${formatCurrency(Number(c.total_spent||0))}</td>
       <td class="p-3">
         ${Number(c.total_debt||0) > 0
-          ? `<span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">$${Number(c.total_debt).toLocaleString('es-CO')}</span>`
+          ? `<span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">${formatCurrency(Number(c.total_debt))}</span>`
           : `<span class="text-xs text-gray-400">—</span>`}
       </td>
       <td class="p-3 text-xs text-gray-400">${c.last_purchase_at ? new Date(c.last_purchase_at).toLocaleDateString('es-CO') : '—'}</td>
@@ -334,7 +342,7 @@ function renderCustomersTab() {
 
   panel.innerHTML = `
     <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div class="bg-gradient-to-r from-[#a0346e] to-[#ecd9ff] px-5 py-4">
+      <div class="bg-gradient-to-r from-[#a0346e] to-[#9d5fa5] px-5 py-4">
         <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">👥 Clientes</h3>
         <p class="text-white/70 text-xs mt-0.5">${customers.length} registrados · Ordenados por total comprado</p>
       </div>

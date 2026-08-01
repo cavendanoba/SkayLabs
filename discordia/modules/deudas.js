@@ -6,6 +6,8 @@
 // - Permite marcar una venta como pagada completamente
 // ─────────────────────────────────────────────────────────────
 
+import { formatCurrency } from '../utils.js';
+
 export async function renderDeudas(container) {
   container.innerHTML = `<div class="animate-pulse bg-gray-100 rounded-2xl h-64"></div>`;
 
@@ -19,7 +21,7 @@ export async function renderDeudas(container) {
     container.innerHTML = `
       <div class="bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl p-6 text-center">
         <p class="font-bold">Error al cargar deudas</p>
-        <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] text-white rounded-xl text-sm font-semibold">Reintentar</button>
+        <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-gradient-to-r from-[#9d5fa5] to-[#d94a7b] text-white rounded-xl text-sm font-semibold">Reintentar</button>
       </div>`;
     return;
   }
@@ -55,13 +57,13 @@ function paintDeudas(container, ventas) {
         <td class="p-3 text-xs text-gray-500 whitespace-nowrap">${fecha}</td>
         <td class="p-3 text-xs text-gray-500 max-w-[180px] truncate" title="${itemNames}">${itemNames}</td>
         <td class="p-3">
-          <p class="font-bold text-gray-800 text-sm">$${Number(v.total).toLocaleString('es-CO')}</p>
-          <p class="text-xs text-emerald-600">Abonado: $${Number(v.amount_paid).toLocaleString('es-CO')}</p>
+          <p class="font-bold text-gray-800 text-sm">${formatCurrency(Number(v.total))}</p>
+          <p class="text-xs text-emerald-600">Abonado: ${formatCurrency(Number(v.amount_paid))}</p>
           <div class="w-full bg-gray-100 rounded-full h-1 mt-1">
             <div class="bg-emerald-400 h-1 rounded-full" style="width:${pct}%"></div>
           </div>
         </td>
-        <td class="p-3 font-bold text-rose-600 text-sm whitespace-nowrap">$${pendiente.toLocaleString('es-CO')}</td>
+        <td class="p-3 font-bold text-rose-600 text-sm whitespace-nowrap">${formatCurrency(pendiente)}</td>
         <td class="p-3">
           <div class="flex gap-2">
             <button data-sale-id="${v.id}" data-pendiente="${pendiente}" data-name="${v.customer_name||'Cliente'}"
@@ -86,7 +88,7 @@ function paintDeudas(container, ventas) {
         </div>
         <div class="text-right">
           <p class="text-white text-xs">Total adeudado</p>
-          <p class="text-white font-bold text-xl">$${totalDeuda.toLocaleString('es-CO')}</p>
+          <p class="text-white font-bold text-xl">${formatCurrency(totalDeuda)}</p>
         </div>
       </div>
 
@@ -134,16 +136,16 @@ async function registrarAbono(saleId, pendiente, customerName, container) {
     title: `Registrar abono`,
     html: `
       <p style="color:#6d165a;font-weight:600;margin-bottom:12px;">${customerName}</p>
-      <p style="font-size:13px;color:#6b7280;margin-bottom:8px;">Pendiente: <strong style="color:#a0346e;">$${pendiente.toLocaleString('es-CO')}</strong></p>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:8px;">Pendiente: <strong style="color:#a0346e;">${formatCurrency(pendiente)}</strong></p>
       <input id="sw-abono" type="number" min="1" max="${pendiente}" class="swal2-input" placeholder="Monto del abono">
       <input id="sw-nota" class="swal2-input" placeholder="Nota (opcional)">`,
     showCancelButton: true,
     confirmButtonText: 'Registrar abono',
-    confirmButtonColor: '#ecd9ff',
+    confirmButtonColor: '#9d5fa5',
     preConfirm: () => {
       const amount = Number(document.getElementById('sw-abono').value);
       if (!amount || amount <= 0) { Swal.showValidationMessage('Ingresa un monto válido.'); return false; }
-      if (amount > pendiente)     { Swal.showValidationMessage(`El abono no puede superar $${pendiente.toLocaleString('es-CO')}.`); return false; }
+      if (amount > pendiente)     { Swal.showValidationMessage(`El abono no puede superar ${formatCurrency(pendiente)}.`); return false; }
       return { saleId, amount, note: document.getElementById('sw-nota').value.trim() };
     }
   });
@@ -156,7 +158,7 @@ async function registrarAbono(saleId, pendiente, customerName, container) {
 async function marcarPagado(saleId, pendiente, customerName, container) {
   const { isConfirmed } = await Swal.fire({
     title: '¿Marcar como pagado?',
-    html: `<p style="color:#6d165a;">${customerName}</p><p style="font-size:13px;color:#6b7280;">Se registrará el pago completo de <strong>$${pendiente.toLocaleString('es-CO')}</strong></p>`,
+      html: `<p style="color:#6d165a;">${customerName}</p><p style="font-size:13px;color:#6b7280;">Se registrará el pago completo de <strong>${formatCurrency(pendiente)}</strong></p>`,
     icon: 'question',
     showCancelButton: true,
     confirmButtonText: 'Sí, marcar pagado',
@@ -180,7 +182,7 @@ async function submitPayment(payload, container) {
 
     const msg = json.data.newStatus === 'paid'
       ? '¡Deuda saldada completamente! 🎉'
-      : `Abono registrado. Restan $${json.data.remaining.toLocaleString('es-CO')}`;
+      : `Abono registrado. Restan ${formatCurrency(json.data.remaining)}`;
 
     await Swal.fire('Listo', msg, 'success');
     await renderDeudas(container);
