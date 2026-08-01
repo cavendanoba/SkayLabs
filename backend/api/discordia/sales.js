@@ -18,9 +18,17 @@ export default async function handler(req, res) {
 
     const sales = await sql(query);
 
+    // Cargar items para cada venta
+    const salesWithItems = await Promise.all(
+      sales.map(async (sale) => {
+        const items = await sql(`SELECT * FROM sale_items WHERE sale_id = ${sale.id}`);
+        return { ...sale, items };
+      })
+    );
+
     return res.status(200).json({
       ok: true,
-      data: sales
+      data: salesWithItems
     });
   }
 
@@ -44,42 +52,59 @@ export default async function handler(req, res) {
 
     const total = items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
 
-    // Insertar venta
-    const [sale] = await sql`
-      INSERT INTO sales (
-        customer_name, customer_phone, channel,
-        total, amount_paid, payment_status, notes
-      )
-      VALUES (
-        ${customerName},
-        ${customerPhone || null},
-        ${channel},
-        ${total},
-        ${paymentStatus === 'paid' ? total : 0},
-        ${paymentStatus},
-        ${notes || null}
-      )
-      RETURNING id, customer_name, customer_phone, channel,
-                total, amount_paid, payment_status, notes, created_at
-    `;
-
-    // Insertar items de la venta
-    for (const item of items) {
-      await sql`
-        INSERT INTO sale_items (sale_id, product_id, quantity, price)
-        VALUES (
-          ${sale.id},
-          ${item.productId || null},
-          ${item.quantity},
-          ${item.price}
+    try {
+      // Insertar venta
+      const [sale] = await sql`
+        INSERT INTO sales (
+          customer_name, customer_phone, channel,
+          total, amount_paid, payment_status, notes
         )
+        VALUES (
+          ${customerName},
+          ${customerPhone || null},
+          ${channel},
+          ${total},
+          ${paymentStatus === 'paid' ? total : 0},
+          ${paymentStatus},
+          ${notes || null}
+        )
+        RETURNING id, customer_name, customer_phone, channel,
+                  total, amount_paid, payment_status, notes, created_at
       `;
-    }
 
-    return res.status(201).json({
-      ok: true,
-      data: sale
-    });
+      // Insertar items y restar stock
+      for (const item of items) {
+        await sql`
+          INSERT INTO sale_items (sale_id, product_id, quantity, price)
+          VALUES (
+            ${sale.id},
+            ${item.productId || null},
+            ${item.quantity},
+            ${item.price}
+          )
+        `;
+
+        // Restar stock del producto
+        if (item.productId) {
+          await sql`
+            UPDATE products
+            SET stock = stock - ${item.quantity}
+            WHERE id = ${item.productId}
+          `;
+        }
+      }
+
+      return res.status(201).json({
+        ok: true,
+        data: sale
+      });
+    } catch (err) {
+      console.error('Error al registrar venta:', err);
+      return res.status(500).json({
+        ok: false,
+        message: 'Error al registrar la venta.'
+      });
+    }
   }
 
   // ─── PUT: actualizar venta ────────────────────────────────
