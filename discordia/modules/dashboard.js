@@ -103,7 +103,7 @@ function buildDeudas(deudas) {
           <thead class="bg-[#fdf2f7]">
             <tr>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Cliente</th>
-              <th class="p-3 text-center text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Ventas</th>
+              <th class="p-3 text-center text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Teléfono</th>
               <th class="p-3 text-right text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Debe</th>
             </tr>
           </thead>
@@ -111,11 +111,10 @@ function buildDeudas(deudas) {
             ${deudas.map(d=>`
               <tr class="border-b border-gray-100 hover:bg-[#fdf7fa] transition">
                 <td class="p-3">
-                  <p class="font-semibold text-gray-900 text-sm">${d.name}</p>
-                  <p class="text-xs text-gray-400">${d.phone||'Sin teléfono'}</p>
+                  <p class="font-semibold text-gray-900 text-sm">${d.customer_name || 'Sin nombre'}</p>
                 </td>
                 <td class="p-3 text-center">
-                  <span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">${d.ventas_pendientes} venta${Number(d.ventas_pendientes)!==1?'s':''}</span>
+                  <p class="text-xs text-gray-500">${d.customer_phone||'—'}</p>
                 </td>
                 <td class="p-3 text-right font-bold text-[#a0346e] text-sm whitespace-nowrap">${formatCurrency(Number(d.total_debt))}</td>
               </tr>`).join('')}
@@ -186,7 +185,7 @@ function buildVentasRecientes(ventas) {
                 : `<span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold">Pendiente</span>`;
               return `
                 <tr class="border-b border-gray-100 hover:bg-[#fdf7fa] transition">
-                  <td class="p-3"><p class="font-semibold text-gray-900 text-sm">${v.cliente||'Sin nombre'}</p><p class="text-xs text-gray-400">${fecha}</p></td>
+                  <td class="p-3"><p class="font-semibold text-gray-900 text-sm">${v.customer_name||'Sin nombre'}</p><p class="text-xs text-gray-400">${fecha}</p></td>
                   <td class="p-3 text-center"><span title="${v.channel}">${ci[v.channel]||'🛍️'}</span></td>
                   <td class="p-3 text-center">${badge}</td>
                   <td class="p-3 text-right font-bold text-[#a0346e] text-sm whitespace-nowrap">${formatCurrency(Number(v.total))}</td>

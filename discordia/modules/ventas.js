@@ -492,7 +492,7 @@ async function showEditVentaModal(container, saleId) {
               <label class="block text-xs font-semibold text-[#6d165a] mb-2">Producto</label>
               <select id="modal-product-select" onclick="event.stopPropagation()" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#9d5fa5] bg-white">
                 <option value="">-- Seleccionar producto --</option>
-                ${catalog.filter(p => p.active !== false).map(p => `<option value="${p.id}" data-price="${p.price}" data-name="${p.name}">${p.name} — $${Number(p.price).toLocaleString('es-CO')}</option>`).join('')}
+                ${catalog.filter(p => p.active !== false).map(p => `<option value="${p.id}" data-price="${p.price}" data-name="${p.name}">${p.name} — ${formatCurrency(Number(p.price))}</option>`).join('')}
               </select>
             </div>
             <div>
@@ -593,17 +593,9 @@ async function showEditVentaModal(container, saleId) {
     const closeBtn = modal.querySelectorAll('.close-modal');
     closeBtn.forEach(btn => btn.addEventListener('click', closeModal));
     
-    // Evitar cerrar modal al hacer clic en elementos del formulario
+    // Cerrar solo si hace clic en el overlay (no en el modal)
     overlay.addEventListener('click', (e) => {
-      if (e.target === overlay && !e.target.closest('select') && !e.target.closest('input') && !e.target.closest('textarea')) {
-        closeModal();
-      }
-    });
-    
-    // Prevenir cierre accidental en selects, inputs y textareas
-    modal.querySelectorAll('select, input, textarea').forEach(el => {
-      el.addEventListener('click', (e) => e.stopPropagation());
-      el.addEventListener('change', (e) => e.stopPropagation());
+      if (e.target === overlay) closeModal();
     });
 
     const addProductBtn = modal.querySelector('#modal-add-product');

@@ -533,7 +533,7 @@ async function deactivateProduct(productId) {
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
           <p class="text-sm font-semibold text-amber-900">${product.name}</p>
           <p class="text-xs text-amber-700 mt-1">SKU: ${product.code || 'Sin código'}</p>
-          <p class="text-xs text-amber-700">Precio: $${Number(product.price).toLocaleString('es-CO')}</p>
+          <p class="text-xs text-amber-700">Precio: ${formatCurrency(Number(product.price||0))}</p>
         </div>
 
         <p class="text-sm text-gray-500 italic">
