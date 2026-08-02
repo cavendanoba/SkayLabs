@@ -3,6 +3,7 @@
 
 import { getCatalog, renderCatalog, initCatalog, setFilters } from './catalog.js';
 import { CONFIG } from './config.js';
+import { formatCurrency } from './utils.js';
 
 // ── CONFIGURACIÓN DE CONTACTO ─────────────────────────────
 document.querySelectorAll('[data-contact-email]').forEach(n => {
