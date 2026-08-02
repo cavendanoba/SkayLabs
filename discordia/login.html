@@ -83,7 +83,7 @@
         </button>
 
         <p class="text-center mt-5 text-xs text-gray-400">
-          <a href="./index.html" class="hover:text-[#6d165a] transition">← Volver a la tienda</a>
+          <a href="/discordia/index.html" class="hover:text-[#6d165a] transition">← Volver a la tienda</a>
         </p>
       </div>
     </div>
@@ -94,7 +94,7 @@
   <script type="module">
     // Redirigir si ya hay sesión
     if (localStorage.getItem('discordia_admin_token')) {
-      window.location.href = './admin.html';
+      window.location.href = '/discordia/admin.html';
     }
 
     const loginBtn = document.getElementById('login-btn');
@@ -151,7 +151,7 @@
         if (data.ok) {
           localStorage.setItem('discordia_admin_token', data.token);
           localStorage.setItem('discordia_admin_user', data.username);
-          window.location.href = './admin.html';
+          window.location.href = '/discordia/admin.html';
         } else {
           showError(data.message || 'Credenciales inválidas.');
         }
