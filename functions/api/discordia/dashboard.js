@@ -7,7 +7,7 @@ export async function onRequestGet({ env }) {
   const sql = getSql(env);
 
   try {
-    const [ventasRecientes, deudasActivas, stockBajo, topProductos, ingresosMes, ingresosPrev] = await Promise.all([
+    const [ventasRecientes, deudasActivas, stockBajo, topProductos, ingresosMes, ingresosPrev, stockMetrics] = await Promise.all([
       sql`SELECT id, customer_name, customer_phone, channel, total, amount_paid, payment_status, notes, created_at
           FROM sales
           ORDER BY created_at DESC
@@ -36,7 +36,14 @@ export async function onRequestGet({ env }) {
           FROM sales
           WHERE payment_status = 'paid'
             AND created_at >= date_trunc('month', now()) - interval '1 month'
-            AND created_at < date_trunc('month', now())`
+            AND created_at < date_trunc('month', now())`,
+      sql`SELECT 
+            COUNT(DISTINCT p.id)::int AS total_productos,
+            COALESCE(SUM(p.stock), 0)::int AS stock_actual,
+            COALESCE(SUM(p.stock) + COALESCE(SUM(si.quantity), 0), 0)::int AS stock_inicial,
+            COALESCE(SUM(si.quantity), 0)::int AS stock_vendido
+          FROM products p
+          LEFT JOIN sale_items si ON p.id = si.product_id`
     ]);
 
     const totalActual = Number(ingresosMes[0]?.total || 0);
@@ -58,7 +65,13 @@ export async function onRequestGet({ env }) {
           unidades: Number(row.unidades),
           ingresos: Number(row.ingresos)
         })),
-        ventasRecientes
+        ventasRecientes,
+        stockMetrics: {
+          total_productos: stockMetrics[0]?.total_productos || 0,
+          stock_actual: stockMetrics[0]?.stock_actual || 0,
+          stock_inicial: stockMetrics[0]?.stock_inicial || 0,
+          stock_vendido: stockMetrics[0]?.stock_vendido || 0
+        }
       }
     });
   } catch (err) {

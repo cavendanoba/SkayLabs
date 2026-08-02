@@ -15,7 +15,7 @@ export async function onRequestPut({ request, env, params }) {
 
   try {
     const body = await request.json();
-    const { customerName, customerPhone, channel, paymentStatus, notes, items = [] } = body || {};
+    const { customerName, customerPhone, channel, paymentStatus, notes, saleDate, items = [] } = body || {};
 
     // Actualizar datos de la venta
     const updated = await sql`
@@ -25,7 +25,8 @@ export async function onRequestPut({ request, env, params }) {
         customer_phone = ${customerPhone || null},
         channel = ${channel},
         payment_status = ${paymentStatus},
-        notes = ${notes || null}
+        notes = ${notes || null},
+        created_at = ${saleDate ? new Date(saleDate).toISOString() : new Date().toISOString()}
       WHERE id = ${Number(saleId)}
       RETURNING id, customer_name, customer_phone, channel,
                 total, amount_paid, payment_status, notes, created_at

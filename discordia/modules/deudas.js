@@ -6,7 +6,7 @@
 // - Permite marcar una venta como pagada completamente
 // ─────────────────────────────────────────────────────────────
 
-import { formatCurrency } from '../utils.js';
+import { formatCurrency } from '/discordia/utils.js';
 
 export async function renderDeudas(container) {
   container.innerHTML = `<div class="animate-pulse bg-gray-100 rounded-2xl h-64"></div>`;

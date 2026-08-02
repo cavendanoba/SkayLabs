@@ -43,6 +43,9 @@ export async function initCatalog() {
 function getFilteredCatalog() {
     let items = [...getCatalog()];
 
+    // Excluir productos con categoría N/A
+    items = items.filter((product) => product.category !== 'N/A');
+
     if (catalogUiState.search.trim()) {
         const term = catalogUiState.search.trim().toLowerCase();
         items = items.filter((product) => {

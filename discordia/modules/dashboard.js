@@ -5,7 +5,7 @@
 // recientes y alertas de stock bajo.
 // ─────────────────────────────────────────────────────────────
 
-import { formatCurrency } from '../utils.js';
+import { formatCurrency } from '/discordia/utils.js';
 
 export async function renderDashboard(container) {
   container.innerHTML = buildSkeleton();
@@ -30,7 +30,7 @@ export async function renderDashboard(container) {
 
   container.innerHTML = `
     <div class="space-y-6">
-      ${buildKPICards(data.ingresosMes, data.deudasActivas, data.stockBajo)}
+      ${buildKPICards(data.ingresosMes, data.deudasActivas, data.stockBajo, data.stockMetrics)}
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         ${buildDeudas(data.deudasActivas)}
         ${buildTopProductos(data.topProductos)}
@@ -53,8 +53,13 @@ function buildSkeleton() {
   </div>`;
 }
 
-function buildKPICards(ingresos, deudas, stockBajo) {
+function buildKPICards(ingresos, deudas, stockBajo, stockMetrics) {
   const totalDeuda = deudas.reduce((s,d) => s + Number(d.total_debt), 0);
+  const stockDiferencia = (stockMetrics?.stock_inicial || 0) - (stockMetrics?.stock_actual || 0);
+  const stockPorcentaje = stockMetrics?.stock_inicial > 0 
+    ? Math.round((stockDiferencia / stockMetrics.stock_inicial) * 100)
+    : 0;
+  
   const varHTML = ingresos.variacion !== null
     ? `<span class="text-xs font-semibold px-2 py-0.5 rounded-full mt-2 bg-white/20 text-white inline-block">
         ${ingresos.variacion >= 0 ? '▲' : '▼'} ${Math.abs(ingresos.variacion)}% vs mes anterior
@@ -64,8 +69,8 @@ function buildKPICards(ingresos, deudas, stockBajo) {
   const cards = [
     { label:'Ingresos del mes', value:formatCurrency(Number(ingresos.total)), sub:varHTML, icon:'💰', bg:'bg-gradient-to-br from-[#6d165a] to-[#a0346e]', vc:'text-white', lc:'text-white/60', bc:'border-[#a0346e]/30' },
     { label:'Ventas este mes', value:ingresos.cantidad, sub:`<span class="text-xs text-gray-500 mt-2 block">${ingresos.cantidad===1?'transacción':'transacciones'}</span>`, icon:'🛒️', bg:'bg-white', vc:'text-[#6d165a]', lc:'text-gray-400', bc:'border-gray-100' },
-    { label:'Deuda pendiente', value:formatCurrency(totalDeuda), sub:`<span class="text-xs font-semibold text-amber-600 mt-2 block">${deudas.length} cliente${deudas.length!==1?'s':''} ${deudas.length!==1?'deben':'debe'}</span>`, icon:'⚠️', bg:'bg-amber-50', vc:'text-amber-800', lc:'text-amber-400', bc:'border-amber-100' },
-    { label:'Stock bajo', value:stockBajo.length, sub:`<span class="text-xs font-semibold ${stockBajo.length>0?'text-rose-600':'text-emerald-600'} mt-2 block">${stockBajo.length===0?'Todo en buen nivel ✅':`${stockBajo.length} producto${stockBajo.length!==1?'s':''} ≤ 3 uds`}</span>`, icon:'📦', bg:stockBajo.length>0?'bg-rose-50':'bg-white', vc:stockBajo.length>0?'text-rose-700':'text-[#6d165a]', lc:stockBajo.length>0?'text-rose-300':'text-gray-400', bc:stockBajo.length>0?'border-rose-100':'border-gray-100' },
+    { label:'Productos', value:stockMetrics?.total_productos || 0, sub:`<span class="text-xs text-gray-500 mt-2 block">en catálogo</span>`, icon:'📦', bg:'bg-white', vc:'text-[#6d165a]', lc:'text-gray-400', bc:'border-gray-100' },
+    { label:'Stock Total', value:stockMetrics?.stock_actual || 0, sub:`<span class="text-xs font-semibold ${stockDiferencia>0?'text-rose-600':'text-emerald-600'} mt-2 block">-${stockDiferencia} unidades (${stockPorcentaje}%)</span>`, icon:'📊', bg:'bg-gradient-to-br from-[#ecd9ff] to-[#ffd5e3]', vc:'text-[#6d165a]', lc:'text-gray-400', bc:'border-[#ffd5e3]/50' },
   ];
 
   return `<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">

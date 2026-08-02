@@ -10,13 +10,13 @@
 // - admin.js llama a esa función cuando el usuario activa el tab.
 // ─────────────────────────────────────────────────────────────
 
-import { requireAuth, getAdminUser, logout } from './auth.js';
-import { renderDashboard }                   from './modules/dashboard.js';
-import { renderVentas }                      from './modules/ventas.js';
-import { renderDeudas }                      from './modules/deudas.js';
-import { fetchProducts }                     from './products.js';
-import { CONFIG }                            from './config.js';
-import { formatCurrency }                    from './utils.js';
+import { requireAuth, getAdminUser, logout } from '/discordia/auth.js';
+import { renderDashboard }                   from '/discordia/modules/dashboard.js';
+import { renderVentas }                      from '/discordia/modules/ventas.js';
+import { renderDeudas }                      from '/discordia/modules/deudas.js';
+import { fetchProducts }                     from '/discordia/products.js';
+import { CONFIG }                            from '/discordia/config.js';
+import { formatCurrency }                    from '/discordia/utils.js';
 
 // ── GUARD ─────────────────────────────────────────────────────
 requireAuth();

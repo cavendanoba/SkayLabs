@@ -6,8 +6,8 @@
 // - Filtros por estado, canal y búsqueda
 // ─────────────────────────────────────────────────────────────
 
-import { getCatalog } from '../catalog.js';
-import { formatCurrency } from '../utils.js';
+import { getCatalog } from '/discordia/catalog.js';
+import { formatCurrency } from '/discordia/utils.js';
 
 let allSales = [];
 let ventasDebounceTimer = null;
@@ -647,6 +647,7 @@ async function showEditVentaModal(container, saleId) {
           channel: modal.querySelector('#modal-channel').value,
           paymentStatus: modal.querySelector('#modal-payment').value,
           notes: modal.querySelector('#modal-notes').value.trim(),
+          saleDate: modal.querySelector('#modal-sale-date').value || saleDate,
           items: editItems.map(i => ({
             productId: i.productId,
             name: i.name || i.productName,
