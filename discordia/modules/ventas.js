@@ -228,8 +228,8 @@ async function showNuevaVentaModal(container) {
  
   const { value: formValues, isConfirmed } = await Swal.fire({
     title: 'Registrar nueva venta',
-    width: 720,
-    padding: '28px',
+    width: 950,
+    padding: '32px',
     html: `
       <div style="text-align:left;display:flex;flex-direction:column;gap:20px;font-family:inherit;">
  

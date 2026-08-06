@@ -50,6 +50,20 @@ export async function onRequestGet({ env }) {
     const totalAnterior = Number(ingresosPrev[0]?.total || 0);
     const variacion = totalAnterior === 0 ? null : Math.round(((totalActual - totalAnterior) / totalAnterior) * 100);
 
+    const stockInicial = stockMetrics[0]?.stock_inicial || 0;
+    const stockVendido = stockMetrics[0]?.stock_vendido || 0;
+    const totalProductos = stockMetrics[0]?.total_productos || 0;
+    
+    // Rotación de inventario: % del inventario inicial que fue vendido
+    const rotacionPorcentaje = stockInicial > 0 
+      ? Math.round((stockVendido / stockInicial) * 100)
+      : 0;
+    
+    // Tasa de rotación: unidades vendidas por producto
+    const tasaRotacion = totalProductos > 0 
+      ? Math.round(stockVendido / totalProductos * 10) / 10
+      : 0;
+
     return json({
       ok: true,
       data: {
@@ -66,11 +80,12 @@ export async function onRequestGet({ env }) {
           ingresos: Number(row.ingresos)
         })),
         ventasRecientes,
-        stockMetrics: {
-          total_productos: stockMetrics[0]?.total_productos || 0,
-          stock_actual: stockMetrics[0]?.stock_actual || 0,
-          stock_inicial: stockMetrics[0]?.stock_inicial || 0,
-          stock_vendido: stockMetrics[0]?.stock_vendido || 0
+        rotacionInventario: {
+          porcentaje: rotacionPorcentaje,
+          tasaRotacion: tasaRotacion,
+          stockVendido: stockVendido,
+          stockInicial: stockInicial,
+          totalProductos: totalProductos
         }
       }
     });

@@ -30,7 +30,7 @@ export async function renderDashboard(container) {
 
   container.innerHTML = `
     <div class="space-y-6">
-      ${buildKPICards(data.ingresosMes, data.deudasActivas, data.stockBajo, data.stockMetrics)}
+      ${buildKPICards(data.ingresosMes, data.deudasActivas, data.stockBajo, data.rotacionInventario)}
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         ${buildDeudas(data.deudasActivas)}
         ${buildTopProductos(data.topProductos)}
@@ -53,12 +53,8 @@ function buildSkeleton() {
   </div>`;
 }
 
-function buildKPICards(ingresos, deudas, stockBajo, stockMetrics) {
+function buildKPICards(ingresos, deudas, stockBajo, rotacionInventario) {
   const totalDeuda = deudas.reduce((s,d) => s + Number(d.total_debt), 0);
-  const stockDiferencia = (stockMetrics?.stock_inicial || 0) - (stockMetrics?.stock_actual || 0);
-  const stockPorcentaje = stockMetrics?.stock_inicial > 0 
-    ? Math.round((stockDiferencia / stockMetrics.stock_inicial) * 100)
-    : 0;
   
   const varHTML = ingresos.variacion !== null
     ? `<span class="text-xs font-semibold px-2 py-0.5 rounded-full mt-2 bg-white/20 text-white inline-block">
@@ -69,8 +65,8 @@ function buildKPICards(ingresos, deudas, stockBajo, stockMetrics) {
   const cards = [
     { label:'Ingresos del mes', value:formatCurrency(Number(ingresos.total)), sub:varHTML, icon:'💰', bg:'bg-gradient-to-br from-[#6d165a] to-[#a0346e]', vc:'text-white', lc:'text-white/60', bc:'border-[#a0346e]/30' },
     { label:'Ventas este mes', value:ingresos.cantidad, sub:`<span class="text-xs text-gray-500 mt-2 block">${ingresos.cantidad===1?'transacción':'transacciones'}</span>`, icon:'🛒️', bg:'bg-white', vc:'text-[#6d165a]', lc:'text-gray-400', bc:'border-gray-100' },
-    { label:'Productos', value:stockMetrics?.total_productos || 0, sub:`<span class="text-xs text-gray-500 mt-2 block">en catálogo</span>`, icon:'📦', bg:'bg-white', vc:'text-[#6d165a]', lc:'text-gray-400', bc:'border-gray-100' },
-    { label:'Stock Total', value:stockMetrics?.stock_actual || 0, sub:`<span class="text-xs font-semibold ${stockDiferencia>0?'text-rose-600':'text-emerald-600'} mt-2 block">-${stockDiferencia} unidades (${stockPorcentaje}%)</span>`, icon:'📊', bg:'bg-gradient-to-br from-[#ecd9ff] to-[#ffd5e3]', vc:'text-[#6d165a]', lc:'text-gray-400', bc:'border-[#ffd5e3]/50' },
+    { label:'Rotación', value:`${rotacionInventario.porcentaje}%`, sub:`<span class="text-xs text-gray-500 mt-2 block">${rotacionInventario.stockVendido} de ${rotacionInventario.stockInicial} uds</span>`, icon:'🔄', bg:'bg-white', vc:'text-[#6d165a]', lc:'text-gray-400', bc:'border-gray-100' },
+    { label:'Tasa de rotación', value:`${rotacionInventario.tasaRotacion}`, sub:`<span class="text-xs text-gray-500 mt-2 block">uds/producto</span>`, icon:'📈', bg:'bg-gradient-to-br from-[#ecd9ff] to-[#ffd5e3]', vc:'text-[#6d165a]', lc:'text-gray-400', bc:'border-[#ffd5e3]/50' },
   ];
 
   return `<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
