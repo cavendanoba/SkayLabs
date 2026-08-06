@@ -51,7 +51,7 @@ function paintDeudas(container, ventas) {
     return `
       <tr class="border-b border-gray-100 hover:bg-[#fdf7fa] transition">
         <td class="p-3">
-          <p class="text-gray-900 text-sm font-semibold">${v.customer_name||'Sin nombre'}</p>
+          <p class="text-gray-900 text-sm">${v.customer_name||'Sin nombre'}</p>
           <p class="text-xs text-gray-400 mt-0.5">${v.customer_phone||'—'}</p>
         </td>
         <td class="p-3 text-xs text-gray-600">${fecha}</td>
@@ -60,24 +60,24 @@ function paintDeudas(container, ventas) {
           ${(v.items||[]).length > 3 ? `<p class="text-gray-400 text-xs">+${(v.items||[]).length-3} más</p>` : ''}</div>
         </td>
         <td class="p-3">
-          <p class="font-semibold text-gray-900 text-sm">${formatCurrency(Number(v.total))}</p>
-          <p class="text-xs text-gray-500 mt-1">Abonado: <span class="text-emerald-600 font-medium">${formatCurrency(Number(v.amount_paid))}</span></p>
+          <p class="text-gray-700 text-sm">${formatCurrency(Number(v.total))}</p>
+          <p class="text-xs text-gray-500 mt-1">Abonado: <span class="text-emerald-600">${formatCurrency(Number(v.amount_paid))}</span></p>
           <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
             <div class="bg-emerald-500 h-1.5 rounded-full" style="width:${pct}%"></div>
           </div>
         </td>
         <td class="p-3 whitespace-nowrap">
-          <p class="text-rose-700 text-base font-bold">${formatCurrency(pendiente)}</p>
-          <p class="text-xs text-gray-500 mt-1" style="font-weight:400;">por cobrar</p>
+          <p class="text-rose-600 text-lg font-bold">${formatCurrency(pendiente)}</p>
+          <p class="text-xs text-gray-400 mt-1">por cobrar</p>
         </td>
         <td class="p-3">
           <div class="flex gap-2">
             <button data-sale-id="${v.id}" data-pendiente="${pendiente}" data-name="${v.customer_name||'Cliente'}"
-              class="btn-abonar px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 font-medium text-xs hover:bg-amber-200 transition whitespace-nowrap">
+              class="btn-abonar px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 font-normal text-xs hover:bg-amber-200 transition whitespace-nowrap">
               💳 Abonar
             </button>
             <button data-sale-id="${v.id}" data-pendiente="${pendiente}" data-name="${v.customer_name||'Cliente'}"
-              class="btn-pagar px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 font-medium text-xs hover:bg-emerald-200 transition whitespace-nowrap">
+              class="btn-pagar px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 font-normal text-xs hover:bg-emerald-200 transition whitespace-nowrap">
               ✅ Pagado
             </button>
           </div>

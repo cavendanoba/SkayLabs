@@ -61,26 +61,26 @@ function paintVentas(container, filtros = {}) {
     const fecha = new Date(s.created_at).toLocaleDateString('es-CO', { day:'numeric', month:'short', year:'2-digit' });
     const itemCount = (s.items||[]).reduce((sum,i)=>sum+Number(i.quantity||1),0);
     const badge = s.payment_status === 'paid'
-      ? `<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">Pagado</span>`
-      : `<span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold">Pendiente</span>`;
+      ? `<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-normal">Pagado</span>`
+      : `<span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-normal">Pendiente</span>`;
 
     return `
       <tr class="border-b border-gray-100 hover:bg-[#fdf7fa] transition">
         <td class="p-3 text-xs text-gray-500 whitespace-nowrap">${fecha}</td>
         <td class="p-3">
-          <p class="font-semibold text-gray-900 text-sm">${s.customer_name||'Sin nombre'}</p>
+          <p class="text-gray-900 text-sm">${s.customer_name||'Sin nombre'}</p>
           <p class="text-xs text-gray-400">${s.customer_phone||'—'}</p>
         </td>
         <td class="p-3 text-center text-xs text-gray-600">${itemCount} item${itemCount!==1?'s':''}</td>
-        <td class="p-3 font-bold text-[#a0346e] text-sm whitespace-nowrap">${formatCurrency(Number(s.total))}</td>
+        <td class="p-3 text-[#a0346e] text-sm font-bold whitespace-nowrap">${formatCurrency(Number(s.total))}</td>
         <td class="p-3 text-sm text-gray-600">${s.channel||'—'}</td>
         <td class="p-3">${badge}</td>
         <td class="p-3 text-xs text-gray-400 max-w-[200px] truncate">${s.notes||'—'}</td>
         <td class="p-3">
           <div class="flex gap-2">
-            <button class="view-sale px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 font-semibold text-xs hover:bg-blue-200 transition" data-id="${s.id}">👁️ Ver</button>
-            <button class="edit-sale px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-semibold text-xs hover:bg-amber-200 transition" data-id="${s.id}">✏️ Editar</button>
-            <button class="delete-sale px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-semibold text-xs hover:bg-rose-200 transition" data-id="${s.id}">🗑️ Eliminar</button>
+            <button class="view-sale px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 font-normal text-xs hover:bg-blue-200 transition" data-id="${s.id}">👁️ Ver</button>
+            <button class="edit-sale px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-normal text-xs hover:bg-amber-200 transition" data-id="${s.id}">✏️ Editar</button>
+            <button class="delete-sale px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-normal text-xs hover:bg-rose-200 transition" data-id="${s.id}">🗑️ Eliminar</button>
           </div>
         </td>
       </tr>`;
@@ -91,9 +91,9 @@ function paintVentas(container, filtros = {}) {
 
       <!-- Header -->
       <div class="bg-gradient-to-r from-[#6d165a] to-[#a0346e] px-5 py-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">🛍️ Historial de ventas</h3>
+        <h3 class="text-white text-lg" style="font-family:'Playfair Display',serif;font-weight:600;">🛍️ Historial de ventas</h3>
         <button id="btn-nueva-venta"
-          class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold rounded-xl transition flex items-center gap-2">
+          class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm font-normal rounded-xl transition flex items-center gap-2">
           <i class="fa-solid fa-plus"></i> Nueva venta
         </button>
       </div>
@@ -102,15 +102,15 @@ function paintVentas(container, filtros = {}) {
       <div class="grid grid-cols-3 gap-px bg-gray-100">
         <div class="bg-white px-4 py-3 text-center">
           <p class="text-lg font-bold text-[#6d165a]">${filtered.length}</p>
-          <p class="text-xs text-gray-500">Ventas</p>
+          <p class="text-xs text-gray-400">Ventas</p>
         </div>
         <div class="bg-white px-4 py-3 text-center">
           <p class="text-lg font-bold text-emerald-600">${formatCurrency(totalIngresos)}</p>
-          <p class="text-xs text-gray-500">Cobrado</p>
+          <p class="text-xs text-gray-400">Cobrado</p>
         </div>
         <div class="bg-white px-4 py-3 text-center">
           <p class="text-lg font-bold text-amber-600">${formatCurrency(totalDeuda)}</p>
-          <p class="text-xs text-gray-500">Por cobrar</p>
+          <p class="text-xs text-gray-400">Por cobrar</p>
         </div>
       </div>
 
@@ -133,14 +133,14 @@ function paintVentas(container, filtros = {}) {
         <table class="min-w-full text-sm">
           <thead class="bg-[#fdf2f7]">
             <tr>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Fecha</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Cliente</th>
-              <th class="p-3 text-center text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Items</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Total</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Canal</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Estado</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Notas</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Acciones</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Fecha</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Cliente</th>
+              <th class="p-3 text-center text-xs uppercase tracking-widest text-[#6d165a] font-medium">Items</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Total</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Canal</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Estado</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Notas</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Acciones</th>
             </tr>
           </thead>
           <tbody>

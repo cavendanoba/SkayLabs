@@ -121,9 +121,9 @@ function renderSummary() {
   if (summaryContainer) {
     summaryContainer.innerHTML = cards.map(c => `
       <article class="bg-white border border-gray-100 rounded-2xl p-3 md:p-4 shadow-sm">
-        <p class="text-xs uppercase tracking-[0.15em] text-gray-500">${c.label}</p>
+        <p class="text-xs uppercase tracking-[0.15em] text-gray-400 font-medium">${c.label}</p>
         <p class="text-xl md:text-2xl font-bold text-[#6d165a] mt-1.5">${c.value}</p>
-        <p class="text-xs text-gray-500 mt-0.5">${c.note}</p>
+        <p class="text-xs text-gray-400 mt-0.5">${c.note}</p>
       </article>`).join('');
   }
 }
