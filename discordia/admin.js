@@ -716,5 +716,7 @@ async function init() {
     saveToStorage(STORAGE_KEYS.sales,     state.sales);
     saveToStorage(STORAGE_KEYS.customers, state.customers);
   } catch { /* usar datos locales como fallback */ }
+}
 
 init();
+
