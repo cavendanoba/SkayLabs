@@ -698,21 +698,23 @@ if (logoutBtn) logoutBtn.addEventListener('click', logout);
 async function init() {
   // Hidratar state desde la API antes de renderizar
   try {
-    const res  = await fetch(CONFIG.ADMIN_API_PATH);
-    const json = await res.json();
+    const [resData, resProducts] = await Promise.all([
+      fetch(CONFIG.ADMIN_API_PATH),
+      fetch('/api/discordia/products')
+    ]);
+    const json         = await resData.json();
+    const productsJson = await resProducts.json();
+
     if (json.ok) {
-      state.catalog   = json.data.catalog   || state.catalog;
       state.sales     = json.data.sales     || state.sales;
       state.customers = json.data.customers || state.customers;
-      saveToStorage(STORAGE_KEYS.catalog,   state.catalog);
-      saveToStorage(STORAGE_KEYS.sales,     state.sales);
-      saveToStorage(STORAGE_KEYS.customers, state.customers);
     }
+    if (productsJson.ok) {
+      state.catalog = productsJson.data || state.catalog; // incluye activos e inactivos
+    }
+    saveToStorage(STORAGE_KEYS.catalog,   state.catalog);
+    saveToStorage(STORAGE_KEYS.sales,     state.sales);
+    saveToStorage(STORAGE_KEYS.customers, state.customers);
   } catch { /* usar datos locales como fallback */ }
-
-  buildTabs();
-  renderSummary();
-  await switchTab('dashboard');
-}
 
 init();
