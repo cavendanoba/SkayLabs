@@ -100,30 +100,36 @@ async function switchTab(tabId) {
 
 // ── RESUMEN (header KPIs) ─────────────────────────────────────
 function renderSummary() {
-  const totalStock   = state.catalog.reduce((s, p) => s + Number(p.stock || 0), 0);
-  const totalSales   = state.sales.length;
-  const totalRevenue = state.sales.reduce((s, v) => s + Number(v.total || 0), 0);
-  const user         = getAdminUser();
+  const totalProducts = state.catalog.length;
+  const totalSales    = state.sales.length;
+  const totalRevenue  = state.sales.reduce((s, v) => s + Number(v.total || 0), 0);
+  const totalPendingDebt = state.sales.reduce((s, v) => {
+    if (v.payment_status === 'pending') {
+      return s + (Number(v.total || 0) - Number(v.amount_paid || 0));
+    }
+    return s;
+  }, 0);
+  const user = getAdminUser();
 
   const cards = [
-    { label: 'Productos',   value: state.catalog.length, note: 'en catálogo' },
-    { label: 'Stock total', value: totalStock,            note: 'unidades disponibles' },
-    { label: 'Ventas',      value: totalSales,            note: 'registradas' },
-    { label: 'Ingresos',    value: formatCurrency(totalRevenue), note: `· Admin: ${user}` },
+    { label: 'Productos',       value: totalProducts,                note: 'en catálogo' },
+    { label: 'Deuda Pendiente', value: formatCurrency(totalPendingDebt), note: 'por cobrar' },
+    { label: 'Ventas',          value: totalSales,                   note: 'registradas' },
+    { label: 'Ingresos',        value: formatCurrency(totalRevenue), note: `· Admin: ${user}` },
   ];
 
   if (summaryContainer) {
     summaryContainer.innerHTML = cards.map(c => `
-      <article class="bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm">
+      <article class="bg-white border border-gray-100 rounded-2xl p-3 md:p-4 shadow-sm">
         <p class="text-xs uppercase tracking-[0.15em] text-gray-500">${c.label}</p>
-        <p class="text-2xl md:text-3xl font-bold text-[#6d165a] mt-2">${c.value}</p>
-        <p class="text-sm text-gray-500 mt-1">${c.note}</p>
+        <p class="text-xl md:text-2xl font-bold text-[#6d165a] mt-1.5">${c.value}</p>
+        <p class="text-xs text-gray-500 mt-0.5">${c.note}</p>
       </article>`).join('');
   }
 }
 
 // ── CATÁLOGO ──────────────────────────────────────────────────
-const catalogUiState = { query: '', lowStockOnly: false };
+const catalogUiState = { query: '', lowStockOnly: false, showInactive: false };
 let catalogDebounceTimer = null;
 
 // Debounce helper para evitar re-renders frecuentes
@@ -137,7 +143,8 @@ function renderCatalogTab() {
   const filtered = state.catalog.filter(item => {
     const matchQ = !q || `${item.name} ${item.code||''} ${item.category||''} ${item.description||''}`.toLowerCase().includes(q);
     const matchS = !catalogUiState.lowStockOnly || Number(item.stock||0) <= 5;
-    return matchQ && matchS;
+    const matchA = catalogUiState.showInactive || item.active !== false; // Mostrar inactivos solo si se activa el checkbox
+    return matchQ && matchS && matchA;
   });
 
   const rows = filtered.map(item => `
@@ -168,7 +175,7 @@ function renderCatalogTab() {
       <td class="p-3">
         <div class="flex gap-2">
           <button class="edit-product px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-semibold text-xs hover:bg-amber-200 transition" data-id="${item.id}">Editar</button>
-          <button class="delete-product px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-semibold text-xs hover:bg-rose-200 transition" data-id="${item.id}">Desactivar</button>
+          <button class="delete-product px-3 py-1.5 rounded-lg ${item.active!==false?'bg-rose-100 text-rose-700 hover:bg-rose-200':'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'} font-semibold text-xs transition" data-id="${item.id}">${item.active!==false?'🗑️ Desactivar':'♻️ Reactivar'}</button>
         </div>
       </td>
     </tr>`).join('');
@@ -190,6 +197,10 @@ function renderCatalogTab() {
         <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
           <input id="catalog-low-stock" type="checkbox" ${catalogUiState.lowStockOnly?'checked':''} class="w-3.5 h-3.5 accent-[#9d5fa5]">
           Solo stock bajo (≤ 5)
+        </label>
+        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+          <input id="catalog-show-inactive" type="checkbox" ${catalogUiState.showInactive?'checked':''} class="w-3.5 h-3.5 accent-[#9d5fa5]">
+          Mostrar desactivados
         </label>
         <span class="self-center text-xs text-gray-400">Mostrando ${filtered.length} de ${state.catalog.length}</span>
       </div>
@@ -221,6 +232,10 @@ function renderCatalogTab() {
   });
   panel.querySelector('#catalog-low-stock').addEventListener('change', e => {
     catalogUiState.lowStockOnly = e.target.checked;
+    renderCatalogTab();
+  });
+  panel.querySelector('#catalog-show-inactive').addEventListener('change', e => {
+    catalogUiState.showInactive = e.target.checked;
     renderCatalogTab();
   });
   panel.querySelector('#add-product').addEventListener('click', () => showProductModal(null));
@@ -503,6 +518,10 @@ async function deactivateProduct(productId) {
     const product = state.catalog.find(p => Number(p.id) === productId);
     if (!product) return resolve();
 
+    const isActive = product.active !== false;
+    const action = isActive ? 'Desactivar' : 'Reactivar';
+    const actionColor = isActive ? 'from-orange-500 to-red-500' : 'from-emerald-500 to-green-500';
+
     // Crear modal de confirmación
     const overlay = document.createElement('div');
     overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4';
@@ -518,25 +537,25 @@ async function deactivateProduct(productId) {
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
       </style>
 
-      <!-- Header de advertencia -->
-      <div class="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-5 flex items-center justify-between">
+      <!-- Header -->
+      <div class="bg-gradient-to-r ${actionColor} px-6 py-5 flex items-center justify-between">
         <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          ⚠️ Desactivar Producto
+          ${isActive ? '⚠️ Desactivar Producto' : '✅ Reactivar Producto'}
         </h3>
       </div>
 
       <!-- Content -->
       <div class="p-6 space-y-4">
-        <p class="text-gray-600">¿Estás seguro de que deseas desactivar este producto?</p>
+        <p class="text-gray-600">¿Estás seguro de que deseas ${isActive ? 'desactivar' : 'reactivar'} este producto?</p>
         
-        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <p class="text-sm font-semibold text-amber-900">${product.name}</p>
-          <p class="text-xs text-amber-700 mt-1">SKU: ${product.code || 'Sin código'}</p>
-          <p class="text-xs text-amber-700">Precio: ${formatCurrency(Number(product.price||0))}</p>
+        <div class="${isActive ? 'bg-amber-50 border border-amber-200' : 'bg-emerald-50 border border-emerald-200'} rounded-lg p-4">
+          <p class="text-sm font-semibold ${isActive ? 'text-amber-900' : 'text-emerald-900'}">${product.name}</p>
+          <p class="text-xs ${isActive ? 'text-amber-700' : 'text-emerald-700'} mt-1">SKU: ${product.code || 'Sin código'}</p>
+          <p class="text-xs ${isActive ? 'text-amber-700' : 'text-emerald-700'}">Precio: ${formatCurrency(Number(product.price||0))}</p>
         </div>
 
         <p class="text-sm text-gray-500 italic">
-          El producto será ocultado del catálogo, pero los datos se mantendrán en el sistema.
+          ${isActive ? 'El producto será ocultado del catálogo público, pero los datos se mantendrán en el sistema.' : 'El producto volverá a ser visible en el catálogo público.'}
         </p>
       </div>
 
@@ -545,8 +564,8 @@ async function deactivateProduct(productId) {
         <button class="cancel-btn px-5 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition">
           Cancelar
         </button>
-        <button class="confirm-delete px-5 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2">
-          <span class="delete-text">🗑️ Desactivar</span>
+        <button class="confirm-delete px-5 py-2.5 bg-gradient-to-r ${actionColor} text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2">
+          <span class="delete-text">${isActive ? '🗑️ Desactivar' : '♻️ Reactivar'}</span>
           <span class="delete-loader hidden">
             <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <circle class="opacity-25" cx="12" cy="12" r="10"></circle>
@@ -582,16 +601,31 @@ async function deactivateProduct(productId) {
     deleteBtn.addEventListener('click', async () => {
       deleteBtn.disabled = true;
       deleteLoader.classList.remove('hidden');
-      deleteText.textContent = 'Desactivando...';
+      deleteText.textContent = isActive ? 'Desactivando...' : 'Reactivando...';
 
       try {
-        await fetch('/api/discordia/products', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: productId })
-        });
+        // Actualizar el estado del producto
+        const updatedProduct = { 
+          ...product, 
+          active: !isActive // Cambiar estado: activo -> inactivo o viceversa
+        };
 
-        state.catalog = state.catalog.filter(p => Number(p.id) !== productId);
+        // Enviar PUT al API para actualizar
+        const res = await fetch('/api/discordia/products', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedProduct)
+        });
+        
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.message);
+
+        // Actualizar state.catalog
+        const idx = state.catalog.findIndex(p => Number(p.id) === productId);
+        if (idx >= 0) {
+          state.catalog[idx] = updatedProduct;
+        }
+        
         saveToStorage(STORAGE_KEYS.catalog, state.catalog);
         renderSummary();
         renderCatalogTab();
@@ -599,16 +633,16 @@ async function deactivateProduct(productId) {
         // Toast de éxito
         const toast = document.createElement('div');
         toast.className = 'fixed top-5 right-5 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg';
-        toast.textContent = '✓ Producto desactivado correctamente';
+        toast.textContent = isActive ? '✓ Producto desactivado correctamente' : '✓ Producto reactivado correctamente';
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
 
         closeModal();
       } catch (err) {
-        alert('Error al desactivar: ' + (err.message || 'Intenta de nuevo'));
+        alert('Error: ' + (err.message || 'Intenta de nuevo'));
         deleteBtn.disabled = false;
         deleteLoader.classList.add('hidden');
-        deleteText.textContent = '🗑️ Desactivar';
+        deleteText.textContent = isActive ? '🗑️ Desactivar' : '♻️ Reactivar';
       }
     });
   });

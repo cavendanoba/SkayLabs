@@ -173,12 +173,56 @@ function paintVentas(container, filtros = {}) {
   );
 }
 
+// ── FUNCIÓN AUXILIAR: Obtener clientes únicos con historial ───
+function getUniqueCustomers() {
+  const customerMap = new Map();
+  
+  allSales.forEach(sale => {
+    const key = (sale.customer_name || 'Sin nombre').toLowerCase();
+    if (!customerMap.has(key)) {
+      const totalSpent = sale.total || 0;
+      const pendingDebt = sale.payment_status === 'pending' ? Number(sale.total) - Number(sale.amount_paid || 0) : 0;
+      
+      customerMap.set(key, {
+        name: sale.customer_name || 'Sin nombre',
+        phone: sale.customer_phone || '',
+        purchases: 1,
+        totalSpent: Number(totalSpent),
+        pendingDebt: pendingDebt,
+        lastPurchase: sale.created_at,
+        channel: sale.channel || ''
+      });
+    } else {
+      const existing = customerMap.get(key);
+      existing.purchases += 1;
+      existing.totalSpent += Number(sale.total || 0);
+      if (sale.payment_status === 'pending') {
+        existing.pendingDebt += Number(sale.total) - Number(sale.amount_paid || 0);
+      }
+      if (new Date(sale.created_at) > new Date(existing.lastPurchase)) {
+        existing.lastPurchase = sale.created_at;
+        existing.channel = sale.channel || existing.channel;
+      }
+    }
+  });
+  
+  return Array.from(customerMap.values()).sort((a, b) => b.totalSpent - a.totalSpent);
+}
+
 // ── MODAL NUEVA VENTA ─────────────────────────────────────────
 async function showNuevaVentaModal(container) {
   const catalog = getCatalog();
+  const uniqueCustomers = getUniqueCustomers();
+  
   const productOptions = catalog.map(p =>
     `<option value="${p.id}" data-price="${p.price}" data-name="${p.name}" data-stock="${p.stock}">
       ${p.name} — ${formatCurrency(p.price)} (stock: ${p.stock})
+    </option>`
+  ).join('');
+  
+  const customerOptions = uniqueCustomers.map((c, idx) => 
+    `<option value="${idx}" data-phone="${c.phone}" data-purchases="${c.purchases}" data-total-spent="${c.totalSpent}" data-pending-debt="${c.pendingDebt}" data-channel="${c.channel}">
+      ${c.name} — ${c.purchases} compra${c.purchases !== 1 ? 's' : ''} (${formatCurrency(c.totalSpent)}) ${c.pendingDebt > 0 ? `⚠️ Debe: ${formatCurrency(c.pendingDebt)}` : '✅'}
     </option>`
   ).join('');
  
@@ -188,6 +232,28 @@ async function showNuevaVentaModal(container) {
     padding: '28px',
     html: `
       <div style="text-align:left;display:flex;flex-direction:column;gap:20px;font-family:inherit;">
+ 
+        <!-- SECCIÓN: SELECCIONAR CLIENTE EXISTENTE -->
+        <section>
+          <h3 style="font-size:13px;font-weight:800;color:#a0346e;text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
+            ¿Cliente recurrente?
+          </h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Buscar cliente existente</label>
+              <select id="sw-existing-customer" class="swal2-input" style="margin:0;width:100%;height:44px;">
+                <option value="">— Crear nueva clienta —</option>
+                ${customerOptions}
+              </select>
+            </div>
+            <div id="sw-customer-info" style="display:none;background:#f0f9ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;">
+              <div style="color:#1e40af;font-weight:600;margin-bottom:8px;">Historial de la clienta:</div>
+              <div id="sw-customer-history"></div>
+            </div>
+          </div>
+        </section>
+
+        <hr style="border:none;border-top:1px solid #f1d7e2;margin:0;">
  
         <!-- SECCIÓN: DATOS DEL CLIENTE -->
         <section>
@@ -207,6 +273,7 @@ async function showNuevaVentaModal(container) {
               <div>
                 <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Canal</label>
                 <select id="sw-channel" class="swal2-input" style="margin:0;width:100%;height:44px;">
+                  <option value="">— Selecciona un canal —</option>
                   <option value="WhatsApp">WhatsApp</option>
                   <option value="Instagram">Instagram</option>
                   <option value="Efectivo">Efectivo</option>
@@ -287,6 +354,47 @@ async function showNuevaVentaModal(container) {
     cancelButtonText: 'Cancelar',
     didOpen: () => {
       window._swItems = [];
+      
+      // Manejador para seleccionar cliente existente
+      const existingCustomerSelect = document.getElementById('sw-existing-customer');
+      const customerNameInput = document.getElementById('sw-customer-name');
+      const customerPhoneInput = document.getElementById('sw-customer-phone');
+      const channelSelect = document.getElementById('sw-channel');
+      const customerInfoDiv = document.getElementById('sw-customer-info');
+      const customerHistoryDiv = document.getElementById('sw-customer-history');
+      
+      existingCustomerSelect.addEventListener('change', (e) => {
+        if (e.target.value === '') {
+          // Crear nueva clienta
+          customerNameInput.value = '';
+          customerPhoneInput.value = '';
+          channelSelect.value = '';
+          customerInfoDiv.style.display = 'none';
+        } else {
+          // Seleccionar cliente existente
+          const idx = parseInt(e.target.value);
+          const customer = uniqueCustomers[idx];
+          const opt = e.target.options[e.target.selectedIndex];
+          
+          customerNameInput.value = customer.name;
+          customerPhoneInput.value = customer.phone;
+          channelSelect.value = customer.channel || '';
+          
+          // Mostrar historial del cliente
+          const lastPurchaseDate = new Date(customer.lastPurchase).toLocaleDateString('es-CO');
+          customerHistoryDiv.innerHTML = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
+              <div><strong>Compras totales:</strong> ${customer.purchases}</div>
+              <div><strong>Total invertido:</strong> ${formatCurrency(customer.totalSpent)}</div>
+              <div><strong>Última compra:</strong> ${lastPurchaseDate}</div>
+              <div style="color:${customer.pendingDebt > 0 ? '#dc2626' : '#059669'};font-weight:600;">
+                ${customer.pendingDebt > 0 ? `⚠️ Debe: ${formatCurrency(customer.pendingDebt)}` : '✅ Sin deuda'}
+              </div>
+            </div>
+          `;
+          customerInfoDiv.style.display = 'block';
+        }
+      });
  
       // Filtro en vivo del selector de productos
       const allOptionsHTML = productOptions;
