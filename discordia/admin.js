@@ -18,15 +18,14 @@ import { fetchProducts }                     from '/discordia/products.js';
 import { CONFIG }                            from '/discordia/config.js';
 import { formatCurrency }                    from '/discordia/utils.js';
 
-// ── GUARD ─────────────────────────────────────────────────────
-requireAuth();
+// ── GUARD (no ejecutar aquí, hacerlo en init) ─────────────────
+// requireAuth() se ejecutará dentro de init() para mejor manejo
 
 // ── ESTADO ────────────────────────────────────────────────────
 let activeTab = 'dashboard';
 
-const panel            = document.getElementById('admin-panel');
-const summaryContainer = document.getElementById('admin-summary');
-const tabButtons       = Array.from(document.querySelectorAll('.admin-tab-btn'));
+let panel            = null;
+let summaryContainer = null;
 
 // ── STORAGE (para compatibilidad con funciones heredadas) ─────
 const STORAGE_KEYS = {
@@ -691,38 +690,70 @@ function renderCustomersTab() {
 }
 
 // ── LOGOUT BUTTON ─────────────────────────────────────────────
-const logoutBtn = document.getElementById('logout-btn');
-if (logoutBtn) logoutBtn.addEventListener('click', logout);
+function setupLogoutButton() {
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) logoutBtn.addEventListener('click', logout);
+}
 
 // ── INIT ──────────────────────────────────────────────────────
 async function init() {
-  // Hidratar state desde la API antes de renderizar
+  // Paso 1: Verificar autenticación
   try {
-    const [resData, resProducts] = await Promise.all([
-      fetch(CONFIG.ADMIN_API_PATH),
-      fetch('/api/discordia/products')
-    ]);
-    const json         = await resData.json();
-    const productsJson = await resProducts.json();
+    requireAuth(); // Si no hay token, redirige a login
+  } catch (err) {
+    console.error('Auth check failed:', err.message);
+    return; // No continuar si falla autenticación
+  }
 
+  // Paso 2: Esperar a que el DOM esté listo
+  await new Promise((resolve) => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', resolve);
+    } else {
+      resolve();
+    }
+  });
+
+  // Paso 3: Inicializar elementos del DOM
+  panel            = document.getElementById('admin-panel');
+  summaryContainer = document.getElementById('admin-summary');
+  
+  if (!panel || !summaryContainer) {
+    console.error('Required DOM elements not found');
+    return;
+  }
+
+  setupLogoutButton();
+
+  // Paso 4: Hidratar state desde la API
+  try {
+    const res  = await fetch(CONFIG.ADMIN_API_PATH);
+    if (!res.ok) throw new Error(`API returned ${res.status}`);
+    const json = await res.json();
     if (json.ok) {
+      state.catalog   = json.data.catalog   || state.catalog;
       state.sales     = json.data.sales     || state.sales;
       state.customers = json.data.customers || state.customers;
+      saveToStorage(STORAGE_KEYS.catalog,   state.catalog);
+      saveToStorage(STORAGE_KEYS.sales,     state.sales);
+      saveToStorage(STORAGE_KEYS.customers, state.customers);
     }
-    if (productsJson.ok) {
-      state.catalog = productsJson.data || state.catalog; // incluye activos e inactivos
-    }
-    saveToStorage(STORAGE_KEYS.catalog,   state.catalog);
-    saveToStorage(STORAGE_KEYS.sales,     state.sales);
-    saveToStorage(STORAGE_KEYS.customers, state.customers);
-  } catch { /* usar datos locales como fallback */ }
+  } catch (err) {
+    console.warn('API load failed, using local data:', err.message);
+    // Continuar con datos locales del fallback
+  }
 
+  // Paso 5: Renderizar UI
   buildTabs();
   renderSummary();
   await switchTab('dashboard');
 }
 
-init();
-
+// Ejecutar init cuando el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 
