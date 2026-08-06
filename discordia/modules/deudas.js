@@ -36,7 +36,7 @@ function paintDeudas(container, ventas) {
     container.innerHTML = `
       <article class="bg-emerald-50 border border-emerald-100 rounded-2xl p-10 text-center shadow-sm">
         <span class="text-5xl block mb-4">🎉</span>
-        <p class="font-bold text-emerald-800 text-xl" style="font-family:'Playfair Display',serif">¡Sin deudas pendientes!</p>
+        <p class="text-emerald-800 text-xl" style="font-family:'Playfair Display',serif;font-weight:600;">¡Sin deudas pendientes!</p>
         <p class="text-emerald-600 mt-2 text-sm">Todas las clientas han pagado sus compras.</p>
       </article>`;
     return;
@@ -51,30 +51,33 @@ function paintDeudas(container, ventas) {
     return `
       <tr class="border-b border-gray-100 hover:bg-[#fdf7fa] transition">
         <td class="p-3">
-          <p class="font-semibold text-gray-900 text-sm">${v.customer_name||'Sin nombre'}</p>
-          <p class="text-xs text-gray-400">${v.customer_phone||'Sin teléfono'}</p>
+          <p class="text-gray-900 text-sm font-semibold">${v.customer_name||'Sin nombre'}</p>
+          <p class="text-xs text-gray-400 mt-0.5">${v.customer_phone||'—'}</p>
         </td>
-        <td class="p-3 text-xs text-gray-500 whitespace-nowrap">${fecha}</td>
-        <td class="p-3 text-xs text-gray-500 max-w-[180px]">
+        <td class="p-3 text-xs text-gray-600">${fecha}</td>
+        <td class="p-3 text-xs text-gray-600 max-w-[180px]">
           <div class="space-y-0.5">${(v.items||[]).slice(0,3).map(i=>`<p class="truncate">${i.name||i.productName||'Producto'} ×${i.quantity}</p>`).join('')}
-          ${(v.items||[]).length > 3 ? `<p class="text-gray-400">+${(v.items||[]).length-3} más</p>` : ''}</div>
+          ${(v.items||[]).length > 3 ? `<p class="text-gray-400 text-xs">+${(v.items||[]).length-3} más</p>` : ''}</div>
         </td>
         <td class="p-3">
-          <p class="font-bold text-gray-800 text-sm">${formatCurrency(Number(v.total))}</p>
-          <p class="text-xs text-emerald-600">Abonado: ${formatCurrency(Number(v.amount_paid))}</p>
-          <div class="w-full bg-gray-100 rounded-full h-1 mt-1">
-            <div class="bg-emerald-400 h-1 rounded-full" style="width:${pct}%"></div>
+          <p class="font-semibold text-gray-900 text-sm">${formatCurrency(Number(v.total))}</p>
+          <p class="text-xs text-gray-500 mt-1">Abonado: <span class="text-emerald-600 font-medium">${formatCurrency(Number(v.amount_paid))}</span></p>
+          <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+            <div class="bg-emerald-500 h-1.5 rounded-full" style="width:${pct}%"></div>
           </div>
         </td>
-        <td class="p-3 font-bold text-rose-600 text-sm whitespace-nowrap">${formatCurrency(pendiente)}</td>
+        <td class="p-3 whitespace-nowrap">
+          <p class="text-rose-700 text-base font-bold">${formatCurrency(pendiente)}</p>
+          <p class="text-xs text-gray-500 mt-1" style="font-weight:400;">por cobrar</p>
+        </td>
         <td class="p-3">
           <div class="flex gap-2">
             <button data-sale-id="${v.id}" data-pendiente="${pendiente}" data-name="${v.customer_name||'Cliente'}"
-              class="btn-abonar px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-semibold text-xs hover:bg-amber-200 transition whitespace-nowrap">
+              class="btn-abonar px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 font-medium text-xs hover:bg-amber-200 transition whitespace-nowrap">
               💳 Abonar
             </button>
             <button data-sale-id="${v.id}" data-pendiente="${pendiente}" data-name="${v.customer_name||'Cliente'}"
-              class="btn-pagar px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 font-semibold text-xs hover:bg-emerald-200 transition whitespace-nowrap">
+              class="btn-pagar px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 font-medium text-xs hover:bg-emerald-200 transition whitespace-nowrap">
               ✅ Pagado
             </button>
           </div>
@@ -86,12 +89,12 @@ function paintDeudas(container, ventas) {
     <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
       <div class="bg-gradient-to-r from-amber-500 to-orange-400 px-5 py-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">⚠️ Deudas pendientes</h3>
+          <h3 class="text-white text-lg" style="font-family:'Playfair Display',serif;font-weight:600;">⚠️ Deudas pendientes</h3>
           <p class="text-white/70 text-xs mt-0.5">${ventas.length} venta${ventas.length!==1?'s':''} por cobrar</p>
         </div>
         <div class="text-right">
-          <p class="text-white text-xs">Total adeudado</p>
-          <p class="text-white font-bold text-xl">${formatCurrency(totalDeuda)}</p>
+          <p class="text-white text-xs font-medium">Total adeudado</p>
+          <p class="text-white text-2xl font-bold mt-1">${formatCurrency(totalDeuda)}</p>
         </div>
       </div>
 
@@ -99,12 +102,12 @@ function paintDeudas(container, ventas) {
         <table class="min-w-full text-sm">
           <thead class="bg-amber-50">
             <tr>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-800 font-semibold">Cliente</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-800 font-semibold">Fecha</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-800 font-semibold">Productos</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-800 font-semibold">Total / Abonado</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-800 font-semibold">Pendiente</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-800 font-semibold">Acciones</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Cliente</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Fecha</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Productos</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Total / Abonado</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Pendiente</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Acciones</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
