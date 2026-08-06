@@ -1,4 +1,4 @@
-const CACHE_NAME = 'discordia-v1';
+const CACHE_NAME = 'discordia-v2';
 
 // Assets del shell de la app — se precargan al instalar
 const PRECACHE_ASSETS = [
