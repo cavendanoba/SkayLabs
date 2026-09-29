@@ -1,0 +1,62 @@
+<section id="infraestructura" class="max-w-3xl mx-auto px-6 py-16">
+  <h2 class="text-2xl sm:text-3xl font-display mb-2 text-center">Infraestructura en vivo</h2>
+  <p class="text-sm text-muted text-center mb-8">Lo que corro yo mismo, verificado en tiempo real.</p>
+
+  <div id="infra-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div class="border border-border rounded-lg p-4 text-center col-span-2 sm:col-span-4">
+      <p class="text-xs text-muted">Consultando estado en vivo…</p>
+    </div>
+  </div>
+
+  <p id="infra-timestamp" class="text-[11px] text-muted text-center mt-6"></p>
+</section>
+
+<script>
+  async function loadInfraStatus() {
+    const grid = document.getElementById('infra-grid');
+    const timestamp = document.getElementById('infra-timestamp');
+    if (!grid || !timestamp) return;
+
+    try {
+      const res = await fetch('/api/status', { cache: 'no-store' });
+      if (!res.ok) throw new Error('status endpoint failed');
+      const data = await res.json();
+
+      grid.innerHTML = data.services
+        .map((service) => {
+          let statusLabel;
+          let statusClass;
+          if (!service.verifiable) {
+            statusLabel = 'no verificable por HTTP';
+            statusClass = 'text-muted';
+          } else if (service.up) {
+            statusLabel = '● activo';
+            statusClass = 'text-green-300';
+          } else {
+            statusLabel = '● sin respuesta';
+            statusClass = 'text-red-300';
+          }
+          return `
+            <div class="border border-border rounded-lg p-4 text-center">
+              <p class="text-xs text-muted mb-2">${service.name}</p>
+              <p class="text-xs ${statusClass}">${statusLabel}</p>
+            </div>
+          `;
+        })
+        .join('');
+
+      const checkedDate = new Date(data.checkedAt);
+      timestamp.textContent = `Última verificación: ${checkedDate.toLocaleTimeString('es-CO')}`;
+    } catch {
+      grid.innerHTML = `
+        <div class="border border-border rounded-lg p-4 text-center col-span-2 sm:col-span-4">
+          <p class="text-xs text-red-300">No se pudo consultar el estado en vivo ahora mismo.</p>
+        </div>
+      `;
+      timestamp.textContent = '';
+    }
+  }
+
+  loadInfraStatus();
+  setInterval(loadInfraStatus, 60000);
+</script>

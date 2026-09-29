@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Starfield from '../components/Starfield.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Skills from '../components/Skills.astro';
+import Projects from '../components/Projects.astro';
+import CaseStudies from '../components/CaseStudies.astro';
+import InfraStatus from '../components/InfraStatus.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+---
+<Layout>
+  <Starfield />
+  <div class="relative z-10">
+    <Header />
+    <main>
+      <Hero />
+      <About />
+      <Skills />
+      <Projects />
+      <CaseStudies />
+      <InfraStatus />
+      <Contact />
+    </main>
+    <Footer />
+  </div>
+</Layout>
