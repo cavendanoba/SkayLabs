@@ -1,0 +1,45 @@
+═══════════════════════════════════════════════
+  OPTIX by SkayLabs — Kit de Identidad Visual
+═══════════════════════════════════════════════
+
+PALETA DE COLORES CORPORATIVOS
+  #0a0c18  — Azul noche (fondo dark profundo)
+  #2b4362  — Azul naval (color principal de marca)
+  #aec3d9  — Azul polvoso (acentos, iris, detalles)
+  #f2f3f5  — Blanco frío (textos sobre oscuro)
+  #cdcbc7  — Gris cálido (textos secundarios)
+
+TIPOGRAFÍA
+  Familia: Arial / Helvetica Neue
+  Peso principal: Bold (700)
+  Peso secundario: Regular (400)
+  Tagline: Letter-spacing amplio (+4 a +6)
+
+ARCHIVOS SVG (vectoriales — escala infinita)
+  svg/optix-icon.svg              Ícono solo (usar para favicon en web)
+  svg/optix-logo-full.svg         Logo completo dark (presentaciones, documentos)
+  svg/optix-logo-horizontal.svg   Logo horizontal light (navbar, cabeceras)
+  svg/optix-logo-dark.svg         Logo horizontal dark (fondos oscuros)
+
+ARCHIVOS PNG (mapas de bits — tamaños fijos)
+  png/optix-icon-512.png          App Store / Google Play (512×512)
+  png/optix-icon-192.png          PWA / Android launcher (192×192)
+  png/optix-icon-64.png           Favicon HD (64×64)
+  png/optix-icon-32.png           Favicon estándar (32×32)
+  png/optix-logo-full.png         Logo completo alta resolución (1600×800)
+  png/optix-logo-horizontal@2x.png  Logo horizontal alta res (1400×360)
+  png/optix-logo-horizontal@1x.png  Logo horizontal estándar (700×180)
+  png/optix-logo-dark@2x.png       Logo dark alta res (1400×360)
+  png/optix-logo-dark@1x.png       Logo dark estándar (700×180)
+
+GUÍA DE USO
+  Navbar del aplicativo web    → optix-logo-horizontal.svg (light)
+  Login / Splash dark          → optix-logo-dark.svg
+  Favicon navegador            → optix-icon-64.png + optix-icon-32.png
+  Google Play / App Store      → optix-icon-512.png
+  PWA manifest.json            → optix-icon-192.png
+  Documentos Word / PDF        → optix-logo-horizontal@2x.png
+  Redes sociales               → optix-logo-full.png
+  WhatsApp Business            → optix-icon-512.png
+
+SkayLabs © 2026 — Todos los derechos reservados

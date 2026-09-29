@@ -1,0 +1,1 @@
+import{a}from"./index-CuY4N-rM.js";const p={list:(t={})=>{const e=new URLSearchParams(t).toString();return a.get(`/patients${e?"?"+e:""}`)},getById:t=>a.get(`/patients/${t}`),create:t=>a.post("/patients",t),update:(t,e)=>a.put(`/patients/${t}`,e)};export{p};

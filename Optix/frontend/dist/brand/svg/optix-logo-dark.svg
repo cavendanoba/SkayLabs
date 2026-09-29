@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="180" viewBox="0 0 700 180">
+  <defs>
+    <radialGradient id="dBg" cx="28%" cy="22%" r="78%">
+      <stop offset="0%" stop-color="#1a2e42"/>
+      <stop offset="100%" stop-color="#060a10"/>
+    </radialGradient>
+    <radialGradient id="dIris" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#c8d8e8" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#4a7090" stop-opacity="0.5"/>
+    </radialGradient>
+    <radialGradient id="dPupil" cx="38%" cy="32%" r="68%">
+      <stop offset="0%" stop-color="#2a4560"/>
+      <stop offset="100%" stop-color="#040608"/>
+    </radialGradient>
+    <radialGradient id="dGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#aec3d9" stop-opacity="0.36"/>
+      <stop offset="100%" stop-color="#aec3d9" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="dBlur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+    <filter id="dShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+
+  <!-- Sombra exterior -->
+  <rect x="4" y="6" width="700" height="180" rx="18" fill="#000" opacity="0.45" filter="url(#dShadow)"/>
+  <!-- Fondo -->
+  <rect width="700" height="180" rx="18" fill="url(#dBg)"/>
+  <rect width="700" height="180" rx="18" fill="none" stroke="#aec3d9" stroke-width="0.8" opacity="0.18"/>
+  <rect width="220" height="90" rx="18" fill="#f2f3f5" opacity="0.025"/>
+
+  <!-- Glow ojo -->
+  <ellipse cx="84" cy="90" rx="56" ry="34" fill="url(#dGlow)" filter="url(#dBlur)"/>
+
+  <!-- Párpados -->
+  <path d="M28 90 Q84 34 140 90"  fill="none" stroke="#000000" stroke-width="7"   stroke-linecap="round" opacity="0.65"/>
+  <path d="M28 90 Q84 34 140 90"  fill="none" stroke="#f2f3f5" stroke-width="3.8" stroke-linecap="round"/>
+  <path d="M28 90 Q84 146 140 90" fill="none" stroke="#000000" stroke-width="5.5" stroke-linecap="round" opacity="0.55"/>
+  <path d="M28 90 Q84 146 140 90" fill="none" stroke="#cdcbc7" stroke-width="2.5" stroke-linecap="round" opacity="0.78"/>
+
+  <!-- Iris capas -->
+  <circle cx="84" cy="90" r="36" fill="none" stroke="#aec3d9" stroke-width="0.8" opacity="0.15"/>
+  <circle cx="84" cy="90" r="32" fill="url(#dIris)"/>
+  <circle cx="84" cy="90" r="32" fill="none" stroke="#aec3d9" stroke-width="2.2" opacity="0.58"/>
+  <circle cx="84" cy="90" r="26" fill="none" stroke="#2b4362"  stroke-width="1.2" opacity="0.42"/>
+
+  <!-- Pupila -->
+  <circle cx="84" cy="90" r="16" fill="url(#dPupil)"/>
+  <circle cx="84" cy="90" r="16" fill="none" stroke="#040608"  stroke-width="0.9" opacity="0.9"/>
+
+  <!-- Reflejos -->
+  <ellipse cx="93" cy="81" rx="7" ry="5" fill="#f2f3f5" opacity="0.97"/>
+  <circle  cx="74" cy="99" r="3"          fill="#f2f3f5" opacity="0.3"/>
+  <ellipse cx="72" cy="82" rx="2.5" ry="1.5" fill="#f2f3f5" opacity="0.16"/>
+
+  <!-- Ejes -->
+  <line x1="28" y1="90" x2="140" y2="90"  stroke="#aec3d9" stroke-width="0.7" stroke-dasharray="4 5" opacity="0.2"/>
+  <line x1="84" y1="34" x2="84"  y2="146" stroke="#aec3d9" stroke-width="0.7" stroke-dasharray="4 5" opacity="0.2"/>
+
+  <!-- Puntos focales -->
+  <circle cx="28"  cy="90" r="7"   fill="#000" opacity="0.7"/>
+  <circle cx="28"  cy="90" r="4.2" fill="#2b4362"/>
+  <circle cx="28"  cy="90" r="4.2" fill="none" stroke="#aec3d9" stroke-width="1" opacity="0.6"/>
+  <circle cx="140" cy="90" r="7"   fill="#000" opacity="0.7"/>
+  <circle cx="140" cy="90" r="4.2" fill="#2b4362"/>
+  <circle cx="140" cy="90" r="4.2" fill="none" stroke="#aec3d9" stroke-width="1" opacity="0.6"/>
+
+  <!-- Conectores circuit -->
+  <line x1="124" y1="64"  x2="152" y2="44"  stroke="#aec3d9" stroke-width="1.4" opacity="0.3"/>
+  <line x1="152" y1="44"  x2="168" y2="44"  stroke="#aec3d9" stroke-width="1.4" opacity="0.3"/>
+  <circle cx="152" cy="44" r="2.8" fill="#aec3d9" opacity="0.48"/>
+  <line x1="124" y1="116" x2="152" y2="136" stroke="#aec3d9" stroke-width="1.4" opacity="0.3"/>
+  <line x1="152" y1="136" x2="168" y2="136" stroke="#aec3d9" stroke-width="1.4" opacity="0.3"/>
+  <circle cx="152" cy="136" r="2.8" fill="#aec3d9" opacity="0.48"/>
+
+  <!-- Divisor -->
+  <line x1="170" y1="30"  x2="170" y2="68"  stroke="#aec3d9" stroke-width="0.7" opacity="0.14"/>
+  <line x1="170" y1="68"  x2="170" y2="112" stroke="#aec3d9" stroke-width="0.7" opacity="0.26"/>
+  <line x1="170" y1="112" x2="170" y2="150" stroke="#aec3d9" stroke-width="0.7" opacity="0.14"/>
+
+  <!-- Texto sombra -->
+  <text x="190" y="122" font-family="Arial,Helvetica,sans-serif" font-size="78" font-weight="700" letter-spacing="-1.5" fill="#000" opacity="0.38">Optix</text>
+  <!-- Texto principal -->
+  <text x="188" y="120" font-family="Arial,Helvetica,sans-serif" font-size="78" font-weight="700" letter-spacing="-1.5" fill="#f2f3f5">Optix</text>
+
+  <!-- Líneas decorativas -->
+  <line x1="188" y1="134" x2="450" y2="134" stroke="#aec3d9" stroke-width="1.2" opacity="0.26"/>
+  <line x1="450" y1="134" x2="640" y2="134" stroke="#aec3d9" stroke-width="0.5" opacity="0.08"/>
+
+  <!-- by SkayLabs -->
+  <text x="190" y="157" font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="400" letter-spacing="6" fill="#aec3d9" opacity="0.62">by SkayLabs</text>
+
+  <!-- Tagline -->
+  <text x="678" y="86"  font-family="Arial,Helvetica,sans-serif" font-size="13" letter-spacing="2.5" fill="#cdcbc7" opacity="0.3" text-anchor="end">Clinical Vision</text>
+  <text x="678" y="104" font-family="Arial,Helvetica,sans-serif" font-size="13" letter-spacing="2.5" fill="#cdcbc7" opacity="0.3" text-anchor="end">Management</text>
+</svg>
