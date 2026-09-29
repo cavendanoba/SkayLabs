@@ -1,0 +1,32 @@
+---
+import { caseStudies } from '../data/caseStudies.js';
+---
+<section id="casos-de-estudio" class="max-w-3xl mx-auto px-6 py-16">
+  <h2 class="text-2xl sm:text-3xl font-display mb-2 text-center">Casos de estudio</h2>
+  <p class="text-sm text-muted text-center mb-10">No solo qué hice, sino por qué.</p>
+
+  <div class="space-y-6">
+    {caseStudies.map((study) => (
+      <article class="border border-border rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-medium">{study.name}</h3>
+          <span class="text-xs text-accentLight border border-accent rounded px-2 py-0.5">{study.tag}</span>
+        </div>
+        <dl class="space-y-2 text-sm text-muted leading-relaxed">
+          <div>
+            <dt class="inline font-medium text-white">Problema: </dt>
+            <dd class="inline">{study.problem}</dd>
+          </div>
+          <div>
+            <dt class="inline font-medium text-white">Decisión: </dt>
+            <dd class="inline">{study.decision}</dd>
+          </div>
+          <div>
+            <dt class="inline font-medium text-white">Resultado: </dt>
+            <dd class="inline">{study.result}</dd>
+          </div>
+        </dl>
+      </article>
+    ))}
+  </div>
+</section>
