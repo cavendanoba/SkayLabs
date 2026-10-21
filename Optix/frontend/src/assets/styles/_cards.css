@@ -1,0 +1,102 @@
+/* frontend/src/assets/styles/_cards.css */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all var(--transition-base);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme="dark"] .card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(174, 195, 217, 0.15);
+}
+
+.card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.card-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text);
+}
+
+.card-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* KPI Card */
+.card-kpi {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-kpi::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, var(--color-accent-glow) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.card-kpi-value {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  color: var(--color-accent);
+  position: relative;
+  z-index: 1;
+}
+
+.card-kpi-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 1;
+}
+
+.card-kpi-change {
+  font-size: var(--font-size-sm);
+  margin-top: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.card-kpi-change.positive {
+  color: var(--color-success);
+}
+
+.card-kpi-change.negative {
+  color: var(--color-danger);
+}

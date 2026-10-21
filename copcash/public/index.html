@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1E6B52">
+  <title>CopCash</title>
+  <link rel="icon" href="icono.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div id="app">
+    <nav class="nav" id="nav" hidden>
+      <a class="marca" href="#/">CopCash</a>
+      <a href="#/" data-ruta="inicio"><span class="ico" aria-hidden="true">◐</span><span>Periodo</span></a>
+      <button type="button" class="nav-registrar" data-accion="registrar" aria-label="Registrar gasto"><span aria-hidden="true">+</span></button>
+      <a href="#/proyeccion" data-ruta="proyeccion"><span class="ico" aria-hidden="true">↗</span><span>Proyección</span></a>
+      <a href="#/deudas" data-ruta="deudas"><span class="ico" aria-hidden="true">◫</span><span>Deudas</span></a>
+      <a href="#/cuentas" data-ruta="cuentas"><span class="ico" aria-hidden="true">◎</span><span>Cuentas</span></a>
+      <a href="#/ajustes" data-ruta="ajustes"><span class="ico" aria-hidden="true">⚙</span><span>Ajustes</span></a>
+    </nav>
+    <main id="vista" tabindex="-1"></main>
+  </div>
+  <dialog id="dialogo"></dialog>
+  <div id="aviso" role="status" aria-live="polite"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

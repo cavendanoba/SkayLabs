@@ -10,22 +10,22 @@
 // - admin.js llama a esa función cuando el usuario activa el tab.
 // ─────────────────────────────────────────────────────────────
 
-import { requireAuth, getAdminUser, logout } from './auth.js';
-import { renderDashboard }                   from './dashboard.js';
-import { renderVentas }                      from './ventas.js';
-import { renderDeudas }                      from './deudas.js';
-import { fetchProducts }                     from './products.js';
-import { CONFIG }                            from './config.js';
+import { requireAuth, getAdminUser, logout } from '/discordia/auth.js';
+import { renderDashboard }                   from '/discordia/modules/dashboard.js';
+import { renderVentas }                      from '/discordia/modules/ventas.js';
+import { renderDeudas }                      from '/discordia/modules/deudas.js';
+import { fetchProducts }                     from '/discordia/products.js';
+import { CONFIG }                            from '/discordia/config.js';
+import { formatCurrency }                    from '/discordia/utils.js';
 
-// ── GUARD ─────────────────────────────────────────────────────
-requireAuth();
+// ── GUARD (no ejecutar aquí, hacerlo en init) ─────────────────
+// requireAuth() se ejecutará dentro de init() para mejor manejo
 
 // ── ESTADO ────────────────────────────────────────────────────
 let activeTab = 'dashboard';
 
-const panel            = document.getElementById('admin-panel');
-const summaryContainer = document.getElementById('admin-summary');
-const tabButtons       = Array.from(document.querySelectorAll('.admin-tab-btn'));
+let panel            = null;
+let summaryContainer = null;
 
 // ── STORAGE (para compatibilidad con funciones heredadas) ─────
 const STORAGE_KEYS = {
@@ -100,42 +100,57 @@ async function switchTab(tabId) {
 
 // ── RESUMEN (header KPIs) ─────────────────────────────────────
 function renderSummary() {
-  const totalStock   = state.catalog.reduce((s, p) => s + Number(p.stock || 0), 0);
-  const totalSales   = state.sales.length;
-  const totalRevenue = state.sales.reduce((s, v) => s + Number(v.total || 0), 0);
-  const user         = getAdminUser();
+  const totalProducts = state.catalog.length;
+  const totalSales    = state.sales.length;
+  const totalRevenue  = state.sales.reduce((s, v) => s + Number(v.total || 0), 0);
+  const totalPendingDebt = state.sales.reduce((s, v) => {
+    if (v.payment_status === 'pending') {
+      return s + (Number(v.total || 0) - Number(v.amount_paid || 0));
+    }
+    return s;
+  }, 0);
+  const user = getAdminUser();
 
   const cards = [
-    { label: 'Productos',   value: state.catalog.length, note: 'en catálogo' },
-    { label: 'Stock total', value: totalStock,            note: 'unidades disponibles' },
-    { label: 'Ventas',      value: totalSales,            note: 'registradas' },
-    { label: 'Ingresos',    value: `$${totalRevenue.toLocaleString('es-CO')}`, note: `· Admin: ${user}` },
+    { label: 'Productos',       value: totalProducts,                note: 'en catálogo' },
+    { label: 'Deuda Pendiente', value: formatCurrency(totalPendingDebt), note: 'por cobrar' },
+    { label: 'Ventas',          value: totalSales,                   note: 'registradas' },
+    { label: 'Ingresos',        value: formatCurrency(totalRevenue), note: `· Admin: ${user}` },
   ];
 
   if (summaryContainer) {
     summaryContainer.innerHTML = cards.map(c => `
-      <article class="bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm">
-        <p class="text-xs uppercase tracking-[0.15em] text-gray-500">${c.label}</p>
-        <p class="text-2xl md:text-3xl font-bold text-[#6d165a] mt-2">${c.value}</p>
-        <p class="text-sm text-gray-500 mt-1">${c.note}</p>
+      <article class="bg-white border border-gray-100 rounded-2xl p-3 md:p-4 shadow-sm">
+        <p class="text-xs uppercase tracking-[0.15em] text-gray-400 font-medium">${c.label}</p>
+        <p class="text-xl md:text-2xl font-bold text-[#6d165a] mt-1.5">${c.value}</p>
+        <p class="text-xs text-gray-400 mt-0.5">${c.note}</p>
       </article>`).join('');
   }
 }
 
 // ── CATÁLOGO ──────────────────────────────────────────────────
-const catalogUiState = { query: '', lowStockOnly: false };
+const catalogUiState = { query: '', lowStockOnly: false, showInactive: false };
+let catalogDebounceTimer = null;
+
+// Debounce helper para evitar re-renders frecuentes
+function debounceCatalogRender() {
+  clearTimeout(catalogDebounceTimer);
+  catalogDebounceTimer = setTimeout(() => renderCatalogTab(), 300);
+}
 
 function renderCatalogTab() {
   const q        = catalogUiState.query.trim().toLowerCase();
   const filtered = state.catalog.filter(item => {
-    const matchQ = !q || `${item.name} ${item.category||''} ${item.description||''}`.toLowerCase().includes(q);
+    const matchQ = !q || `${item.name} ${item.code||''} ${item.category||''} ${item.description||''}`.toLowerCase().includes(q);
     const matchS = !catalogUiState.lowStockOnly || Number(item.stock||0) <= 5;
-    return matchQ && matchS;
+    const matchA = catalogUiState.showInactive || item.active !== false; // Mostrar inactivos solo si se activa el checkbox
+    return matchQ && matchS && matchA;
   });
 
   const rows = filtered.map(item => `
     <tr class="border-b border-gray-100 hover:bg-[#fdf7fa]">
       <td class="p-3 text-center font-medium text-sm text-gray-500">${item.id}</td>
+      <td class="p-3 text-center font-medium text-xs text-gray-500">${item.code||'—'}</td>
       <td class="p-3">
         <div class="flex items-center gap-3">
           <img src="${item.image||'./assets/default.png'}" alt="${item.name}"
@@ -147,7 +162,7 @@ function renderCatalogTab() {
           </div>
         </div>
       </td>
-      <td class="p-3 font-bold text-[#a0346e] text-sm">$${Number(item.price||0).toLocaleString('es-CO')}</td>
+      <td class="p-3 font-bold text-[#a0346e] text-sm">${formatCurrency(Number(item.price||0))}</td>
       <td class="p-3">
         <span class="text-sm font-semibold ${Number(item.stock)<=3?'text-rose-600':Number(item.stock)<=5?'text-amber-600':'text-gray-800'}">${item.stock}</span>
       </td>
@@ -161,7 +176,7 @@ function renderCatalogTab() {
       <td class="p-3">
         <div class="flex gap-2">
           <button class="edit-product px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-semibold text-xs hover:bg-amber-200 transition" data-id="${item.id}">Editar</button>
-          <button class="delete-product px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-semibold text-xs hover:bg-rose-200 transition" data-id="${item.id}">Desactivar</button>
+          <button class="delete-product px-3 py-1.5 rounded-lg ${item.active!==false?'bg-rose-100 text-rose-700 hover:bg-rose-200':'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'} font-semibold text-xs transition" data-id="${item.id}">${item.active!==false?'🗑️ Desactivar':'♻️ Reactivar'}</button>
         </div>
       </td>
     </tr>`).join('');
@@ -178,11 +193,15 @@ function renderCatalogTab() {
 
       <div class="p-4 border-b border-gray-100 flex flex-wrap gap-3">
         <input id="catalog-search" value="${catalogUiState.query}"
-          placeholder="Buscar por nombre, categoría o descripción..."
-          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#ecd9ff]">
+          placeholder="Buscar por nombre, código, categoría o descripción..."
+          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#9d5fa5]">
         <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
-          <input id="catalog-low-stock" type="checkbox" ${catalogUiState.lowStockOnly?'checked':''} class="w-3.5 h-3.5 accent-[#ecd9ff]">
+          <input id="catalog-low-stock" type="checkbox" ${catalogUiState.lowStockOnly?'checked':''} class="w-3.5 h-3.5 accent-[#9d5fa5]">
           Solo stock bajo (≤ 5)
+        </label>
+        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+          <input id="catalog-show-inactive" type="checkbox" ${catalogUiState.showInactive?'checked':''} class="w-3.5 h-3.5 accent-[#9d5fa5]">
+          Mostrar desactivados
         </label>
         <span class="self-center text-xs text-gray-400">Mostrando ${filtered.length} de ${state.catalog.length}</span>
       </div>
@@ -192,6 +211,7 @@ function renderCatalogTab() {
           <thead class="bg-[#fdf2f7]">
             <tr>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">ID</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Código</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Producto</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Precio</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Stock</th>
@@ -210,10 +230,14 @@ function renderCatalogTab() {
 
   panel.querySelector('#catalog-search').addEventListener('input', e => {
     catalogUiState.query = e.target.value;
-    renderCatalogTab();
+    debounceCatalogRender();
   });
   panel.querySelector('#catalog-low-stock').addEventListener('change', e => {
     catalogUiState.lowStockOnly = e.target.checked;
+    renderCatalogTab();
+  });
+  panel.querySelector('#catalog-show-inactive').addEventListener('change', e => {
+    catalogUiState.showInactive = e.target.checked;
     renderCatalogTab();
   });
   panel.querySelector('#add-product').addEventListener('click', () => showProductModal(null));
@@ -223,9 +247,11 @@ function renderCatalogTab() {
 
 // ── MODAL PRODUCTO ────────────────────────────────────────────
 async function showProductModal(productId) {
-  const editing = productId != null;
-  const product = editing ? state.catalog.find(p => Number(p.id) === productId) : null;
+  return new Promise((resolve) => {
+    const editing = productId != null;
+    const product = editing ? state.catalog.find(p => Number(p.id) === productId) : null;
 
+<<<<<<< HEAD
   const { value, isConfirmed } = await Swal.fire({
     title: editing ? 'Editar producto' : 'Agregar producto',
     html: `
@@ -261,86 +287,459 @@ async function showProductModal(productId) {
       };
     }
   });
+=======
+    // Crear overlay y modal
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+    overlay.style.animation = 'fadeIn 0.2s ease-out';
+>>>>>>> 30b96ae19e03ed9f87792572b07b3a3f71d26030
 
-  if (!isConfirmed || !value) return;
+    const modal = document.createElement('div');
+    modal.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto';
+    modal.style.animation = 'slideUp 0.3s ease-out';
 
-  try {
-    const method = editing ? 'PUT' : 'POST';
-    const res    = await fetch('/api/discordia/products', {
-      method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value)
+    modal.innerHTML = `
+      <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .error-msg { color: #dc2626; font-size: 0.875rem; margin-top: 4px; display: none; }
+        .input-error { border-color: #dc2626 !important; }
+        .success-toast { 
+          position: fixed; top: 20px; right: 20px; 
+          background: #10b981; color: white; 
+          padding: 12px 20px; border-radius: 8px; 
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+          animation: slideInRight 0.3s ease-out;
+          z-index: 60;
+        }
+        @keyframes slideInRight { 
+          from { transform: translateX(400px); } 
+          to { transform: translateX(0); } 
+        }
+      </style>
+
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] px-6 py-5 flex items-center justify-between">
+        <h2 class="text-xl font-bold text-white" style="font-family: 'Playfair Display', serif;">
+          ${editing ? '✏️ Editar Producto' : '➕ Nuevo Producto'}
+        </h2>
+        <button class="close-modal text-white hover:bg-white/20 p-2 rounded-lg transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6 space-y-5" onclick="event.stopPropagation()">
+        <!-- Nombre -->
+        <div>
+          <label class="block text-sm font-semibold text-[#6d165a] mb-2">Nombre del Producto *</label>
+          <input type="text" id="modal-name" placeholder="Ej: Labial Rojo Pasión" 
+            value="${product?.name||''}" 
+            onclick="event.stopPropagation()"
+            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+          <div class="error-msg" id="error-name"></div>
+        </div>
+
+        <!-- Código y Categoría -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Código</label>
+            <input type="text" id="modal-code" placeholder="Ej: PROD001" 
+              value="${product?.code||''}" 
+              onclick="event.stopPropagation()"
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Categoría *</label>
+            <input type="text" id="modal-category" placeholder="Ej: Maquillaje" 
+              value="${product?.category||''}" 
+              onclick="event.stopPropagation()"
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+            <div class="error-msg" id="error-category"></div>
+          </div>
+        </div>
+
+        <!-- Precio y Stock -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Precio (COP) *</label>
+            <input type="number" id="modal-price" placeholder="0" min="0" 
+              value="${product?.price??''}" 
+              onclick="event.stopPropagation()"
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+            <div class="error-msg" id="error-price"></div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-[#6d165a] mb-2">Stock *</label>
+            <input type="number" id="modal-stock" placeholder="0" min="0" 
+              value="${product?.stock??0}" 
+              onclick="event.stopPropagation()"
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+            <div class="error-msg" id="error-stock"></div>
+          </div>
+        </div>
+
+        <!-- Imagen -->
+        <div>
+          <label class="block text-sm font-semibold text-[#6d165a] mb-2">Ruta de Imagen</label>
+          <input type="text" id="modal-image" placeholder="assets/producto.jpg" 
+            value="${product?.image||'assets/default.png'}" 
+            onclick="event.stopPropagation()"
+            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+          <p class="text-xs text-gray-500 mt-1.5">Ej: assets/labial-rojo.jpg o URL externa</p>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label class="block text-sm font-semibold text-[#6d165a] mb-2">Descripción</label>
+          <textarea id="modal-description" placeholder="Describe el producto, ingredientes, beneficios..." 
+            rows="4"
+            onclick="event.stopPropagation()"
+            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition resize-none">${product?.description||''}</textarea>
+        </div>
+
+        <!-- Mensaje de error general -->
+        <div class="error-msg bg-red-50 px-4 py-3 rounded-lg border border-red-200" id="error-general"></div>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
+        <button class="close-modal px-5 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition" onclick="event.stopPropagation()">
+          Cancelar
+        </button>
+        <button class="save-product px-5 py-2.5 bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2" onclick="event.stopPropagation()">
+          <span class="save-text">${editing ? '💾 Guardar Cambios' : '➕ Agregar Producto'}</span>
+          <span class="save-loader hidden">
+            <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle class="opacity-25" cx="12" cy="12" r="10"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    // Elementos del modal
+    const nameInput = modal.querySelector('#modal-name');
+    const codeInput = modal.querySelector('#modal-code');
+    const categoryInput = modal.querySelector('#modal-category');
+    const priceInput = modal.querySelector('#modal-price');
+    const stockInput = modal.querySelector('#modal-stock');
+    const imageInput = modal.querySelector('#modal-image');
+    const descInput = modal.querySelector('#modal-description');
+    const saveBtn = modal.querySelector('.save-product');
+    const closeBtn = modal.querySelectorAll('.close-modal');
+    const saveLoader = modal.querySelector('.save-loader');
+    const saveText = modal.querySelector('.save-text');
+
+    // Cerrar modal
+    const closeModal = () => {
+      overlay.style.animation = 'fadeOut 0.2s ease-out';
+      modal.style.animation = 'slideDown 0.3s ease-out';
+      setTimeout(() => {
+        overlay.remove();
+        resolve();
+      }, 300);
+    };
+
+    closeBtn.forEach(btn => btn.addEventListener('click', closeModal));
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
     });
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.message);
 
-    // Actualizar state local
-    if (editing) {
-      const idx = state.catalog.findIndex(p => Number(p.id) === productId);
-      if (idx >= 0) state.catalog[idx] = json.data;
-    } else {
-      state.catalog.push(json.data);
-    }
-    saveToStorage(STORAGE_KEYS.catalog, state.catalog);
-    renderSummary();
-    renderCatalogTab();
-    Swal.fire('Guardado', 'Catálogo actualizado.', 'success');
-  } catch (err) {
-    Swal.fire('Error', err.message || 'No se pudo guardar.', 'error');
-  }
+    // Validación
+    const clearError = (fieldId) => {
+      const errorEl = modal.querySelector(`#error-${fieldId}`);
+      if (errorEl) errorEl.style.display = 'none';
+      const input = modal.querySelector(`#modal-${fieldId}`);
+      if (input) input.classList.remove('input-error');
+    };
+
+    const showError = (fieldId, message) => {
+      const errorEl = modal.querySelector(`#error-${fieldId}`);
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+      const input = modal.querySelector(`#modal-${fieldId}`);
+      if (input) input.classList.add('input-error');
+    };
+
+    // Guardar
+    saveBtn.addEventListener('click', async () => {
+      // Limpiar errores previos
+      ['name', 'category', 'price', 'stock'].forEach(f => clearError(f));
+      modal.querySelector('#error-general').style.display = 'none';
+
+      // Validar
+      const name = nameInput.value.trim();
+      const category = categoryInput.value.trim();
+      const price = Number(priceInput.value);
+      const stock = Number(stockInput.value);
+
+      let hasError = false;
+      if (!name) { showError('name', 'El nombre es obligatorio'); hasError = true; }
+      if (!category) { showError('category', 'La categoría es obligatoria'); hasError = true; }
+      if (isNaN(price) || price < 0) { showError('price', 'Ingresa un precio válido'); hasError = true; }
+      if (isNaN(stock) || stock < 0) { showError('stock', 'Ingresa un stock válido'); hasError = true; }
+
+      if (hasError) return;
+
+      // Preparar datos
+      const payload = {
+        id: productId,
+        name,
+        code: codeInput.value.trim() || null,
+        price,
+        stock,
+        category,
+        image: imageInput.value.trim() || 'assets/default.png',
+        description: descInput.value.trim(),
+        active: true
+      };
+
+      // Enviar
+      saveBtn.disabled = true;
+      saveLoader.classList.remove('hidden');
+      saveText.textContent = editing ? 'Guardando...' : 'Agregando...';
+
+      try {
+        const method = editing ? 'PUT' : 'POST';
+        const res = await fetch('/api/discordia/products', {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.message);
+
+        // Actualizar state
+        if (editing) {
+          const idx = state.catalog.findIndex(p => Number(p.id) === productId);
+          if (idx >= 0) state.catalog[idx] = json.data;
+        } else {
+          state.catalog.push(json.data);
+        }
+        saveToStorage(STORAGE_KEYS.catalog, state.catalog);
+        renderSummary();
+        renderCatalogTab();
+
+        // Toast de éxito
+        const toast = document.createElement('div');
+        toast.className = 'success-toast';
+        toast.textContent = editing ? '✓ Producto actualizado correctamente' : '✓ Producto agregado correctamente';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+
+        closeModal();
+      } catch (err) {
+        const errorEl = modal.querySelector('#error-general');
+        errorEl.textContent = err.message || 'No se pudo guardar el producto';
+        errorEl.style.display = 'block';
+      } finally {
+        saveBtn.disabled = false;
+        saveLoader.classList.add('hidden');
+        saveText.textContent = editing ? '💾 Guardar Cambios' : '➕ Agregar Producto';
+      }
+    });
+
+    // Focus al nombre
+    nameInput.focus();
+  });
 }
 
 async function deactivateProduct(productId) {
-  const product = state.catalog.find(p => Number(p.id) === productId);
-  if (!product) return;
+  return new Promise((resolve) => {
+    const product = state.catalog.find(p => Number(p.id) === productId);
+    if (!product) return resolve();
 
-  const { isConfirmed } = await Swal.fire({
-    title: '¿Desactivar producto?',
-    text: product.name,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Desactivar',
-    confirmButtonColor: '#ecd9ff'
-  });
-  if (!isConfirmed) return;
+    const isActive = product.active !== false;
+    const action = isActive ? 'Desactivar' : 'Reactivar';
+    const actionColor = isActive ? 'from-orange-500 to-red-500' : 'from-emerald-500 to-green-500';
 
-  try {
-    await fetch('/api/discordia/products', {
-      method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: productId })
+    // Crear modal de confirmación
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+    overlay.style.animation = 'fadeIn 0.2s ease-out';
+
+    const modal = document.createElement('div');
+    modal.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-md';
+    modal.style.animation = 'slideUp 0.3s ease-out';
+
+    modal.innerHTML = `
+      <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      </style>
+
+      <!-- Header -->
+      <div class="bg-gradient-to-r ${actionColor} px-6 py-5 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          ${isActive ? '⚠️ Desactivar Producto' : '✅ Reactivar Producto'}
+        </h3>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6 space-y-4">
+        <p class="text-gray-600">¿Estás seguro de que deseas ${isActive ? 'desactivar' : 'reactivar'} este producto?</p>
+        
+        <div class="${isActive ? 'bg-amber-50 border border-amber-200' : 'bg-emerald-50 border border-emerald-200'} rounded-lg p-4">
+          <p class="text-sm font-semibold ${isActive ? 'text-amber-900' : 'text-emerald-900'}">${product.name}</p>
+          <p class="text-xs ${isActive ? 'text-amber-700' : 'text-emerald-700'} mt-1">SKU: ${product.code || 'Sin código'}</p>
+          <p class="text-xs ${isActive ? 'text-amber-700' : 'text-emerald-700'}">Precio: ${formatCurrency(Number(product.price||0))}</p>
+        </div>
+
+        <p class="text-sm text-gray-500 italic">
+          ${isActive ? 'El producto será ocultado del catálogo público, pero los datos se mantendrán en el sistema.' : 'El producto volverá a ser visible en el catálogo público.'}
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
+        <button class="cancel-btn px-5 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition">
+          Cancelar
+        </button>
+        <button class="confirm-delete px-5 py-2.5 bg-gradient-to-r ${actionColor} text-white font-semibold rounded-lg hover:shadow-lg transition flex items-center gap-2">
+          <span class="delete-text">${isActive ? '🗑️ Desactivar' : '♻️ Reactivar'}</span>
+          <span class="delete-loader hidden">
+            <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle class="opacity-25" cx="12" cy="12" r="10"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const cancelBtn = modal.querySelector('.cancel-btn');
+    const deleteBtn = modal.querySelector('.confirm-delete');
+    const deleteLoader = modal.querySelector('.delete-loader');
+    const deleteText = modal.querySelector('.delete-text');
+
+    const closeModal = () => {
+      overlay.style.animation = 'fadeOut 0.2s ease-out';
+      modal.style.animation = 'slideDown 0.3s ease-out';
+      setTimeout(() => {
+        overlay.remove();
+        resolve();
+      }, 300);
+    };
+
+    cancelBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
     });
-    state.catalog = state.catalog.filter(p => Number(p.id) !== productId);
-    saveToStorage(STORAGE_KEYS.catalog, state.catalog);
-    renderSummary();
-    renderCatalogTab();
-  } catch {
-    Swal.fire('Error', 'No se pudo desactivar.', 'error');
-  }
+
+    deleteBtn.addEventListener('click', async () => {
+      deleteBtn.disabled = true;
+      deleteLoader.classList.remove('hidden');
+      deleteText.textContent = isActive ? 'Desactivando...' : 'Reactivando...';
+
+      try {
+        // Actualizar el estado del producto
+        const updatedProduct = { 
+          ...product, 
+          active: !isActive // Cambiar estado: activo -> inactivo o viceversa
+        };
+
+        // Enviar PUT al API para actualizar
+        const res = await fetch('/api/discordia/products', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedProduct)
+        });
+        
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.message);
+
+        // Actualizar state.catalog
+        const idx = state.catalog.findIndex(p => Number(p.id) === productId);
+        if (idx >= 0) {
+          state.catalog[idx] = updatedProduct;
+        }
+        
+        saveToStorage(STORAGE_KEYS.catalog, state.catalog);
+        renderSummary();
+        renderCatalogTab();
+
+        // Toast de éxito
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-5 right-5 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg';
+        toast.textContent = isActive ? '✓ Producto desactivado correctamente' : '✓ Producto reactivado correctamente';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+
+        closeModal();
+      } catch (err) {
+        alert('Error: ' + (err.message || 'Intenta de nuevo'));
+        deleteBtn.disabled = false;
+        deleteLoader.classList.add('hidden');
+        deleteText.textContent = isActive ? '🗑️ Desactivar' : '♻️ Reactivar';
+      }
+    });
+  });
 }
 
 // ── CLIENTES ──────────────────────────────────────────────────
 function renderCustomersTab() {
-  const customers = state.customers.slice()
+  // Extraer clientes únicos desde las ventas
+  const customerMap = new Map();
+  state.sales.forEach(sale => {
+    const key = (sale.customer_name||'Sin nombre').toLowerCase();
+    if (!customerMap.has(key)) {
+      const totalDebt = sale.payment_status === 'pending' ? Number(sale.total) - Number(sale.amount_paid||0) : 0;
+      customerMap.set(key, {
+        name: sale.customer_name||'Sin nombre',
+        phone: sale.customer_phone||'—',
+        order_count: 1,
+        total_spent: Number(sale.total),
+        total_debt: totalDebt,
+        last_purchase_at: sale.created_at,
+        payment_status: sale.payment_status
+      });
+    } else {
+      const existing = customerMap.get(key);
+      existing.order_count += 1;
+      existing.total_spent += Number(sale.total);
+      if (sale.payment_status === 'pending') {
+        existing.total_debt += Number(sale.total) - Number(sale.amount_paid||0);
+      }
+      if (new Date(sale.created_at) > new Date(existing.last_purchase_at)) {
+        existing.last_purchase_at = sale.created_at;
+      }
+    }
+  });
+  const customers = Array.from(customerMap.values())
     .sort((a,b) => Number(b.total_spent||0) - Number(a.total_spent||0));
 
   const rows = customers.map(c => `
     <tr class="border-b border-gray-100 hover:bg-[#fdf7fa]">
       <td class="p-3">
         <p class="font-semibold text-gray-900 text-sm">${c.name||'Sin nombre'}</p>
-        <p class="text-xs text-gray-400">${c.city||'—'}</p>
+        <p class="text-xs text-gray-400">Registrado en ventas</p>
       </td>
       <td class="p-3 text-sm text-gray-600">${c.phone||'—'}</td>
-      <td class="p-3 text-sm text-gray-600">${c.email||'—'}</td>
-      <td class="p-3 text-center text-sm">${Number(c.order_count||0)}</td>
-      <td class="p-3 font-bold text-[#a0346e] text-sm whitespace-nowrap">$${Number(c.total_spent||0).toLocaleString('es-CO')}</td>
+      <td class="p-3 text-center text-sm text-gray-600">${c.order_count} compra${c.order_count!==1?'s':''}</td>
+      <td class="p-3 font-bold text-[#a0346e] text-sm whitespace-nowrap">${formatCurrency(Number(c.total_spent||0))}</td>
       <td class="p-3">
         ${Number(c.total_debt||0) > 0
-          ? `<span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">$${Number(c.total_debt).toLocaleString('es-CO')}</span>`
-          : `<span class="text-xs text-gray-400">—</span>`}
+          ? `<span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">💰 ${formatCurrency(Number(c.total_debt))}</span>`
+          : `<span class="text-xs text-emerald-600 font-semibold">✅ Pagado</span>`}
       </td>
       <td class="p-3 text-xs text-gray-400">${c.last_purchase_at ? new Date(c.last_purchase_at).toLocaleDateString('es-CO') : '—'}</td>
     </tr>`).join('');
 
   panel.innerHTML = `
     <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div class="bg-gradient-to-r from-[#a0346e] to-[#ecd9ff] px-5 py-4">
+      <div class="bg-gradient-to-r from-[#a0346e] to-[#9d5fa5] px-5 py-4">
         <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">👥 Clientes</h3>
         <p class="text-white/70 text-xs mt-0.5">${customers.length} registrados · Ordenados por total comprado</p>
       </div>
@@ -350,10 +749,9 @@ function renderCustomersTab() {
             <tr>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Cliente</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Teléfono</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Email</th>
               <th class="p-3 text-center text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Órdenes</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Total comprado</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Deuda</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Estado de pago</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Última compra</th>
             </tr>
           </thead>
@@ -366,14 +764,45 @@ function renderCustomersTab() {
 }
 
 // ── LOGOUT BUTTON ─────────────────────────────────────────────
-const logoutBtn = document.getElementById('logout-btn');
-if (logoutBtn) logoutBtn.addEventListener('click', logout);
+function setupLogoutButton() {
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) logoutBtn.addEventListener('click', logout);
+}
 
 // ── INIT ──────────────────────────────────────────────────────
 async function init() {
-  // Hidratar state desde la API antes de renderizar
+  // Paso 1: Verificar autenticación
+  try {
+    requireAuth(); // Si no hay token, redirige a login
+  } catch (err) {
+    console.error('Auth check failed:', err.message);
+    return; // No continuar si falla autenticación
+  }
+
+  // Paso 2: Esperar a que el DOM esté listo
+  await new Promise((resolve) => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', resolve);
+    } else {
+      resolve();
+    }
+  });
+
+  // Paso 3: Inicializar elementos del DOM
+  panel            = document.getElementById('admin-panel');
+  summaryContainer = document.getElementById('admin-summary');
+  
+  if (!panel || !summaryContainer) {
+    console.error('Required DOM elements not found');
+    return;
+  }
+
+  setupLogoutButton();
+
+  // Paso 4: Hidratar state desde la API
   try {
     const res  = await fetch(CONFIG.ADMIN_API_PATH);
+    if (!res.ok) throw new Error(`API returned ${res.status}`);
     const json = await res.json();
     if (json.ok) {
       state.catalog   = json.data.catalog   || state.catalog;
@@ -383,11 +812,22 @@ async function init() {
       saveToStorage(STORAGE_KEYS.sales,     state.sales);
       saveToStorage(STORAGE_KEYS.customers, state.customers);
     }
-  } catch { /* usar datos locales como fallback */ }
+  } catch (err) {
+    console.warn('API load failed, using local data:', err.message);
+    // Continuar con datos locales del fallback
+  }
 
+  // Paso 5: Renderizar UI
   buildTabs();
   renderSummary();
   await switchTab('dashboard');
 }
 
-init();
+// Ejecutar init cuando el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+

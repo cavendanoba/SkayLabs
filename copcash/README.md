@@ -1,266 +1,111 @@
-# 💰 CopCash - Organizador de Nómina Personal Avanzado
+# CopCash 2
 
-## 📋 Descripción
+Control de gastos personal y del hogar, pensado para el periodo de pago (del 20 al 19), con proyección mes a mes y escenarios.
 
-**CopCash** es una aplicación web completa de gestión financiera personal diseñada como una **SPA (Single Page Application)** con arquitectura **MVC simplificada**. Permite a los usuarios organizar su nómina, gestionar gastos, crear metas de ahorro, administrar tarjetas de crédito con sistema de cuotas y proyectar el flujo de caja.
+- **Periodo**: cuánto te consignaron, cuánto llevas gastado por categoría contra tu presupuesto y cuánto puedes gastar al día.
+- **Movimientos**: cada gasto, ingreso o pago de deuda. Lo que compras con una tarjeta sube su saldo automáticamente.
+- **Proyección**: ahorro acumulado periodo a periodo, con primas, cesantías, créditos por nómina, mudanza, aporte de la pareja, un crédito nuevo y gastos únicos. Puedes guardar varios escenarios y compararlos.
+- **Deudas**: saldos, cuotas, tasa efectiva anual, fecha de fin y simulador de créditos con comisiones (FGA, seguro).
+- **Hogar**: tú y tu pareja con cuentas separadas; los gastos marcados como compartidos se reparten por porcentaje y la app lleva las cuentas claras.
 
-## 🏗️ Arquitectura
+Solo depende de `pg` y `bcryptjs`. Requiere **Node 20.12 o superior** y PostgreSQL 13+.
 
-La aplicación sigue un patrón **MVC (Modelo-Vista-Controlador) simplificado**:
+## Instalación en el servidor
 
-### Estructura de Carpetas
+1. Crea la base de datos (o reutiliza la de la versión anterior; sus tablas no se tocan):
 
-```
-copcash/
-├── index.html                      # Shell HTML principal (SPA)
-├── css/
-│   └── styles.css                  # Estilos personalizados
-├── data/
-│   └── seedData.js                 # Datos de ejemplo inicial
-└── js/
-    ├── app.js                      # Punto de entrada de la aplicación
-    ├── models/
-    │   ├── storage.js              # Modelo de persistencia (localStorage)
-    │   └── calculos.js             # Lógica de cálculos complejos
-    ├── views/
-    │   ├── dashboardView.js        # Vista del Dashboard
-    │   ├── gastosView.js           # Vistas de Gastos (Fijos y Variables)
-    │   ├── ingresosView.js         # Vista de Ingresos Extra
-    │   ├── tarjetasView.js         # Vista de Tarjetas de Crédito
-    │   ├── metasView.js            # Vista de Metas de Ahorro
-    │   ├── flujoView.js            # Vista del Flujo de Caja Proyectado
-    │   ├── categoriasView.js       # Vista de Categorías y Presupuestos
-    │   └── navbarView.js           # Vistas del Navbar y Configuración
-    └── controllers/
-        └── router.js               # Controlador principal y Router SPA
-```
+   ```sql
+   CREATE DATABASE copcash;
+   ```
 
-## 🏛️ Componentes
+2. Copia la carpeta del proyecto al servidor e instala dependencias:
 
-### 1. **Modelo (Models)**
+   ```bash
+   npm install
+   ```
 
-**storage.js**: Maneja toda la persistencia de datos en localStorage y ejecuta operaciones CRUD.
-- `StorageModel`: Clase central que gestiona sincronización de datos
-- Métodos para CRUD de todas las entidades
+3. Crea `.env` a partir de `.env.example`:
 
-**calculos.js**: Lógica de cálculos complejos separada del modelo de almacenamiento.
-- `TarjetasCalculos`: Cálculos de cuotas, saldos y pagos mensuales
-- `IngresosGastosCalculos`: Totales, dinero libre, alertas de presupuesto
-- `MetasCalculos`: Progreso, montos restantes, plazos
-- `FlujoCalculos`: Proyección diaria del flujo de caja
+   ```bash
+   cp .env.example .env
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"   # pega el resultado en JWT_SECRET
+   ```
 
-### 2. **Vistas (Views)**
+   Ajusta `DATABASE_URL` con tu usuario y clave de PostgreSQL.
 
-Cada vista es responsable de renderizar componentes HTML sin lógica de negocio.
-- `DashboardView`: Resumen general con KPIs principales
-- `GastosFijosView` / `GastosVariablesView`: Gestión de gastos
-- `IngresosExtraView`: Gestión de ingresos extras
-- `TarjetasView`: Tarjetas de crédito y compras a cuotas
-- `MetasView`: Metas de ahorro con seguimiento
-- `FlujoView`: Proyección del flujo diario
-- `CategoriasView`: Gestión de categorías y presupuestos
-- `NavbarView` / `ConfiguracionView`: Navegación y configuración
+4. Carga tus datos iniciales (nómina, deudas, gastos fijos, gastos de octubre y los dos escenarios de mudanza):
 
-### 3. **Controlador (Controller)**
+   ```bash
+   npm run cargar-datos -- --email tu@correo.com --password "una-clave-segura" --nombre "Cristhian"
+   ```
 
-**router.js**: Coordina la navegación SPA y maneja todos los eventos del usuario.
-- `Router`: Clase que gestiona el enrutamiento entre vistas
-- Métodos de navegación (`navigate`, `render`)
-- Setup de listeners para cada sección
-- Orquestación entre modelos y vistas
+   Si la cuenta ya existe (por ejemplo, la de la versión anterior), no hace falta `--password`. Para volver a cargar desde cero, agrega `--reiniciar`. Los datos están en `scripts/datos-iniciales.js`.
 
-### 4. **Datos (Data)**
+5. Arranca:
 
-**seedData.js**: Datos de ejemplo iniciales para la primera carga.
-- Salario, categorías, gastos, tarjetas, metas de ejemplo
+   ```bash
+   npm start
+   ```
 
-## 🚀 Características Funcionales
+   Abre `http://IP-DEL-SERVIDOR:3000` desde el PC o el celular conectado al mismo wifi. En el celular, “Agregar a pantalla de inicio” la deja como app.
 
-### 1. Gestión de Salario
-- Registrar salario neto mensual
-- Configurar día de cobro
-- Visualización clara del ingreso base
+Las tablas se crean solas al arrancar (`server/migrations/*.sql`). Para hacerlo a mano: `npm run migrar`.
 
-### 2. Gastos Fijos
-- Crear, editar y eliminar gastos mensuales recurrentes
-- Asociar a categorías
-- Especificar día de vencimiento
-- Marcar como activo/inactivo
+### Dejarla corriendo siempre
 
-### 3. Gastos Variables
-- Registro de gastos no recurrentes
-- Marcar como pagado/pendiente
-- Fecha específica de gasto
-- Categorización
+Con systemd (Linux), crea `/etc/systemd/system/copcash.service`:
 
-### 4. Ingresos Extra
-- Agregar ingresos adicionales
-- Establecer fecha esperada
-- Seguimiento de ingresos no regulares
+```ini
+[Unit]
+Description=CopCash
+After=network.target postgresql.service
 
-### 5. Gestión de Tarjetas de Crédito
-- **Múltiples tarjetas**: Crear y administrar varias tarjetas
-- **Compras a Cuotas**: 
-  - Registrar compras con número total de cuotas
-  - Rastrear cuotas pagadas
-  - Cálculo automático de:
-    - Valor por cuota
-    - Monto restante
-    - Cuotas pendientes
-- **Pago Mensual Estimado**: Calcula automáticamente el total a pagar este mes
-- **Límite Disponible**: Muestra saldo actual vs límite
+[Service]
+WorkingDirectory=/ruta/a/copcash
+ExecStart=/usr/bin/node server/index.js
+Restart=always
+User=TU_USUARIO
 
-### 6. Metas de Ahorro
-- Crear metas con objetivo monetario
-- Fecha objetivo (opcional)
-- **Aportes Automáticos**: Descuenta automáticamente cada mes
-- **Barra de Progreso**: Visualización clara del avance
-- **Cálculo Automático**: Cuánto ahorrar por mes para alcanzar la meta
-
-### 7. Flujo de Caja Proyectado
-- **Proyección diaria**: 30-60 días adelante
-- **Saldo día a día**: Incluye todos los eventos:
-  - Ingresos (salario, extra)
-  - Gastos fijos
-  - Gastos variables pagados
-  - Pagos de tarjetas
-  - Aportes a metas
-- **Alertas**: Resalta días con saldo negativo
-- **Visualización**: Tabla clara con evento, monto y saldo acumulado
-
-### 8. Categorías y Presupuestos
-- **Categorías Personalizables**: Crear y eliminar categorías
-- **Emojis e Iconos**: Asociar ícono a cada categoría
-- **Presupuestos Mensuales**: Establecer límite por categoría
-- **Alertas de Presupuesto**: Notificación si se excede el límite
-
-### 9. Dashboard Principal
-- **KPIs**: Dinero libre, deuda tarjetas, metas activas
-- **Resumen Mensual**: Breakdown de ingresos y gastos
-- **Alertas**: Presupuestos excedidos y saldos negativos proyectados
-- **Metas Destacadas**: Progreso visual de metas principales
-
-### 10. Navegación SPA
-- **Sin recargas**: Navegación fluida entre secciones
-- **Navbar moderno**: Con modo oscuro/claro
-- **Menú responsivo**: Adapta a dispositivos móviles
-
-### 11. Persistencia y Backups
-- **localStorage**: Todos los datos se guardan localmente
-- **Exportar JSON**: Descargar backup completo
-- **Importar JSON**: Restaurar datos desde backup
-- **Reset**: Opción para restaurar datos de ejemplo
-
-## 🎨 Tecnologías Utilizadas
-
-- **HTML5**: Semántica moderna
-- **CSS3 con Tailwind CSS** (CDN): Diseño responsive y esquema de colores
-- **JavaScript ES6+**: Módulos, clases, async/await
-- **localStorage**: Persistencia de datos en navegador
-- **Módulos ES6**: Importación/exportación de componentes
-
-## 📱 Características de UX/UI
-
-- **Responsive Design**: Se adapta a mobile, tablet y desktop
-- **Modo Oscuro/Claro**: Preferencia del usuario en localStorage
-- **Animaciones Suaves**: Transiciones fluidas entre vistas
-- **Validación de Formularios**: Montos positivos, fechas válidas
-- **Alertas Visuales**: Colores para estados (rojo = negativo, verde = positivo)
-- **Barras de Progreso**: Para metas y utilización de crédito
-
-## 🔄 Flujo de Interacción
-
-1. **Insertar datos**: Gastos, ingresos, tarjetas, metas
-2. **Sistema calcula**: Automáticamente actualiza totales y proyecciones
-3. **Vistas se actualizan**: Dashboard refleja cambios en tiempo real
-4. **Flujo se regenera**: Proyecciones se recalculan con datos nuevos
-5. **Alertas se disparan**: Si presupuesto se excede o saldo es negativo
-
-## 💾 Persistencia de Datos
-
-Todos los datos se guardan automáticamente en `localStorage` bajo la clave `copcash_app_data`:
-
-```javascript
-{
-  salario: { monto, diaCobro, descripcion },
-  categorias: [],
-  gastosFijos: [],
-  gastosVariables: [],
-  ingresosExtra: [],
-  tarjetas: [{ compras: [] }],
-  metas: []
-}
+[Install]
+WantedBy=multi-user.target
 ```
 
-## 🚀 Cómo Iniciar
+y luego `sudo systemctl enable --now copcash`. En Windows o si prefieres algo más simple: `npx pm2 start server/index.js --name copcash`.
 
-1. Ir a `/copcash/index.html` en un servidor local
-2. La app se carga con datos de ejemplo automáticamente
-3. Navegar con el menú superior
-4. Todos los cambios se guardan instantáneamente
+### Usarla desde fuera de la casa
 
-## 📊 Cálculos Principales
+No expongas el puerto 3000 directo a internet. Pon delante algo que le dé HTTPS:
 
-### Dinero Libre
-```
-= Salario 
-  - Gastos Fijos 
-  - Gastos Variables (pagados)
-  - Cuotas de Tarjetas (este mes)
-  - Aportes Automáticos a Metas
-```
+- **Cloudflare Tunnel** (no abre puertos en el router): `cloudflared tunnel --url http://localhost:3000`, y luego asígnale un subdominio (por ejemplo `plata.skaylabs.site`).
+- **Caddy o Nginx** como proxy inverso con certificado.
 
-### Valor Cuota Tarjeta
-```
-= Monto Total / Número Total de Cuotas (redondeado a 2 decimales)
+En ambos casos agrega `TRUST_PROXY=1` al `.env` para que el límite de intentos de inicio de sesión vea la IP real.
+
+### Copias de seguridad
+
+```bash
+pg_dump -h 192.168.1.46 -U USUARIO copcash > copcash-$(date +%F).sql
 ```
 
-### Pago Mensual Tarjeta
+## Cómo piensa la proyección
+
+- Un **periodo** va del día de pago al día anterior del siguiente pago. Su nombre es el mes en que empieza: “Pago oct 2026” es del 20 de octubre al 19 de noviembre.
+- **Salario consignado** = neto sin créditos de nómina − cuotas de los créditos marcados “por nómina” que sigan activos. Cuando un crédito termina, el salario sube solo.
+- **Primas**: legal (medio básico) en junio y diciembre, extralegal en diciembre; **intereses de cesantías** (12 % del básico) en enero.
+- **Gasto variable** = presupuesto de cada categoría. **Gastos fijos** salen de Ajustes; los “del hogar” se cobran según tu porcentaje, que puede cambiar desde un periodo (por ejemplo, si pagas el 100 % desde febrero).
+- **Deudas**: con saldo y tasa se amortizan mes a mes; con número de cuotas terminan cuando se acaban; sin saldo ni cuotas se cobran siempre (como Icetex).
+
+## Estructura
+
 ```
-= Suma de: (Valor Cuota × 1) para cada compra con cuotas restantes > 0
+server/          API (Node sin framework), migraciones SQL, validación
+public/          Frontend (HTML, CSS y módulos JS, sin compilación)
+public/js/motor.js   Motor de proyección, compartido por navegador y pruebas
+scripts/         Carga de datos iniciales y migraciones
+test/            Pruebas del motor (npm test)
+legacy/          Archivos de la versión 1 que se reemplazaron
 ```
 
-### Progreso Meta
-```
-= (Monto Actual / Monto Objetivo) × 100%
-```
+## Versión anterior
 
-### Ahorro Requerido por Mes
-```
-= Monto Faltante / Meses Restantes (si tiene fecha objetivo)
-```
-
-## 🔒 Seguridad
-
-- Datos almacenados localmente (no se envían a servidores)
-- Validación de entrada en formularios
-- Backup regular recomendado
-
-## 📝 Notas Importantes
-
-- Los datos NO se sincronizarán entre dispositivos distintos
-- Cada navegador tiene su propio localStorage
-- Se recomienda exportar datos periódicamente
-- El modo oscuro se guarda en preferencias
-
-## 🎯 Casos de Uso
-
-1. **Presupuesto Personal**: Controlar gastos mensuales
-2. **Planificación Financiera**: Proyectar flujo de caja
-3. **Metas de Ahorro**: Seguimiento de ahorros hacia objetivos
-4. **Deuda de Tarjetas**: Rastrear cuotas y saldos
-5. **Análisis Gastos**: Por categoría y patrones
-
-## 👨‍💻 Desarrollo
-
-Estructura de componentes reutilizables y mantenibles:
-- Cada vista es independiente
-- Modelo centralizado de datos
-- Controller orquesta la interacción
-- Fácil de extender con nuevas vistas/funcionalidades
-
----
-
-**Version**: 1.0.0  
-**License**: MIT   
-**Última actualización**: Marzo 2026
+Las tablas de la versión 1 (`user_data`, `shared_resources`) siguen en la base sin cambios, y las cuentas (`users`) se reutilizan: entra con el mismo correo y clave. Los archivos de la v1 que se reemplazaron están en `legacy/`. Los que no se reemplazaron (`index.html`, `js/`, `css/`, `data/` y los `.md` de la raíz) ya no se usan y puedes moverlos a `legacy/` o borrarlos.

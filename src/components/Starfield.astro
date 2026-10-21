@@ -1,0 +1,43 @@
+---
+const dots = Array.from({ length: 40 }, (_, i) => ({
+  top: Math.random() * 100,
+  left: Math.random() * 100,
+  size: Math.random() * 2 + 1,
+  delay: Math.random() * 6,
+  duration: 3 + Math.random() * 4,
+}));
+---
+<div class="starfield" aria-hidden="true">
+  {dots.map((dot) => (
+    <span
+      class="dot"
+      style={`top:${dot.top}%; left:${dot.left}%; width:${dot.size}px; height:${dot.size}px; animation-delay:${dot.delay}s; animation-duration:${dot.duration}s;`}
+    />
+  ))}
+</div>
+
+<style>
+  .starfield {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .dot {
+    position: absolute;
+    border-radius: 50%;
+    background: #ffffff;
+    opacity: 0.15;
+    animation-name: twinkle;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.7; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dot { animation: none; opacity: 0.3; }
+  }
+</style>

@@ -1,0 +1,322 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============= ENUMS =============
+
+enum Role {
+  ADMIN
+  DOCTOR
+  RECEPTIONIST
+  PATIENT
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  WAITING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentType {
+  FIRST_VISIT
+  FOLLOW_UP
+  URGENT
+  PROCEDURE
+  EXAM
+}
+
+enum NotificationChannel {
+  ALL
+  WHATSAPP
+  SMS
+  EMAIL
+  NONE
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionCategory {
+  CONSULTATION
+  PROCEDURE
+  EXAM
+  RENT
+  SALARY
+  SUPPLIES
+  EQUIPMENT
+  OTHER
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+  CARD
+  OTHER
+}
+
+enum DocumentType {
+  CC
+  CE
+  PA
+  RC
+  TI
+  NIT
+}
+
+enum HxRecordStatus {
+  DRAFT
+  FINALIZED
+  ARCHIVED
+}
+
+// ============= MODELS =============
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String
+  role          Role      @default(RECEPTIONIST)
+  active        Boolean   @default(true)
+  phoneNumber   String?
+  specialty     String?   // Para médicos: Oftalmología, etc.
+  licenseNumber String?   // Para médicos
+  
+  appointments  Appointment[] @relation("DoctorAppointments")
+  hxRecords     HxRecord[]    @relation("DoctorRecords")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Patient {
+  id            String    @id @default(cuid())
+  firstName     String
+  lastName      String
+  email         String?   @unique
+  phoneNumber   String?
+  document      String    @unique
+  documentType  DocumentType
+  birthDate     DateTime?
+  gender        String?
+  address       String?
+  city          String?
+  neighborhood  String?
+  emergencyName String?
+  emergencyPhone String?
+  
+  appointments  Appointment[]
+  hxRecords     HxRecord[]
+  transactions  Transaction[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Appointment {
+  id            String    @id @default(cuid())
+  patientId     String
+  patient       Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId      String
+  doctor        User      @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  appointmentType AppointmentType
+  status        AppointmentStatus @default(SCHEDULED)
+  dateTime      DateTime
+  duration      Int       @default(30) // minutos
+  reason        String?
+  notes         String?
+  
+  hxRecord      HxRecord?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([dateTime])
+}
+
+model HxRecord {
+  id              String    @id @default(cuid())
+  appointmentId   String?   @unique
+  appointment     Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  patientId       String
+  patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId        String
+  doctor          User      @relation("DoctorRecords", fields: [doctorId], references: [id])
+  
+  status          HxRecordStatus @default(DRAFT)
+  
+  // Anamnesis
+  chiefComplaint  String?
+  medicalHistory  String?
+  surgicalHistory String?
+  allergies       String?
+  medications     String?
+  
+  // Oftalmología
+  ophthalmology   HxOphthalmology?
+  diagnoses       Diagnosis[]
+  prescriptions   Prescription[]
+  
+  // Adjuntos
+  attachments     HxAttachment[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  finalizedAt     DateTime?
+  
+  @@index([patientId])
+  @@index([doctorId])
+}
+
+model HxOphthalmology {
+  id            String    @id @default(cuid())
+  hxRecordId    String    @unique
+  hxRecord      HxRecord  @relation(fields: [hxRecordId], references: [id], onDelete: Cascade)
+  
+  // Agudeza Visual (con corrección)
+  visualAcuityOD String? // OD = Ojo Derecho
+  visualAcuityOS String? // OS = Ojo Izquierdo
+  // Agudeza Visual (sin corrección)
+  visualAcuityScOD String?
+  visualAcuityScOS String?
+
+  // Refracción
+  refractionOD  String?
+  refractionOS  String?
+  addition      String?
+  refractionNotes String?
+  
+  // Presión Intraocular (Tonometría)
+  intraocularPressureOD Float?
+  intraocularPressureOS Float?
+  
+  // Biomicroscopía
+  biomicroscopyOD String?
+  biomicroscopyOS String?
+  
+  // Fondo de Ojo
+  fundusOD      String?
+  fundusOS      String?
+  
+  // Plan general
+  plan          String?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Diagnosis {
+  id            String    @id @default(cuid())
+  hxRecordId    String
+  hxRecord      HxRecord  @relation(fields: [hxRecordId], references: [id], onDelete: Cascade)
+  cie10Code     String
+  cie10         Cie10Code @relation(fields: [cie10Code], references: [code])
+  isPrimary     Boolean   @default(false)
+  
+  createdAt     DateTime  @default(now())
+  
+  @@unique([hxRecordId, cie10Code])
+  @@index([hxRecordId])
+}
+
+model Prescription {
+  id            String    @id @default(cuid())
+  hxRecordId    String
+  hxRecord      HxRecord  @relation(fields: [hxRecordId], references: [id], onDelete: Cascade)
+  
+  medicationName String
+  dosage        String?
+  frequency     String?
+  duration      String?
+  instructions  String?
+  
+  createdAt     DateTime  @default(now())
+  
+  @@index([hxRecordId])
+}
+
+model HxAttachment {
+  id            String    @id @default(cuid())
+  hxRecordId    String
+  hxRecord      HxRecord  @relation(fields: [hxRecordId], references: [id], onDelete: Cascade)
+  
+  fileName      String
+  fileUrl       String
+  fileType      String
+  fileSize      Int
+  
+  createdAt     DateTime  @default(now())
+  
+  @@index([hxRecordId])
+}
+
+model Cie10Code {
+  code          String    @id
+  description   String
+  category      String?   // Oftalmología, Otras...
+  diagnoses     Diagnosis[]
+  
+  createdAt     DateTime  @default(now())
+}
+
+model Transaction {
+  id            String    @id @default(cuid())
+  patientId     String?
+  patient       Patient?  @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  
+  type          TransactionType
+  category      TransactionCategory
+  amount        Float
+  paymentMethod PaymentMethod
+  
+  description   String?
+  receiptUrl    String?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@index([patientId])
+  @@index([createdAt])
+}
+
+model Notification {
+  id            String    @id @default(cuid())
+  userId        String?   // Si es para staff
+  patientId     String?   // Si es para paciente
+  
+  type          String    // appointment_reminder, new_appointment, etc.
+  title         String
+  message       String
+  channel       NotificationChannel @default(ALL)
+  
+  read          Boolean   @default(false)
+  readAt        DateTime?
+  sentAt        DateTime?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}

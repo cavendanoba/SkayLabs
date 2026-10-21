@@ -1,0 +1,70 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Cristhian Sky — Ingeniero de sistemas y desarrollador full stack',
+  description = 'Portfolio de Cristhian, ingeniero de sistemas especializado en infraestructura self-hosted, APIs y aplicaciones web full stack (Astro, Node.js, PostgreSQL).',
+} = Astro.props;
+
+const siteUrl = 'https://skaylabs.site';
+const ogImage = `${siteUrl}/skaylabs-icon-mark.svg`;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={siteUrl} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="Cristhian" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:url" content={siteUrl} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Fuente: se carga solo el peso usado, con preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Prosto+One&display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: 'Cristhian',
+      alternateName: 'SkayClouds',
+      jobTitle: 'Ingeniero de sistemas y desarrollador full stack',
+      url: siteUrl,
+      sameAs: [
+        'https://github.com/cavendanoba',
+      ],
+    })} />
+  </head>
+  <body class="bg-bg text-white font-sans antialiased">
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  html {
+    scroll-behavior: smooth;
+  }
+</style>

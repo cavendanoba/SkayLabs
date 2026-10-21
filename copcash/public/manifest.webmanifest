@@ -1,0 +1,9 @@
+{
+  "name": "CopCash",
+  "short_name": "CopCash",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F2F4EF",
+  "theme_color": "#1E6B52",
+  "icons": [{ "src": "icono.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

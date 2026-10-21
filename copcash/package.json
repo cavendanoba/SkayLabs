@@ -1,0 +1,19 @@
+{
+  "name": "copcash",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.12"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "migrar": "node scripts/migrar.js",
+    "test": "node --test test/motor.test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "pg": "^8.13.1"
+  }
+}

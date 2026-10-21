@@ -1,0 +1,7 @@
+node_modules/
+.env
+*.log
+# Datos personales de carga inicial: no se suben al repositorio
+scripts/datos-iniciales.js
+scripts/cargar-datos.js
+scripts/fase1-datos.js

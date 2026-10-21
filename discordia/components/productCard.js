@@ -1,5 +1,7 @@
 // components/productCard.js
 // Small reusable product card factory. Returns a DOM element.
+import { formatCurrency } from '../utils.js';
+
 export function escapeHtml(unsafe) {
     return String(unsafe)
         .replace(/&/g, "&amp;")
@@ -38,10 +40,10 @@ export function createProductCard(product, placeholderSrc, imgPath) {
                     <span class="text-xs bg-[#fcf5ee] text-[#5c4a6d] px-2 py-1 rounded-full font-semibold">${category}</span>
                 </div>
                 <p class="text-sm text-gray-700 mt-2">Stock: ${product.stock}</p>
-                <p class="font-bold text-xl mt-2 text-[#5c4a6d]">$${(product.price || 0).toLocaleString()}</p>
+                <p class="font-bold text-xl mt-2 text-[#5c4a6d]">${formatCurrency(product.price || 0)}</p>
                 ${reviewCount > 0 ? `<div class="flex items-center mt-2"><span class="text-yellow-400 text-sm">${stars}</span><span class="text-xs text-gray-600 ml-1">(${reviewCount} reseñas)</span></div>` : ''}
             </div>
-            <button class="w-full mt-4 add-btn bg-gradient-to-r from-[#ecd9ff] to-[#ffd5e3] text-white font-bold py-2 rounded-lg hover:from-[#ffd5e3] hover:to-[#fcf5ee] transition" data-id="${product.id}">
+            <button class="w-full mt-4 add-btn bg-gradient-to-r from-[#9d5fa5] to-[#d94a7b] text-white font-bold py-2 rounded-lg hover:from-[#8a4a8e] hover:to-[#c23a6a] transition" data-id="${product.id}">
                 Agregar al carrito
             </button>
         </div>

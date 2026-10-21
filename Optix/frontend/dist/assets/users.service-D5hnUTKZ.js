@@ -1,0 +1,1 @@
+import{a as t}from"./index-CuY4N-rM.js";const a={list:(s={})=>{const e=new URLSearchParams(s).toString();return t.get(`/users${e?"?"+e:""}`)},getById:s=>t.get(`/users/${s}`),create:s=>t.post("/users",s),update:(s,e)=>t.put(`/users/${s}`,e),updateStatus:(s,e)=>t.patch(`/users/${s}/status`,{active:e})};export{a as u};

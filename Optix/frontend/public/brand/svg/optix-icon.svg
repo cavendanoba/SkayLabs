@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="iBg" cx="35%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#3a5a7a"/>
+      <stop offset="100%" stop-color="#0a0c18"/>
+    </radialGradient>
+    <radialGradient id="iIris" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#c8d8e8" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#4a7090" stop-opacity="0.5"/>
+    </radialGradient>
+    <radialGradient id="iPupil" cx="38%" cy="32%" r="68%">
+      <stop offset="0%" stop-color="#2a4560"/>
+      <stop offset="100%" stop-color="#040608"/>
+    </radialGradient>
+    <radialGradient id="iGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#aec3d9" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#aec3d9" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="gBlur" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+    <filter id="sBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+
+  <!-- Sombra exterior -->
+  <rect x="10" y="18" width="512" height="512" rx="112" fill="#000" opacity="0.5" filter="url(#sBlur)"/>
+  <!-- Fondo -->
+  <rect width="512" height="512" rx="112" fill="url(#iBg)"/>
+  <!-- Borde luminoso -->
+  <rect width="512" height="512" rx="112" fill="none" stroke="#aec3d9" stroke-width="2" opacity="0.2"/>
+  <!-- Brillo esquina -->
+  <rect width="256" height="256" rx="112" fill="#f2f3f5" opacity="0.04"/>
+
+  <!-- Glow ojo -->
+  <ellipse cx="256" cy="256" rx="170" ry="102" fill="url(#iGlow)" filter="url(#gBlur)"/>
+
+  <!-- Párpado superior sombra -->
+  <path d="M72 256 Q256 96 440 256"  fill="none" stroke="#000000" stroke-width="20"  stroke-linecap="round" opacity="0.6"/>
+  <!-- Párpado superior -->
+  <path d="M72 256 Q256 96 440 256"  fill="none" stroke="#f2f3f5" stroke-width="11"  stroke-linecap="round"/>
+  <!-- Párpado inferior sombra -->
+  <path d="M72 256 Q256 416 440 256" fill="none" stroke="#000000" stroke-width="16"  stroke-linecap="round" opacity="0.55"/>
+  <!-- Párpado inferior -->
+  <path d="M72 256 Q256 416 440 256" fill="none" stroke="#cdcbc7" stroke-width="8"   stroke-linecap="round" opacity="0.82"/>
+
+  <!-- Iris glow ring -->
+  <circle cx="256" cy="256" r="116" fill="none" stroke="#aec3d9" stroke-width="3" opacity="0.16"/>
+  <!-- Iris principal -->
+  <circle cx="256" cy="256" r="104" fill="url(#iIris)"/>
+  <circle cx="256" cy="256" r="104" fill="none" stroke="#aec3d9" stroke-width="5"   opacity="0.6"/>
+  <!-- Limbo -->
+  <circle cx="256" cy="256" r="86"  fill="none" stroke="#2b4362" stroke-width="3"   opacity="0.44"/>
+
+  <!-- Pupila -->
+  <circle cx="256" cy="256" r="50"  fill="url(#iPupil)"/>
+  <circle cx="256" cy="256" r="50"  fill="none" stroke="#040608" stroke-width="2"   opacity="0.85"/>
+
+  <!-- Reflejo principal -->
+  <ellipse cx="280" cy="228" rx="20" ry="14" fill="#f2f3f5" opacity="0.97"/>
+  <!-- Reflejo secundario -->
+  <circle  cx="228" cy="278" r="8"            fill="#f2f3f5" opacity="0.3"/>
+  <!-- Reflejo terciario -->
+  <ellipse cx="224" cy="232" rx="7" ry="4"    fill="#f2f3f5" opacity="0.16"/>
+
+  <!-- Ejes ópticos -->
+  <line x1="72"  y1="256" x2="440" y2="256" stroke="#aec3d9" stroke-width="1.8" stroke-dasharray="10 14" opacity="0.2"/>
+  <line x1="256" y1="96"  x2="256" y2="416" stroke="#aec3d9" stroke-width="1.8" stroke-dasharray="10 14" opacity="0.2"/>
+
+  <!-- Punto focal izquierdo -->
+  <circle cx="72"  cy="256" r="16" fill="#000" opacity="0.65"/>
+  <circle cx="72"  cy="256" r="10" fill="#2b4362"/>
+  <circle cx="72"  cy="256" r="10" fill="none" stroke="#aec3d9" stroke-width="2.5" opacity="0.65"/>
+  <!-- Punto focal derecho -->
+  <circle cx="440" cy="256" r="16" fill="#000" opacity="0.65"/>
+  <circle cx="440" cy="256" r="10" fill="#2b4362"/>
+  <circle cx="440" cy="256" r="10" fill="none" stroke="#aec3d9" stroke-width="2.5" opacity="0.65"/>
+
+  <!-- Conector circuit arriba derecha -->
+  <line x1="342" y1="172" x2="396" y2="130" stroke="#aec3d9" stroke-width="4"   opacity="0.3"/>
+  <line x1="396" y1="130" x2="440" y2="130" stroke="#aec3d9" stroke-width="4"   opacity="0.3"/>
+  <circle cx="396" cy="130" r="7"            fill="#aec3d9" opacity="0.48"/>
+  <!-- Conector circuit abajo derecha -->
+  <line x1="342" y1="340" x2="396" y2="382" stroke="#aec3d9" stroke-width="4"   opacity="0.3"/>
+  <line x1="396" y1="382" x2="440" y2="382" stroke="#aec3d9" stroke-width="4"   opacity="0.3"/>
+  <circle cx="396" cy="382" r="7"            fill="#aec3d9" opacity="0.48"/>
+</svg>

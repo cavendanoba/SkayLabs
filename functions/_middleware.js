@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // functions/_middleware.js
 //
 // Corre antes de cada petición a skaylabs.site.
@@ -46,4 +47,18 @@ export async function onRequest({ request, next }) {
   const salida = new Response(resp.body, resp);
   for (const [k, v] of Object.entries(CABECERAS)) if (!salida.headers.has(k)) salida.headers.set(k, v);
   return salida;
+=======
+// Redirige skaylabs.pages.dev -> skaylabs.site (301), conservando ruta y query.
+// /sw.js se exime: los navegadores no permiten actualizar un Service Worker
+// a través de una redirección, y así los SW viejos pueden recibir el kill-switch.
+export async function onRequest(context) {
+  const url = new URL(context.request.url);
+  if (url.hostname === 'skaylabs.pages.dev' && !url.pathname.endsWith('/sw.js')) {
+    url.protocol = 'https:';
+    url.hostname = 'skaylabs.site';
+    url.port = '';
+    return Response.redirect(url.toString(), 301);
+  }
+  return context.next();
+>>>>>>> 30b96ae19e03ed9f87792572b07b3a3f71d26030
 }
