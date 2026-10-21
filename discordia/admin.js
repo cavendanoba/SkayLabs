@@ -151,6 +151,7 @@ function renderCatalogTab() {
       <td class="p-3">
         <span class="text-sm font-semibold ${Number(item.stock)<=3?'text-rose-600':Number(item.stock)<=5?'text-amber-600':'text-gray-800'}">${item.stock}</span>
       </td>
+      <td class="p-3 text-xs font-mono text-gray-500">${item.code||'—'}</td>
       <td class="p-3 text-sm text-gray-600">${item.category||'—'}</td>
       <td class="p-3">
         <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${item.active!==false?'bg-emerald-100 text-emerald-700':'bg-gray-100 text-gray-500'}">
@@ -194,13 +195,14 @@ function renderCatalogTab() {
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Producto</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Precio</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Stock</th>
+              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Código</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Categoría</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Estado</th>
               <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            ${rows || `<tr><td colspan="7" class="p-6 text-center text-gray-400">No hay productos que coincidan.</td></tr>`}
+            ${rows || `<tr><td colspan="8" class="p-6 text-center text-gray-400">No hay productos que coincidan.</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -231,6 +233,8 @@ async function showProductModal(productId) {
       <input id="sw-price"    class="swal2-input" placeholder="Precio *"      type="number" min="0" value="${product?.price??''}">
       <input id="sw-stock"    class="swal2-input" placeholder="Stock *"       type="number" min="0" value="${product?.stock??0}">
       <input id="sw-category" class="swal2-input" placeholder="Categoría *"   value="${product?.category||''}">
+      <input id="sw-code"     class="swal2-input" placeholder="Código / SKU"  value="${product?.code||''}">
+      <input id="sw-cost"     class="swal2-input" placeholder="Costo unitario" type="number" min="0" value="${product?.cost_price??''}">
       <input id="sw-image"    class="swal2-input" placeholder="Ruta imagen (assets/xx.jpg)" value="${product?.image||'assets/default.png'}">
       <textarea id="sw-desc"  class="swal2-textarea" placeholder="Descripción">${product?.description||''}</textarea>`,
     showCancelButton: true,
@@ -249,6 +253,8 @@ async function showProductModal(productId) {
         id:          productId,
         name, price, stock,
         category:    cat,
+        code:        document.getElementById('sw-code').value.trim(),
+        cost_price:  document.getElementById('sw-cost').value === '' ? null : Number(document.getElementById('sw-cost').value),
         image:       document.getElementById('sw-image').value.trim() || 'assets/default.png',
         description: document.getElementById('sw-desc').value.trim(),
         active:      true

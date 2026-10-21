@@ -11,6 +11,10 @@
 
 import bcrypt from 'bcryptjs';
 import { getSql, json } from './_lib/db.js';
+import { firmarToken } from './_lib/auth.js';
+
+// Hash de relleno: tarda lo mismo exista o no el usuario
+const HASH_FALSO = '$2a$12$.HwrUtGU1MOLtykTAPwTMuS2XQEhVcMAb01Jk2E7pw/3UPE3mXutG';
 
 export async function onRequestPost({ request, env }) {
   let body;
@@ -32,21 +36,22 @@ export async function onRequestPost({ request, env }) {
     SELECT * FROM admin_users WHERE username = ${username}
   `;
 
-  if (!user) {
-    // Mismo mensaje para usuario no encontrado y contraseña incorrecta
+  // Mismo tiempo y mismo mensaje para usuario no encontrado y contraseña incorrecta
+  const valid = await bcrypt.compare(String(password), user ? user.password_hash : HASH_FALSO);
+
+  if (!user || !valid) {
     return json({ ok: false, message: 'Credenciales inválidas' }, 401);
   }
 
-  const valid = await bcrypt.compare(password, user.password_hash);
-
-  if (!valid) {
-    return json({ ok: false, message: 'Credenciales inválidas' }, 401);
+  // Token firmado: la API lo verifica en cada petición (ver _middleware.js)
+  let token;
+  try {
+    token = await firmarToken(user.username, env.DISCORDIA_TOKEN_SECRETO);
+  } catch {
+    return json({ ok: false, message: 'Falta configurar DISCORDIA_TOKEN_SECRETO en Cloudflare Pages.' }, 500);
   }
 
-  // Token simple (igual que la versión original de Vercel)
-  const token = btoa(`${username}:${Date.now()}:${Math.random()}`);
-
-  return json({ ok: true, token, username });
+  return json({ ok: true, token, username: user.username });
 }
 
 // Cloudflare Pages Functions exige manejar explícitamente otros métodos

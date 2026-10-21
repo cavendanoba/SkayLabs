@@ -20,7 +20,26 @@ export function requireAuth() {
     window.location.href = './login.html';
     throw new Error('No autenticado'); // detiene la ejecución del resto del módulo
   }
+  conectarApi(token);
   return token;
+}
+
+// Todas las llamadas del panel a /api/discordia/ llevan el token; si el servidor
+// responde 401 (token vencido o inválido) se vuelve al login.
+let conectado = false;
+function conectarApi(token) {
+  if (conectado) return;
+  conectado = true;
+  const original = window.fetch.bind(window);
+  window.fetch = async (recurso, opciones = {}) => {
+    const url = new URL(typeof recurso === 'string' ? recurso : recurso.url, location.href);
+    if (url.origin !== location.origin || !url.pathname.startsWith('/api/discordia/')) return original(recurso, opciones);
+    const headers = new Headers(opciones.headers || (typeof recurso === 'string' ? undefined : recurso.headers));
+    headers.set('Authorization', `Bearer ${token}`);
+    const r = await original(recurso, { ...opciones, headers });
+    if (r.status === 401) logout();
+    return r;
+  };
 }
 
 export function getAdminUser() {

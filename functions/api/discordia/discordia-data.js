@@ -6,10 +6,15 @@
 
 import { getSql, json } from './_lib/db.js';
 
-export async function onRequestGet({ env }) {
+export async function onRequestGet({ env, data }) {
   const sql = getSql(env);
 
   try {
+    // Sin sesión de admin (la tienda pública) solo sale el catálogo: nunca ventas ni datos de clientes
+    if (!data?.admin) {
+      const catalog = await sql`SELECT * FROM products WHERE active = true ORDER BY id`;
+      return json({ ok: true, storage: 'postgresql', data: { catalog, sales: [], customers: [] } });
+    }
     const [products, sales, customers] = await Promise.all([
       sql`SELECT * FROM products WHERE active = true ORDER BY id`,
       sql`SELECT * FROM sales ORDER BY created_at DESC LIMIT 100`,
@@ -23,7 +28,7 @@ export async function onRequestGet({ env }) {
     });
   } catch (error) {
     console.error('Error en /api/discordia/discordia-data:', error);
-    return json({ ok: false, message: error.message || 'Error interno en la API de Discordia' }, 500);
+    return json({ ok: false, message: 'Error interno en la API de Discordia' }, 500);
   }
 }
 
