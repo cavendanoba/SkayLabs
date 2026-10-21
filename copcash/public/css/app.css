@@ -77,7 +77,8 @@ main > * { max-width: 1400px; margin-inline: auto; }
 
 @media (min-width: 900px) {
   .nav { inset: 0 auto 0 0; width: 220px; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 2px; border: 0; padding: 26px 14px; background: var(--bosque); }
-  .nav .marca { display: block; font-family: var(--fuente-cifras); font-weight: 700; font-size: 1.4rem; color: #fff; padding: 0 10px 26px; text-decoration: none; letter-spacing: -0.02em; }
+  .nav .marca { display: block; padding: 0 10px 26px; text-decoration: none; }
+  .nav .marca img { display: block; width: 150px; height: auto; }
   .nav .solo-escritorio { display: flex; }
   .nav a { flex: none; flex-direction: row; gap: 12px; font-size: 0.95rem; padding: 10px 12px; color: #A9C9B9; }
   .nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
@@ -239,9 +240,13 @@ dialog h2 { margin-bottom: 14px; }
   background: #174E3D; color: #EAF3EE; padding: 48px clamp(28px, 5vw, 72px);
   display: flex; flex-direction: column; justify-content: space-between; gap: 32px; position: relative; overflow: hidden;
 }
-.entrada-marca { font: 700 1.35rem var(--fuente-cifras); letter-spacing: -0.02em; color: #fff; }
+.entrada-marca { display: block; width: 200px; height: auto; }
 .entrada-titulo { font: 700 clamp(2.4rem, 4.6vw, 4.2rem)/1.02 var(--fuente-cifras); letter-spacing: -0.035em; color: #fff; margin-top: auto; }
 .entrada-texto { font-size: 1.05rem; max-width: 34ch; color: #B9D5C7; margin-top: 14px; }
+.entrada-puntos { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; max-width: 46ch; }
+.entrada-puntos li { position: relative; padding-left: 18px; font-size: 0.95rem; line-height: 1.45; color: #B9D5C7; }
+.entrada-puntos li::before { content: ''; position: absolute; left: 0; top: 0.55em; width: 7px; height: 7px; border-radius: 50%; background: #7FC8A6; }
+.entrada-puntos strong { color: #fff; font-weight: 600; }
 .entrada-pista svg { width: 100%; max-width: 560px; height: auto; display: block; }
 .entrada-pista line { stroke: rgba(255,255,255,0.35); stroke-width: 1; }
 .entrada-pista .b-pos { fill: #7FC8A6; }
@@ -266,7 +271,9 @@ dialog h2 { margin-bottom: 14px; }
   .entrada { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .entrada-lado { padding: 22px 20px 18px; gap: 14px; }
   .entrada-titulo { font-size: 2rem; margin-top: 18px; }
+  .entrada-marca { width: 140px; }
   .entrada-texto { font-size: 0.95rem; margin-top: 8px; }
+  .entrada-puntos { display: none; }
   .entrada-pista svg { max-width: 100%; }
   .entrada-form { place-items: start center; padding: 28px 20px 40px; }
 }

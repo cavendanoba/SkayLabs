@@ -82,9 +82,14 @@ function pintarEntrada(modo = 'login', error = '') {
   vista.innerHTML = h`
     <section class="entrada">
       <div class="entrada-lado">
-        <div class="entrada-marca">CopCash</div>
-        <h1 class="entrada-titulo">Del 20 al 19,<br>con la cuenta clara.</h1>
+        <img class="entrada-marca" src="logo.svg" alt="CopCash" width="200" height="100">
+        <h1 class="entrada-titulo">Del 1 al 30,<br>con la cuenta clara.</h1>
         <p class="entrada-texto">Lo que gastas hoy, lo que debes y cuánto te queda en cada pago, mes a mes.</p>
+        <ul class="entrada-puntos">
+          <li><strong>Tu periodo, tus fechas.</strong> Configuras el día de pago y el de corte; CopCash arma cada periodo con eso.</li>
+          <li><strong>Deudas sin sorpresas.</strong> Tarjetas y créditos con su cuota, saldo e intereses, contados como gasto fijo.</li>
+          <li><strong>Mira hacia adelante.</strong> Proyección de hasta 24 meses: sabes desde hoy en qué mes te falta plata.</li>
+        </ul>
         <div class="entrada-pista">${crudo(pistaEntrada())}</div>
       </div>
       <div class="entrada-form">
