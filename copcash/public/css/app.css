@@ -77,8 +77,10 @@ main > * { max-width: 1400px; margin-inline: auto; }
 
 @media (min-width: 900px) {
   .nav { inset: 0 auto 0 0; width: 220px; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 2px; border: 0; padding: 26px 14px; background: var(--bosque); }
-  .nav .marca { display: block; padding: 0 10px 26px; text-decoration: none; }
-  .nav .marca img { display: block; width: 150px; height: auto; }
+  .nav .marca { display: flex; justify-content: center; padding: 0; margin: 0 0 24px; background: none; text-decoration: none; }
+  .nav .marca:hover { background: none; }
+  .nav .marca:focus-visible { outline: 2px solid #7FC8A6; outline-offset: 4px; }
+  .nav .marca img { display: block; width: 105px; height: auto; }
   .nav .solo-escritorio { display: flex; }
   .nav a { flex: none; flex-direction: row; gap: 12px; font-size: 0.95rem; padding: 10px 12px; color: #A9C9B9; }
   .nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
