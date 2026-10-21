@@ -30,14 +30,44 @@ function enriquecer(req, res) {
   res.sendFile = (archivo, maxAge = 0) => {
     fs.stat(archivo, (err, st) => {
       if (err || !st.isFile()) { res.statusCode = 404; res.end('No encontrado'); return; }
+      const ext = path.extname(archivo).toLowerCase();
+      res.setHeader('Content-Type', MIME[ext] || 'application/octet-stream');
+      // Ni Cloudflare ni ningún otro intermediario guarda copias: cada cambio se ve de inmediato.
+      res.setHeader('CDN-Cache-Control', 'no-store');
+      res.setHeader('Cloudflare-CDN-Cache-Control', 'no-store');
+      if (ext === '.html') {
+        // El HTML nunca se guarda y lleva la versión actual en los enlaces a CSS y JS,
+        // así el navegador pide los archivos nuevos apenas se suben al servidor.
+        res.setHeader('Cache-Control', 'no-store');
+        fs.readFile(archivo, 'utf8', (e, html) => {
+          if (e) { res.statusCode = 500; res.end('Error'); return; }
+          const v = versionDe(path.dirname(archivo));
+          res.end(html.replace(/(href|src)="((?:css|js)\/[^"?]+\.(?:css|js))"/g, `$1="$2?v=${v}"`));
+        });
+        return;
+      }
+      // El resto se revalida siempre (ETag): si no cambió responde 304 sin volver a descargar.
       const etag = `"${st.size.toString(16)}-${st.mtimeMs.toString(16)}"`;
-      if (req.headers['if-none-match'] === etag) { res.statusCode = 304; res.end(); return; }
-      res.setHeader('Content-Type', MIME[path.extname(archivo).toLowerCase()] || 'application/octet-stream');
       res.setHeader('ETag', etag);
       res.setHeader('Cache-Control', maxAge ? `public, max-age=${maxAge}` : 'no-cache');
+      if (req.headers['if-none-match'] === etag) { res.statusCode = 304; res.end(); return; }
       fs.createReadStream(archivo).pipe(res);
     });
   };
+}
+
+/** Huella de la carpeta pública: cambia cuando cambia cualquier archivo (nombre, tamaño o fecha). */
+function versionDe(dir) {
+  const h = crypto.createHash('sha1');
+  const recorrer = (d) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const r = path.join(d, e.name);
+      if (e.isDirectory()) recorrer(r);
+      else if (e.isFile()) { const st = fs.statSync(r); h.update(`${r}:${st.size}:${st.mtimeMs}|`); }
+    }
+  };
+  try { recorrer(dir); } catch { return Date.now().toString(36); }
+  return h.digest('hex').slice(0, 10);
 }
 
 function leerCuerpo(req, limite) {
