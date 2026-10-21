@@ -48,13 +48,10 @@ export function requireAuth() {
     window.location.href = '/discordia/login.html';
     throw new Error('No autenticado'); // detiene la ejecución del resto del módulo
   }
-<<<<<<< HEAD
   conectarApi(token);
-=======
   
   // Inicia el timer de inactividad
   resetInactivityTimer();
->>>>>>> 30b96ae19e03ed9f87792572b07b3a3f71d26030
   return token;
 }
 

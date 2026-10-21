@@ -7,7 +7,6 @@ export async function onRequestGet({ env }) {
   const sql = getSql(env);
 
   try {
-<<<<<<< HEAD
     // La base histórica y la actual no tienen exactamente las mismas
     // columnas. to_jsonb() permite leer los campos opcionales sin que una
     // columna ausente convierta todo el dashboard en un error 500.
@@ -39,28 +38,6 @@ export async function onRequestGet({ env }) {
           ORDER BY COALESCE(NULLIF(to_jsonb(customers)->>'total_debt', '')::numeric, 0) DESC
           LIMIT 10`,
       sql`SELECT id, name, stock, price FROM products WHERE stock <= 3 ORDER BY stock ASC, name ASC LIMIT 10`,
-=======
-    const [ventasRecientes, deudasActivas, stockBajo, topProductos, ingresosMes, ingresosPrev, stockMetrics] = await Promise.all([
-      sql`SELECT id, customer_name, customer_phone, channel, total, amount_paid, payment_status, notes, created_at
-          FROM sales
-          ORDER BY created_at DESC
-          LIMIT 5`,
-      sql`SELECT s.id, s.customer_name, s.customer_phone, 
-                 (s.total - COALESCE(s.amount_paid, 0))::numeric AS total_debt
-          FROM sales s
-          WHERE s.payment_status = 'pending'
-          ORDER BY (s.total - COALESCE(s.amount_paid, 0)) DESC
-          LIMIT 10`,
-      sql`SELECT id, name, stock, price FROM products WHERE stock <= 3 ORDER BY stock ASC, name ASC LIMIT 10`,
-      sql`SELECT COALESCE(p.name, si.name) AS product_name,
-                 SUM(si.quantity)::int AS unidades,
-                 SUM(si.quantity * si.price)::numeric AS ingresos
-          FROM sale_items si
-          LEFT JOIN products p ON p.id = si.product_id
-          GROUP BY COALESCE(p.name, si.name)
-          ORDER BY ingresos DESC
-          LIMIT 5`,
->>>>>>> 30b96ae19e03ed9f87792572b07b3a3f71d26030
       sql`SELECT COUNT(*)::int AS cantidad, COALESCE(SUM(total), 0)::numeric AS total
           FROM sales s
           WHERE COALESCE(
@@ -77,17 +54,7 @@ export async function onRequestGet({ env }) {
                 ) = 'paid'
             AND created_at >= date_trunc('month', now()) - interval '1 month'
             AND created_at < date_trunc('month', now())`,
-<<<<<<< HEAD
       sql`SELECT to_regclass('public.sale_items') AS table_name`
-=======
-      sql`SELECT 
-            COUNT(DISTINCT p.id)::int AS total_productos,
-            COALESCE(SUM(p.stock), 0)::int AS stock_actual,
-            COALESCE(SUM(p.stock) + COALESCE(SUM(si.quantity), 0), 0)::int AS stock_inicial,
-            COALESCE(SUM(si.quantity), 0)::int AS stock_vendido
-          FROM products p
-          LEFT JOIN sale_items si ON p.id = si.product_id`
->>>>>>> 30b96ae19e03ed9f87792572b07b3a3f71d26030
     ]);
 
     // sale_items aún no existe en instalaciones nuevas. En ese caso el
@@ -102,6 +69,19 @@ export async function onRequestGet({ env }) {
                   ORDER BY ingresos DESC
                   LIMIT 5`
       : [];
+
+    const stockMetrics = saleItemsTable[0]?.table_name
+      ? await sql`SELECT
+                    (SELECT COUNT(*) FROM products)::int AS total_productos,
+                    (SELECT COALESCE(SUM(stock), 0) FROM products)::int AS stock_actual,
+                    ((SELECT COALESCE(SUM(stock), 0) FROM products)
+                      + (SELECT COALESCE(SUM(quantity), 0) FROM sale_items))::int AS stock_inicial,
+                    (SELECT COALESCE(SUM(quantity), 0) FROM sale_items)::int AS stock_vendido`
+      : await sql`SELECT COUNT(*)::int AS total_productos,
+                         COALESCE(SUM(stock), 0)::int AS stock_actual,
+                         COALESCE(SUM(stock), 0)::int AS stock_inicial,
+                         0 AS stock_vendido
+                  FROM products`;
 
     const totalActual = Number(ingresosMes[0]?.total || 0);
     const totalAnterior = Number(ingresosPrev[0]?.total || 0);

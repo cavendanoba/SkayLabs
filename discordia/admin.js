@@ -251,48 +251,10 @@ async function showProductModal(productId) {
     const editing = productId != null;
     const product = editing ? state.catalog.find(p => Number(p.id) === productId) : null;
 
-<<<<<<< HEAD
-  const { value, isConfirmed } = await Swal.fire({
-    title: editing ? 'Editar producto' : 'Agregar producto',
-    html: `
-      <input id="sw-name"     class="swal2-input" placeholder="Nombre *"      value="${product?.name||''}">
-      <input id="sw-price"    class="swal2-input" placeholder="Precio *"      type="number" min="0" value="${product?.price??''}">
-      <input id="sw-stock"    class="swal2-input" placeholder="Stock *"       type="number" min="0" value="${product?.stock??0}">
-      <input id="sw-category" class="swal2-input" placeholder="Categoría *"   value="${product?.category||''}">
-      <input id="sw-code"     class="swal2-input" placeholder="Código / SKU"  value="${product?.code||''}">
-      <input id="sw-cost"     class="swal2-input" placeholder="Costo unitario" type="number" min="0" value="${product?.cost_price??''}">
-      <input id="sw-image"    class="swal2-input" placeholder="Ruta imagen (assets/xx.jpg)" value="${product?.image||'assets/default.png'}">
-      <textarea id="sw-desc"  class="swal2-textarea" placeholder="Descripción">${product?.description||''}</textarea>`,
-    showCancelButton: true,
-    confirmButtonText: editing ? 'Guardar' : 'Agregar',
-    confirmButtonColor: '#ecd9ff',
-    preConfirm: () => {
-      const name  = document.getElementById('sw-name').value.trim();
-      const price = Number(document.getElementById('sw-price').value);
-      const stock = Number(document.getElementById('sw-stock').value);
-      const cat   = document.getElementById('sw-category').value.trim();
-      if (!name || !cat || isNaN(price) || price < 0 || isNaN(stock) || stock < 0) {
-        Swal.showValidationMessage('Nombre, precio, stock y categoría son obligatorios.');
-        return false;
-      }
-      return {
-        id:          productId,
-        name, price, stock,
-        category:    cat,
-        code:        document.getElementById('sw-code').value.trim(),
-        cost_price:  document.getElementById('sw-cost').value === '' ? null : Number(document.getElementById('sw-cost').value),
-        image:       document.getElementById('sw-image').value.trim() || 'assets/default.png',
-        description: document.getElementById('sw-desc').value.trim(),
-        active:      true
-      };
-    }
-  });
-=======
     // Crear overlay y modal
     const overlay = document.createElement('div');
     overlay.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4';
     overlay.style.animation = 'fadeIn 0.2s ease-out';
->>>>>>> 30b96ae19e03ed9f87792572b07b3a3f71d26030
 
     const modal = document.createElement('div');
     modal.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto';
@@ -381,6 +343,15 @@ async function showProductModal(productId) {
           </div>
         </div>
 
+        <!-- Costo -->
+        <div>
+          <label class="block text-sm font-semibold text-[#6d165a] mb-2">Costo unitario (COP)</label>
+          <input type="number" id="modal-cost" placeholder="Opcional" min="0" 
+            value="${product?.cost_price??''}" 
+            onclick="event.stopPropagation()"
+            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
+        </div>
+
         <!-- Imagen -->
         <div>
           <label class="block text-sm font-semibold text-[#6d165a] mb-2">Ruta de Imagen</label>
@@ -430,6 +401,7 @@ async function showProductModal(productId) {
     const categoryInput = modal.querySelector('#modal-category');
     const priceInput = modal.querySelector('#modal-price');
     const stockInput = modal.querySelector('#modal-stock');
+    const costInput = modal.querySelector('#modal-cost');
     const imageInput = modal.querySelector('#modal-image');
     const descInput = modal.querySelector('#modal-description');
     const saveBtn = modal.querySelector('.save-product');
@@ -495,6 +467,7 @@ async function showProductModal(productId) {
         id: productId,
         name,
         code: codeInput.value.trim() || null,
+        cost_price: costInput.value === '' ? null : Number(costInput.value),
         price,
         stock,
         category,
