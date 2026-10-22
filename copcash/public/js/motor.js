@@ -249,7 +249,7 @@ export function proyectar({ perfil, deudas = [], recurrentes = [], categorias = 
       }
       // Cuota de este periodo ya pagada y registrada: el saldo y las cuotas de la deuda ya la descuentan
       if (i === 0 && omitir.has(String(d.id))) { d.historial.push({ clave, pago: 0, saldo: d.saldo }); continue; }
-      const vigente = d.abierta || (d.restantes == null ? d.saldo > 0.5 : d.restantes > 0);
+      const vigente = d.cronograma || d.abierta || (d.restantes == null ? d.saldo > 0.5 : d.restantes > 0);
       const yaLiquidada = d.liquidar && difMeses(d.liquidar, clave) > 0;
       if (!vigente || yaLiquidada) { d.historial.push({ clave, pago: 0, saldo: d.saldo }); continue; }
 
@@ -273,6 +273,10 @@ export function proyectar({ perfil, deudas = [], recurrentes = [], categorias = 
         }
         d.restantes -= 1;
         if (d.restantes === 0) d.saldo = 0;
+      } else if (d.cronograma) {
+        // tarjeta con sus facturas calculadas desde las compras: se paga la factura que vence en este periodo
+        pago = fijo ?? 0;
+        d.saldo = Math.max(0, d.saldo - pago);
       } else if (fijo != null) {
         // la factura ya está armada con las cuotas de cada compra y los cobros fijos
         pago = Math.min(fijo, d.saldo + interes);
@@ -457,4 +461,50 @@ export function resumenTarjeta(t, compras, hoyISO) {
     disponible: cupo != null ? r0(Math.max(0, cupo - saldo)) : null,
     uso: cupo ? Math.min(1, saldo / cupo) : null,
   };
+}
+
+/**
+ * Próximas facturas de una tarjeta, a partir de sus compras a cuotas.
+ * La primera es la misma "Próximo pago" de `resumenTarjeta`; en las siguientes cada compra pendiente
+ * avanza una cuota por corte, se suman los cobros fijos, y lo que no está detallado en compras se va
+ * pagando con la cuota mensual configurada para la tarjeta.
+ * Devuelve [{ corte, vence, monto }].
+ */
+export function facturasTarjeta(t, compras, hoyISO, cuantas = 14) {
+  const rt = resumenTarjeta(t, compras, hoyISO);
+  if (!rt.corte || !rt.vence || !t.dia_pago) return [];
+  const cargos = totalCargos(t);
+  const cuotaConfig = Number(t.cuota) || 0;
+  let porDetallar = rt.sinDetallar;
+  let saldo = Number(t.saldo) || 0;
+  // Cada compra: valor de su cuota, cuotas que le faltan y desde qué corte entra a las facturas
+  const items = rt.pendientes.map((c) => ({ valor: valorCuota(c), faltan: cuotasPendientes(c), fecha: String(c.fecha).slice(0, 10) }));
+  const out = [];
+  let corte = rt.corte;
+  for (let k = 0; k < cuantas; k += 1) {
+    const vence = proximaFechaDia(corte, t.dia_pago);
+    let monto;
+    if (k === 0) {
+      monto = rt.estimado;
+      for (const it of items) if (it.fecha <= corte && it.faltan > 0) it.faltan -= 1;
+      // lo que la primera factura cobra por encima de las cuotas y cargos sale de lo no detallado
+      const enCuotas = rt.enFactura.reduce((s, c) => s + valorCuota(c), 0);
+      porDetallar = Math.max(0, porDetallar - Math.max(0, monto - enCuotas - cargos));
+    } else {
+      let cuotas = 0;
+      for (const it of items) if (it.fecha <= corte && it.faltan > 0) { cuotas += it.valor; it.faltan -= 1; }
+      let extra = 0;
+      if (porDetallar > 1) {
+        extra = Math.min(porDetallar, Math.max(0, cuotaConfig - cuotas - cargos));
+        porDetallar -= extra;
+      }
+      // nunca se paga más capital del que se debe
+      const capital = Math.min(cuotas + extra, saldo);
+      monto = capital + (saldo > 1 ? cargos : 0);
+    }
+    saldo = Math.max(0, saldo - Math.max(0, monto - cargos));
+    out.push({ corte, vence, monto: r0(monto) });
+    corte = proximaFechaDia(corte, t.dia_corte);
+  }
+  return out;
 }

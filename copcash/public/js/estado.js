@@ -1,5 +1,5 @@
 import { api } from './api.js';
-import { proyectar, periodoDeFecha, sumarMeses, difMeses, resumenTarjeta, rangoPeriodo } from './motor.js';
+import { proyectar, periodoDeFecha, sumarMeses, difMeses, facturasTarjeta, rangoPeriodo } from './motor.js';
 
 export const estado = { datos: null, cargado: 0 };
 
@@ -116,17 +116,22 @@ export async function proyeccionDesdeHoy({ meses = 12 } = {}) {
 }
 
 /**
- * Tarjeta con fecha de corte y pago: la factura que viene ya se conoce por sus compras, así que la
- * proyección usa ese valor en el periodo en que vence (el mismo "Próximo pago" de la tarjeta).
+ * Tarjeta con fecha de corte y pago: sus facturas se calculan desde las compras a cuotas, así que la
+ * proyección paga en cada periodo la factura que vence en él (la primera es el mismo "Próximo pago"
+ * que se ve en Deudas). Una factura que vence antes de `desde` ya no se cuenta.
  */
 function conFacturaPrevista(x, desde) {
   const d = estado.datos;
   if (x.tipo !== 'tarjeta' || !x.dia_corte || !x.dia_pago) return x;
-  const rt = resumenTarjeta(x, (d.compras || []).filter((c) => c.deuda_id === x.id), d.hoy);
-  if (!rt.vence || !(rt.estimado > 0)) return x;
-  const clave = periodoDeFecha(rt.vence, diaCorte());
-  if (difMeses(desde, clave) < 0) return x; // vence antes de lo que se proyecta
-  return { ...x, pagos_previstos: { [clave]: rt.estimado } };
+  const facturas = facturasTarjeta(x, (d.compras || []).filter((c) => c.deuda_id === x.id), d.hoy, 30);
+  if (!facturas.length) return x;
+  const pagos = {};
+  for (const f of facturas) {
+    const clave = periodoDeFecha(f.vence, diaCorte());
+    if (difMeses(desde, clave) < 0) continue;
+    pagos[clave] = (pagos[clave] || 0) + f.monto;
+  }
+  return { ...x, pagos_previstos: pagos, cronograma: true };
 }
 
 /** Cuentas activas y tarjetas (deudas tipo tarjeta) para escoger "con qué se pagó". Valores: "c:ID" o "t:ID". */
