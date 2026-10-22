@@ -213,6 +213,7 @@ export function proyectar({ perfil, deudas = [], recurrentes = [], categorias = 
     });
   }
 
+  const omitir = new Set((p.omitir_primero || []).map(String));
   const periodos = [];
   let acumulado = num(p.ahorro_inicial);
 
@@ -246,6 +247,8 @@ export function proyectar({ perfil, deudas = [], recurrentes = [], categorias = 
           continue;
         }
       }
+      // Cuota de este periodo ya pagada y registrada: el saldo y las cuotas de la deuda ya la descuentan
+      if (i === 0 && omitir.has(String(d.id))) { d.historial.push({ clave, pago: 0, saldo: d.saldo }); continue; }
       const vigente = d.abierta || (d.restantes == null ? d.saldo > 0.5 : d.restantes > 0);
       const yaLiquidada = d.liquidar && difMeses(d.liquidar, clave) > 0;
       if (!vigente || yaLiquidada) { d.historial.push({ clave, pago: 0, saldo: d.saldo }); continue; }
@@ -374,6 +377,7 @@ export function parametrosPorDefecto() {
     credito: null,
     liquidar: [],
     eventos: [],
+    omitir_primero: [], // ids de deudas cuya cuota del primer periodo ya está pagada
   };
 }
 

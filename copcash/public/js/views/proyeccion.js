@@ -1,7 +1,7 @@
 // Proyección: cuánto te sobra o te falta cada periodo con lo que tienes configurado.
 // No tiene supuestos propios: todo sale de Ajustes (nómina, gastos fijos y variables), Deudas y Cuentas.
 import { h, pesos } from '../ui.js';
-import { proyeccion, disponibleHoy } from '../estado.js';
+import { proyeccionDesdeHoy } from '../estado.js';
 import { nombreMes } from '../motor.js';
 import { pista } from './pista.js';
 
@@ -16,11 +16,13 @@ let meses = 12;
 let detalle = true;
 
 export async function vistaProyeccion(raiz) {
-  const r = proyeccion({ meses });
+  const r = await proyeccionDesdeHoy({ meses });
   const ps = r.periodos;
   const fin = ps[ps.length - 1]?.totales.acumulado ?? 0;
   const primero = ps[0];
-  const arrancas = disponibleHoy();
+  const a0 = r.arranque;
+  const arrancas = a0.total;
+  const porPagar = a0.cuotasPorPagar + a0.presupuestoPorGastar;
 
   // filas por concepto (unión de nombres a lo largo de los periodos)
   const filasDe = (grupo) => {
@@ -54,14 +56,17 @@ export async function vistaProyeccion(raiz) {
         : h`<div class="alerta verde"><div><strong>Con lo que tienes configurado, te alcanza.</strong>
             <p class="chico">Lo más bajo que llegas es ${pesos(r.minimo)}. En ${meses} meses tendrías ${pesos(fin)}.</p></div></div>`}
 
+      ${r.alertas.length ? h`<div class="alerta roja"><div><strong>Revisa ${r.alertas.length === 1 ? 'esta deuda' : 'estas deudas'}: el último pago no cuadra con la cuota.</strong>
+          ${r.alertas.map((x) => h`<p class="chico">${x.nombre}: en ${nombreMes(x.clave)} se proyecta un pago de ${pesos(x.pago)} y la cuota es ${pesos(x.cuota)}. Con ${x.restantes ?? '—'} cuotas de ${pesos(x.cuota)} no alcanza a pagar el saldo de ${pesos(x.saldo)}: revisa el saldo y las cuotas que faltan en <a href="#/deudas">Deudas</a>.</p>`)}</div></div>` : ''}
+
       <section class="bloque">
         <div class="bloque-cab"><h2>De dónde sale</h2><span class="chico suave">Primer periodo: ${primero ? nombreMes(primero.clave) : '—'}</span></div>
         <dl class="fuentes">
-          <div><dt>Arrancas con</dt><dd>${pesos(arrancas)}</dd><a class="chico" href="#/cuentas">Cuentas</a></div>
+          <div><dt>Arrancas con</dt><dd class="${arrancas < 0 ? 'neg' : ''}">${pesos(arrancas)}</dd><span class="chico suave">${pesos(a0.disponible)} en cuentas menos ${pesos(porPagar)} que faltan por pagar antes del próximo pago</span><a class="chico" href="#/cuentas">Cuentas</a></div>
           ${fuente.map(([t, v, href, donde, nota]) => h`<div><dt>${t}</dt><dd>${pesos(v)}</dd>${nota ? h`<span class="chico suave">${nota}</span>` : ''}<a class="chico" href="${href}">${donde}</a></div>`)}
           <div class="destacado"><dt>${libreMes < 0 ? 'Te falta' : 'Te sobra'} ese periodo</dt><dd class="${libreMes < 0 ? 'neg' : ''}">${pesos(libreMes)}</dd><span class="chico suave">${primero && primero.grupos.ingresos.length > 1 ? 'con primas' : 'sin primas'}</span></div>
         </dl>
-        <p class="chico suave" style="margin-top:10px">Para cambiar la proyección cambia tus datos: el salario y las primas en Ajustes, lo que gastas en Ajustes › Gastos, tus créditos en Deudas y lo que tienes hoy en Cuentas. Las cuotas que te descuentan por nómina ya están restadas de lo que te consignan.</p>
+        <p class="chico suave" style="margin-top:10px">Lo que falta por pagar este periodo son las cuotas que aún no registras como pagadas y lo que queda del presupuesto de cada categoría (fijos y variables). Para cambiar la proyección cambia tus datos: el salario y las primas en Ajustes, lo que gastas en Ajustes › Gastos, tus créditos en Deudas y lo que tienes hoy en Cuentas. Las cuotas que te descuentan por nómina ya están restadas de lo que te consignan.</p>
       </section>
 
       <section class="bloque">

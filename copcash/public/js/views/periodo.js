@@ -1,7 +1,7 @@
 // Periodo: lo que puedes gastar, tus movimientos del periodo y en qué se fue la plata.
 import { api } from '../api.js';
 import { h, pesos, diaMes, fechaCorta, abrirDialogo } from '../ui.js';
-import { estado, periodoActual, diaCorte, proyeccion } from '../estado.js';
+import { estado, periodoActual, diaCorte, proyeccion, presupuestoPorCategoria } from '../estado.js';
 import { rangoPeriodo, sumarMeses, resumenTarjeta } from '../motor.js';
 import { filaMovimiento, editarMovimiento, formMovimiento, medioDe } from './movimientos.js';
 import { colorDeuda, formPago } from './deudas.js';
@@ -16,17 +16,6 @@ const TIPOS_MEDIO = {
 };
 
 /** Presupuesto del periodo por categoría: lo variable + los gastos fijos activos que caen en ella. */
-export function presupuestoPorCategoria() {
-  const d = estado.datos;
-  const out = new Map();
-  for (const c of d.categorias) if (c.activa) out.set(c.id, { cat: c, presupuesto: c.fija ? 0 : Number(c.presupuesto), gastado: 0 });
-  for (const g of d.recurrentes) {
-    if (!g.activo || !g.categoria_id || !out.has(g.categoria_id)) continue;
-    out.get(g.categoria_id).presupuesto += Number(g.monto);
-  }
-  return out;
-}
-
 /** Fecha dentro del periodo en que cae un día del mes (p. ej. el día de pago de una tarjeta). */
 function fechaEnPeriodo(desde, hasta, dia) {
   const [a, m] = desde.split('-').map(Number);

@@ -1,5 +1,5 @@
 import { api } from './api.js';
-import { proyectar, periodoDeFecha, sumarMeses, difMeses, resumenTarjeta } from './motor.js';
+import { proyectar, periodoDeFecha, sumarMeses, difMeses, resumenTarjeta, rangoPeriodo } from './motor.js';
 
 export const estado = { datos: null, cargado: 0 };
 
@@ -38,6 +38,81 @@ export function proyeccion({ desde, meses = 12 } = {}) {
     desde: inicio,
     meses,
   });
+}
+
+/** Presupuesto de cada categoría activa: el de las variables más los gastos fijos que tiene asignados. */
+export function presupuestoPorCategoria() {
+  const d = estado.datos;
+  const out = new Map();
+  for (const c of d.categorias) if (c.activa) out.set(c.id, { cat: c, presupuesto: c.fija ? 0 : Number(c.presupuesto), gastado: 0 });
+  for (const g of d.recurrentes) {
+    if (!g.activo || !g.categoria_id || !out.has(g.categoria_id)) continue;
+    out.get(g.categoria_id).presupuesto += Number(g.monto);
+  }
+  return out;
+}
+
+/**
+ * Proyección desde hoy para la vista de Proyección.
+ * La plata de las cuentas ya incluye el pago de este periodo, pero todavía faltan gastos y cuotas
+ * por pagar antes del próximo pago. Por eso se arranca con: disponible hoy − lo que falta pagar este
+ * periodo, y las deudas avanzan la cuota de este periodo antes de proyectar los siguientes.
+ */
+export async function proyeccionDesdeHoy({ meses = 12 } = {}) {
+  const d = estado.datos;
+  const actual = periodoActual();
+  const [desde, hasta] = rangoPeriodo(actual, diaCorte());
+  const movs = await api.get(`/movimientos?desde=${desde}&hasta=${hasta}`);
+  const deudas = d.deudas.map((x) => conFacturaPrevista(x, actual));
+  const base = { perfil: d.perfil, deudas, recurrentes: d.recurrentes, categorias: d.categorias, ahorros: d.ahorros || [], desde: actual };
+
+  // Cuotas de este periodo (las que no son por nómina) y cuánto se les ha pagado
+  const p0 = proyectar({ ...base, meses: 1 }).periodos[0];
+  const pagadoA = new Map();
+  for (const m of movs) if (m.tipo === 'pago_deuda') pagadoA.set(String(m.deuda_id), (pagadoA.get(String(m.deuda_id)) || 0) + Number(m.monto));
+  let cuotasPorPagar = 0;
+  const pagadas = [];
+  for (const c of p0.grupos.deudas.concat(p0.grupos.unicos.filter((u) => u.deuda_id != null))) {
+    const pagado = pagadoA.get(String(c.deuda_id)) || 0;
+    if (pagado >= c.monto * 0.95) pagadas.push(c.deuda_id);
+    else cuotasPorPagar += c.monto - pagado;
+  }
+
+  // Lo que falta gastar del presupuesto de este periodo (fijos y variables)
+  const presu = presupuestoPorCategoria();
+  for (const m of movs) if (m.tipo === 'gasto' && presu.has(m.categoria_id)) presu.get(m.categoria_id).gastado += Number(m.monto);
+  let presupuestoPorGastar = 0;
+  for (const v of presu.values()) presupuestoPorGastar += Math.max(0, v.presupuesto - v.gastado);
+  // Gastos fijos sin categoría: no hay cómo saber si ya se pagaron, se cuentan como pendientes
+  for (const g of d.recurrentes) if (g.activo && (!g.categoria_id || !presu.has(g.categoria_id))) presupuestoPorGastar += Number(g.monto);
+
+  const disponible = disponibleHoy();
+  const arranque = disponible - cuotasPorPagar - presupuestoPorGastar;
+
+  const r = proyectar({ ...base, meses: meses + 1, parametros: { ahorro_inicial: 0, omitir_primero: pagadas } });
+  let acumulado = arranque;
+  const periodos = r.periodos.slice(1).map((p) => {
+    acumulado += p.totales.resultado;
+    return { ...p, totales: { ...p.totales, acumulado } };
+  });
+  const primerRojo = periodos.find((x) => x.totales.acumulado < 0);
+  // Deudas cuyo último pago proyectado es mucho mayor que su cuota: casi siempre saldo y cuotas que no cuadran
+  const alertas = [];
+  for (const dd of r.deudas) {
+    const orig = d.deudas.find((x) => String(x.id) === String(dd.id));
+    const cuota = Number(orig?.cuota) || 0;
+    if (!cuota || orig?.tipo === 'tarjeta') continue;
+    const salto = dd.historial.slice(1).find((h) => h.pago > cuota * 1.5);
+    if (salto) alertas.push({ nombre: dd.nombre, clave: salto.clave, pago: salto.pago, cuota, saldo: Number(orig.saldo) || 0, restantes: orig.cuotas_restantes });
+  }
+  return {
+    periodos,
+    primerRojo: primerRojo ? primerRojo.clave : null,
+    minimo: Math.min(arranque, ...periodos.map((x) => x.totales.acumulado)),
+    deudas: r.deudas,
+    arranque: { disponible, cuotasPorPagar, presupuestoPorGastar, total: arranque, periodo: actual },
+    alertas,
+  };
 }
 
 /**
