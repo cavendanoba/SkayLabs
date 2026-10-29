@@ -7,6 +7,7 @@ import { vistaDeudas } from './views/deudas.js';
 import { vistaProyeccion } from './views/proyeccion.js';
 import { vistaAjustes } from './views/ajustes.js';
 import { vistaCuentas } from './views/cuentas.js';
+import { vistaSeguimiento } from './views/seguimiento.js';
 
 const RUTAS = {
   '': vistaPeriodo,
@@ -15,6 +16,7 @@ const RUTAS = {
   deudas: vistaDeudas,
   cuentas: vistaCuentas,
   proyeccion: vistaProyeccion,
+  seguimiento: vistaSeguimiento,
   ajustes: vistaAjustes,
 };
 

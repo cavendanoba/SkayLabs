@@ -66,7 +66,7 @@ p { margin: 0; }
 .nav a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; text-decoration: none; color: var(--tinta-suave); font-size: 0.7rem; padding: 4px 0; border-radius: var(--radio-chico); }
 .nav a .ico { font-size: 1.15rem; line-height: 1.2; }
 .nav a[aria-current="page"] { color: var(--verde); font-weight: 600; }
-.nav .marca, .nav .solo-escritorio { display: none; }
+.nav .marca, .nav .solo-escritorio, .nav .sufijo { display: none; }
 .nav-registrar {
   width: 52px; height: 52px; margin: -22px 6px 0; border-radius: 50%; border: 0; background: var(--verde); color: #fff;
   font-size: 1.9rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,0.15); flex: none;
@@ -82,6 +82,7 @@ main > * { max-width: 1400px; margin-inline: auto; }
   .nav .marca:focus-visible { outline: 2px solid #7FC8A6; outline-offset: 4px; }
   .nav .marca img { display: block; width: 105px; height: auto; }
   .nav .solo-escritorio { display: flex; }
+  .nav .sufijo { display: inline; }
   .nav a { flex: none; flex-direction: row; gap: 12px; font-size: 0.95rem; padding: 10px 12px; color: #A9C9B9; }
   .nav a:hover { color: #fff; background: rgba(255,255,255,0.06); }
   .nav a[aria-current="page"] { background: rgba(255,255,255,0.12); color: #fff; }
@@ -544,3 +545,22 @@ button.cuota-estado { background: var(--superficie); border: 1px solid var(--lin
 .cuotas-fijas li { display: flex; justify-content: space-between; gap: 10px; font-size: 0.9rem; }
 .cuotas-fijas li span:last-child { font-weight: 600; white-space: nowrap; }
 .periodo-ejemplo { margin: 0; padding: 8px 10px; background: var(--superficie-2); border-radius: var(--radio-chico); font-weight: 600; }
+
+/* ── Real vs plan ── */
+.cat.seg { grid-template-columns: 1.6rem minmax(0, 1fr) auto; }
+.cat.seg .riel { position: relative; overflow: visible; }
+.cat.seg .riel span { position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; }
+.cat.seg .riel .real { z-index: 2; }
+.cat.seg .riel .cierre { background: var(--verde); opacity: 0.28; z-index: 1; }
+.cat.seg.cerca .riel span { background: var(--ambar); }
+.cat.seg.pasado .riel span { background: var(--rojo); }
+.cat.seg .riel .hoy { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--tinta); border-radius: 1px; z-index: 3; }
+.cat.seg .seg-nota { grid-column: 2 / 4; }
+.etiqueta.riesgo { background: var(--ambar-claro); color: var(--ambar); }
+.tips { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tips li { border-left: 4px solid var(--linea); background: var(--superficie-2); border-radius: var(--radio-chico); padding: 10px 12px; }
+.tips li p { margin: 2px 0 0; }
+.tips li.rojo { border-left-color: var(--rojo); }
+.tips li.ambar { border-left-color: var(--ambar); }
+.tips li.verde { border-left-color: var(--verde); }
+.tips li.azul { border-left-color: var(--violeta); }

@@ -41,10 +41,10 @@ export function proyeccion({ desde, meses = 12 } = {}) {
 }
 
 /** Presupuesto de cada categoría activa: el de las variables más los gastos fijos que tiene asignados. */
-export function presupuestoPorCategoria() {
+export function presupuestoPorCategoria(categorias = estado.datos.categorias) {
   const d = estado.datos;
   const out = new Map();
-  for (const c of d.categorias) if (c.activa) out.set(c.id, { cat: c, presupuesto: c.fija ? 0 : Number(c.presupuesto), gastado: 0 });
+  for (const c of categorias) if (c.activa) out.set(c.id, { cat: c, presupuesto: c.fija ? 0 : Number(c.presupuesto), gastado: 0 });
   for (const g of d.recurrentes) {
     if (!g.activo || !g.categoria_id || !out.has(g.categoria_id)) continue;
     out.get(g.categoria_id).presupuesto += Number(g.monto);
@@ -58,13 +58,14 @@ export function presupuestoPorCategoria() {
  * por pagar antes del próximo pago. Por eso se arranca con: disponible hoy − lo que falta pagar este
  * periodo, y las deudas avanzan la cuota de este periodo antes de proyectar los siguientes.
  */
-export async function proyeccionDesdeHoy({ meses = 12 } = {}) {
+export async function proyeccionDesdeHoy({ meses = 12, categorias = null, movimientos = null } = {}) {
   const d = estado.datos;
   const actual = periodoActual();
   const [desde, hasta] = rangoPeriodo(actual, diaCorte());
-  const movs = await api.get(`/movimientos?desde=${desde}&hasta=${hasta}`);
+  const movs = movimientos || await api.get(`/movimientos?desde=${desde}&hasta=${hasta}`);
+  const cats = categorias || d.categorias;
   const deudas = d.deudas.map((x) => conFacturaPrevista(x, actual));
-  const base = { perfil: d.perfil, deudas, recurrentes: d.recurrentes, categorias: d.categorias, ahorros: d.ahorros || [], desde: actual };
+  const base = { perfil: d.perfil, deudas, recurrentes: d.recurrentes, categorias: cats, ahorros: d.ahorros || [], desde: actual };
 
   // Cuotas de este periodo (las que no son por nómina) y cuánto se les ha pagado
   const p0 = proyectar({ ...base, meses: 1 }).periodos[0];
@@ -79,7 +80,7 @@ export async function proyeccionDesdeHoy({ meses = 12 } = {}) {
   }
 
   // Lo que falta gastar del presupuesto de este periodo (fijos y variables)
-  const presu = presupuestoPorCategoria();
+  const presu = presupuestoPorCategoria(cats);
   for (const m of movs) if (m.tipo === 'gasto' && presu.has(m.categoria_id)) presu.get(m.categoria_id).gastado += Number(m.monto);
   let presupuestoPorGastar = 0;
   for (const v of presu.values()) presupuestoPorGastar += Math.max(0, v.presupuesto - v.gastado);
