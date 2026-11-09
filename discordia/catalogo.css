@@ -57,3 +57,8 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; }
 .total { font-size: 1.2rem; margin: 16px 0; display: flex; justify-content: space-between; margin-top: auto; padding-top: 16px; }
 .whatsapp { padding: 15px; border: none; border-radius: 10px; background: #25d366; color: #08351c; font-size: 1rem; font-weight: 600; }
 .whatsapp:disabled { cursor: not-allowed; background: #eee; color: #555; }
+
+.brillos { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 40; }
+.destello, .chispa { position: absolute; top: 0; left: 0; display: block; will-change: transform, opacity; }
+.destello { clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); }
+.chispa { border-radius: 50%; }

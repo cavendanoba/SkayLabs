@@ -4,6 +4,7 @@
 
 import { CONFIG } from './config.js';
 import { fetchProducts } from './products.js';
+import { volarAlCarrito, activarEstelaMouse } from './brillos.js?v=3';
 
 const CLAVE_CARRITO = 'discordia-carrito';
 const IMAGEN_VACIA = 'assets/default.png';
@@ -32,6 +33,7 @@ let filtro = 'Todas';
 let busqueda = '';
 const seleccion = new Map();
 let foco = null;
+let enVuelo = 0;
 
 function urlImagen(p) {
   if (!p.image || p.image === IMAGEN_VACIA) return null;
@@ -128,7 +130,12 @@ function tarjeta(g) {
       return;
     }
     carrito[p.id] = (carrito[p.id] || 0) + 1;
+    enVuelo += 1;
     guardarCarrito();
+    volarAlCarrito(boton, $('abrirCarrito'), () => {
+      enVuelo -= 1;
+      pintarCarrito();
+    });
   };
 
   tarjetaNodo.append(boton);
@@ -184,7 +191,7 @@ function pintarCarrito() {
       el('div', { className: 'linea-botones' }, menos, el('span', { textContent: String(cant) }), mas));
   }));
   $('total').textContent = fmt(total);
-  $('contador').textContent = String(unidades);
+  $('contador').textContent = String(Math.max(0, unidades - enVuelo));
   $('carritoVacio').hidden = ls.length > 0;
   $('enviar').disabled = ls.length === 0;
 }
@@ -232,4 +239,5 @@ async function cargar() {
   pintarCarrito();
 }
 
+activarEstelaMouse();
 cargar();
