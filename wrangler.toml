@@ -6,3 +6,7 @@ pages_build_output_dir = "dist"
 [[hyperdrive]]
 binding = "HYPERDRIVE"
 id = "a0e02ff7de744ed585d9639489bd0435"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "discordia-images"

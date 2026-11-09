@@ -360,6 +360,15 @@ async function showProductModal(productId) {
             onclick="event.stopPropagation()"
             class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-[#9d5fa5] focus:ring-2 focus:ring-[#9d5fa5]/20 transition">
           <p class="text-xs text-gray-500 mt-1.5">Ej: assets/labial-rojo.jpg o URL externa</p>
+          <div class="flex items-center gap-3 mt-3">
+            <img id="modal-image-preview" src="${product?.image||'./assets/default.png'}" alt="Vista previa de la foto"
+              class="w-14 h-14 rounded-lg object-cover border border-gray-200"
+              onerror="this.src='./assets/default.png';this.onerror=null;">
+            <button type="button" id="modal-image-upload" onclick="event.stopPropagation()"
+              class="px-4 py-2.5 rounded-lg bg-[#6d165a] text-white text-sm font-semibold">Subir foto</button>
+            <input type="file" id="modal-image-file" accept="image/jpeg,image/png,image/webp" class="hidden" onclick="event.stopPropagation()">
+          </div>
+          <p id="modal-image-status" class="text-xs text-gray-500 mt-1.5">JPG, PNG o WebP de máximo 3 MB.</p>
         </div>
 
         <!-- Descripción -->
@@ -403,6 +412,35 @@ async function showProductModal(productId) {
     const stockInput = modal.querySelector('#modal-stock');
     const costInput = modal.querySelector('#modal-cost');
     const imageInput = modal.querySelector('#modal-image');
+    const imageFile = modal.querySelector('#modal-image-file');
+    const imageUpload = modal.querySelector('#modal-image-upload');
+    const imagePreview = modal.querySelector('#modal-image-preview');
+    const imageStatus = modal.querySelector('#modal-image-status');
+
+    imageUpload.addEventListener('click', () => imageFile.click());
+    imageFile.addEventListener('change', async () => {
+      const file = imageFile.files[0];
+      if (!file) return;
+      imageUpload.disabled = true;
+      imageUpload.textContent = 'Subiendo...';
+      imageStatus.textContent = '';
+      try {
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await fetch('/api/discordia/upload-image', { method: 'POST', body: fd });
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.message);
+        imageInput.value = json.url;
+        imagePreview.src = json.url;
+        imageStatus.textContent = 'Foto lista. Guarda el producto para aplicarla.';
+      } catch (err) {
+        imageStatus.textContent = err.message || 'No se pudo subir la foto.';
+      } finally {
+        imageUpload.disabled = false;
+        imageUpload.textContent = 'Subir foto';
+        imageFile.value = '';
+      }
+    });
     const descInput = modal.querySelector('#modal-description');
     const saveBtn = modal.querySelector('.save-product');
     const closeBtn = modal.querySelectorAll('.close-modal');
