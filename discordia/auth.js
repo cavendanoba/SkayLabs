@@ -15,7 +15,7 @@
 // httpOnly cookies y refresh tokens.
 // ─────────────────────────────────────────────────────────────
 
-const INACTIVITY_TIMEOUT = 2 * 60 * 1000; // 2 minutos en milisegundos
+const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 1 hora sin actividad
 let inactivityTimer = null;
 
 function resetInactivityTimer() {
@@ -36,6 +36,16 @@ if (typeof window !== 'undefined' && localStorage.getItem('discordia_admin_token
   document.addEventListener('mousedown', resetInactivityTimer);
   document.addEventListener('keydown', resetInactivityTimer);
   document.addEventListener('touchstart', resetInactivityTimer);
+  // Mover el mouse o desplazarse también cuenta como actividad (como máximo un reinicio cada 30 s).
+  let ultimoReinicio = 0;
+  const actividadSuave = () => {
+    const ahora = Date.now();
+    if (ahora - ultimoReinicio < 30000) return;
+    ultimoReinicio = ahora;
+    resetInactivityTimer();
+  };
+  document.addEventListener('mousemove', actividadSuave, { passive: true });
+  document.addEventListener('scroll', actividadSuave, { passive: true, capture: true });
   document.addEventListener('click', resetInactivityTimer);
   
   // Inicia el timer cuando se carga la página
