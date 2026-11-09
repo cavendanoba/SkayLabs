@@ -26,7 +26,7 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: false, message: 'Producto o servidor no permitido.' }, 400);
   }
 
-  const resp = await fetch(origen.toString(), { redirect: 'error' });
+  const resp = await fetch(origen.toString(), { redirect: 'manual' });
   if (!resp.ok) return json({ ok: false, message: `El proveedor respondió ${resp.status}.` }, 502);
 
   const tipo = (resp.headers.get('Content-Type') || '').split(';')[0].trim().toLowerCase();
