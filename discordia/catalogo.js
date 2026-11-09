@@ -48,7 +48,12 @@ function fotosDe(p) {
   if (typeof galeria === 'string') {
     try { galeria = JSON.parse(galeria); } catch { galeria = []; }
   }
-  const rutas = [p.image, ...(Array.isArray(galeria) ? galeria : [])].map(rutaImagen).filter(Boolean);
+  // Algunas fotos quedaron guardadas como texto '["/ruta"]'; se desempacan aquí.
+  const extras = (Array.isArray(galeria) ? galeria : []).flatMap(g => {
+    if (typeof g !== 'string' || !g.startsWith('[')) return [g];
+    try { return JSON.parse(g); } catch { return []; }
+  });
+  const rutas = [p.image, ...extras].map(rutaImagen).filter(Boolean);
   return [...new Set(rutas)];
 }
 

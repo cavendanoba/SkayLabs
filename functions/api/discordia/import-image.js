@@ -39,7 +39,7 @@ export async function onRequestPost({ request, env }) {
   const url = await guardarImagen(env, datos, tipo);
   const sql = getSql(env);
   const [producto] = body.gallery
-    ? await sql`UPDATE products SET gallery = COALESCE(gallery, '[]'::jsonb) || ${JSON.stringify([url])}::jsonb, updated_at = NOW() WHERE id = ${productId} RETURNING id`
+    ? await sql`UPDATE products SET gallery = COALESCE(gallery, '[]'::jsonb) || jsonb_build_array(${url}::text), updated_at = NOW() WHERE id = ${productId} RETURNING id`
     : await sql`UPDATE products SET image = ${url}, updated_at = NOW() WHERE id = ${productId} RETURNING id`;
   if (!producto) return json({ ok: false, message: 'Producto no encontrado.' }, 404);
 
