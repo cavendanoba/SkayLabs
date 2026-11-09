@@ -17,6 +17,8 @@ button { cursor: pointer; }
 .categorias { display: flex; gap: 8px; overflow-x: auto; padding: 16px 20px; position: sticky; top: 0; background: #faf7f5; z-index: 5; }
 .categorias button { min-height: 44px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 8px 18px; border-radius: 999px; white-space: nowrap; font-size: 15px; }
 .categorias .activa { background: #1a1a1a; color: #fff; }
+.categorias button:first-child { margin-left: auto; }
+.categorias button:last-child { margin-right: auto; }
 
 main { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; }
 .titulo-cat { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 2rem; margin: 32px 0 16px; border-bottom: 2px solid #1a1a1a; padding-bottom: 8px; }
