@@ -1,6 +1,7 @@
 // functions/api/discordia/import-image.js
 // POST (solo admin) { product_id, url } → copia a R2 una foto de la tienda del proveedor
 // y la asigna al producto. Solo acepta los servidores de imágenes de Trendy y Engol.
+// Con gallery: true la agrega a sus fotos adicionales en vez de reemplazar la principal.
 
 import { getSql, json } from './_lib/db.js';
 import { guardarImagen, TIPOS, MAX_BYTES } from './_lib/images.js';
@@ -37,7 +38,9 @@ export async function onRequestPost({ request, env }) {
 
   const url = await guardarImagen(env, datos, tipo);
   const sql = getSql(env);
-  const [producto] = await sql`UPDATE products SET image = ${url}, updated_at = NOW() WHERE id = ${productId} RETURNING id`;
+  const [producto] = body.gallery
+    ? await sql`UPDATE products SET gallery = COALESCE(gallery, '[]'::jsonb) || ${JSON.stringify([url])}::jsonb, updated_at = NOW() WHERE id = ${productId} RETURNING id`
+    : await sql`UPDATE products SET image = ${url}, updated_at = NOW() WHERE id = ${productId} RETURNING id`;
   if (!producto) return json({ ok: false, message: 'Producto no encontrado.' }, 404);
 
   return json({ ok: true, url });

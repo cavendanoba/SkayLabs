@@ -11,6 +11,7 @@ const IMAGEN_VACIA = 'assets/default.png';
 const NOMBRES_CATEGORIA = { LABI: 'Labios', OJOS: 'Ojos', CEJAS: 'Cejas', PIEL: 'Piel', SKIN: 'Cuidado de la piel', ACCE: 'Accesorios' };
 const ORDEN_CATEGORIA = Object.values(NOMBRES_CATEGORIA);
 const CODIGO_TONO = /^(.+?)\s*#\s*([\w.-]+)$/;
+const SIN_DESCRIPCION = 'Pronto agregaremos más información de este producto.';
 
 const $ = id => document.getElementById(id);
 const fmt = n => '$' + Number(n).toLocaleString('es-CO', { maximumFractionDigits: 0 });
@@ -35,9 +36,20 @@ const seleccion = new Map();
 let foco = null;
 let enVuelo = 0;
 
-function urlImagen(p) {
-  if (!p.image || p.image === IMAGEN_VACIA) return null;
-  return /^(https?:)?\//.test(p.image) ? p.image : './' + p.image;
+function rutaImagen(ruta) {
+  if (!ruta || ruta === IMAGEN_VACIA) return null;
+  return /^(https?:)?\//.test(ruta) ? ruta : './' + ruta;
+}
+
+const urlImagen = p => rutaImagen(p.image);
+
+function fotosDe(p) {
+  let galeria = p.gallery;
+  if (typeof galeria === 'string') {
+    try { galeria = JSON.parse(galeria); } catch { galeria = []; }
+  }
+  const rutas = [p.image, ...(Array.isArray(galeria) ? galeria : [])].map(rutaImagen).filter(Boolean);
+  return [...new Set(rutas)];
 }
 
 function agrupar(productos) {
@@ -89,7 +101,8 @@ function pintarFoto(contenedor, g, p) {
 }
 
 function tarjeta(g) {
-  const foto = el('div', { className: 'foto' });
+  const foto = el('button', { type: 'button', className: 'foto', onclick: () => abrirDetalle(g, seleccionado(g)) });
+  foto.setAttribute('aria-label', 'Ver detalles de ' + g.titulo);
   const precio = el('p', { className: 'precio' });
   const boton = el('button', { type: 'button', className: 'agregar' });
   const tarjetaNodo = el('article', { className: 'card' }, foto, el('h3', { textContent: g.titulo }), precio);
@@ -141,6 +154,32 @@ function tarjeta(g) {
   tarjetaNodo.append(boton);
   actualizar();
   return tarjetaNodo;
+}
+
+function mostrarFotoDetalle(url, titulo) {
+  const contenedor = $('detalleFoto');
+  if (!url) { contenedor.replaceChildren('Foto próximamente'); return; }
+  contenedor.replaceChildren(el('img', { src: url, alt: titulo }));
+}
+
+function abrirDetalle(g, p) {
+  const titulo = g.conTonos ? g.titulo + ' · Tono ' + p.tono : g.titulo;
+  const fotos = fotosDe(p);
+  const descripcion = String(p.description || '').trim();
+
+  $('detalleTitulo').textContent = titulo;
+  $('detalleMarca').textContent = p.brand || '';
+  $('detalleMarca').hidden = !p.brand;
+  $('detallePrecio').textContent = fmt(p.price);
+  $('detalleTexto').textContent = descripcion && !descripcion.startsWith('Pendiente de precio') ? descripcion : SIN_DESCRIPCION;
+  mostrarFotoDetalle(fotos[0], titulo);
+
+  $('detalleMiniaturas').replaceChildren(...(fotos.length > 1 ? fotos : []).map((url, i) => {
+    const b = el('button', { type: 'button', onclick: () => mostrarFotoDetalle(url, titulo) }, el('img', { src: url, alt: '' }));
+    b.setAttribute('aria-label', 'Ver foto ' + (i + 1));
+    return b;
+  }));
+  $('detalle').showModal();
 }
 
 function pintarCatalogo() {
@@ -225,6 +264,8 @@ $('abrirCarrito').onclick = abrirCarrito;
 $('cerrarCarrito').onclick = cerrarCarrito;
 $('fondoCarrito').onclick = cerrarCarrito;
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('carrito').hidden) cerrarCarrito(); });
+$('cerrarDetalle').onclick = () => $('detalle').close();
+$('detalle').addEventListener('click', e => { if (e.target === $('detalle')) $('detalle').close(); });
 $('buscar').addEventListener('input', e => { busqueda = e.target.value; pintarCatalogo(); });
 
 async function cargar() {

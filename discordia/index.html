@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600&display=swap">
-  <link rel="stylesheet" href="./catalogo.css?v=4">
+  <link rel="stylesheet" href="./catalogo.css?v=5">
 </head>
 <body>
   <header class="portada">
@@ -58,6 +58,22 @@
     <button id="enviar" class="whatsapp" type="button">Pedir por WhatsApp</button>
   </aside>
 
-  <script type="module" src="./catalogo.js?v=4"></script>
+  <dialog id="detalle" class="detalle" aria-labelledby="detalleTitulo">
+    <div class="detalle-cuerpo">
+      <button id="cerrarDetalle" class="detalle-cerrar" type="button" aria-label="Cerrar detalles">×</button>
+      <div>
+        <div id="detalleFoto" class="detalle-foto"></div>
+        <div id="detalleMiniaturas" class="miniaturas"></div>
+      </div>
+      <div class="detalle-info">
+        <p id="detalleMarca" class="marca"></p>
+        <h2 id="detalleTitulo"></h2>
+        <p id="detallePrecio" class="precio"></p>
+        <p id="detalleTexto" class="detalle-texto"></p>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="./catalogo.js?v=5"></script>
 </body>
 </html>
