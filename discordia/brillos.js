@@ -1,11 +1,21 @@
 // brillos.js — Destellos del catálogo: el vuelo al carrito y la estela del mouse.
-// Respeta a quienes tienen desactivadas las animaciones en su sistema.
+// Respeta a quienes tienen desactivadas las animaciones en su sistema,
+// salvo que hayan elegido encender los brillos con el botón del catálogo.
 
 const COLORES = ['#ffd76a', '#f5c518', '#ff9ed2', '#ffffff', '#ffb3de'];
 const MAX_ESTELA = 40;
 const DURACION_VUELO = 850;
 
+const CLAVE_BRILLOS = 'discordia-brillos';
+
 const sinAnimacion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let brillosElegidos = leerPreferencia();
+const hayBrillos = () => !sinAnimacion.matches || brillosElegidos;
+
+function leerPreferencia() {
+  try { return localStorage.getItem(CLAVE_BRILLOS) === 'si'; } catch { return false; }
+}
+
 const capa = document.createElement('div');
 capa.className = 'brillos';
 capa.setAttribute('aria-hidden', 'true');
@@ -69,7 +79,7 @@ function cuadrosRuta(a, b, alturaArco, { desvio = 0, escala, giro, opacidad }) {
 
 // Lanza el brillo desde `origen` hasta `destino` y llama a `alLlegar` una sola vez.
 export function volarAlCarrito(origen, destino, alLlegar) {
-  if (sinAnimacion.matches) { alLlegar(); return; }
+  if (!hayBrillos()) { alLlegar(); return; }
 
   let llego = false;
   const llegar = () => {
@@ -105,6 +115,21 @@ export function volarAlCarrito(origen, destino, alLlegar) {
   }
 }
 
+// El botón solo aparece a quienes tienen las animaciones desactivadas en su sistema.
+export function activarBotonBrillos(boton) {
+  const pintar = () => {
+    boton.hidden = !sinAnimacion.matches;
+    boton.textContent = brillosElegidos ? 'Apagar brillos' : 'Activar brillos ✨';
+  };
+  boton.onclick = () => {
+    brillosElegidos = !brillosElegidos;
+    try { localStorage.setItem(CLAVE_BRILLOS, brillosElegidos ? 'si' : 'no'); } catch { /* aplica solo a esta visita */ }
+    pintar();
+  };
+  sinAnimacion.addEventListener('change', pintar);
+  pintar();
+}
+
 export function activarEstelaMouse() {
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
@@ -112,7 +137,7 @@ export function activarEstelaMouse() {
   let activas = 0;
 
   window.addEventListener('pointermove', evento => {
-    if (sinAnimacion.matches || evento.pointerType !== 'mouse' || activas >= MAX_ESTELA) return;
+    if (!hayBrillos() || evento.pointerType !== 'mouse' || activas >= MAX_ESTELA) return;
     const ahora = performance.now();
     if (ahora - ultimo.tiempo < 28 || Math.hypot(evento.clientX - ultimo.x, evento.clientY - ultimo.y) < 16) return;
     ultimo = { x: evento.clientX, y: evento.clientY, tiempo: ahora };

@@ -10,6 +10,8 @@ button { cursor: pointer; }
 .portada h1 { margin: 6px 0 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(3rem, 12vw, 7rem); line-height: 1.1; letter-spacing: .08em; }
 .edicion { margin: 0; text-transform: uppercase; letter-spacing: .3em; font-size: .75rem; color: #d9cfd2; }
 .bajada { margin: 8px 0 0; font-style: italic; color: #eae3e5; }
+.boton-brillos { margin-top: 16px; min-height: 44px; padding: 8px 18px; border: 1px solid #d9cfd2; border-radius: 999px; background: none; color: #fff; font-size: .9rem; }
+.boton-brillos:focus-visible { outline-color: #fff; }
 
 .buscador { padding: 20px 20px 0; max-width: 1200px; margin: 0 auto; }
 .buscador input { width: 100%; padding: 14px 18px; border: 1px solid #ddd; border-radius: 999px; font-size: 1rem; background: #fff; color: #1a1a1a; }

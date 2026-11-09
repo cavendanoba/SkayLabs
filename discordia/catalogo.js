@@ -4,7 +4,7 @@
 
 import { CONFIG } from './config.js';
 import { fetchProducts } from './products.js';
-import { volarAlCarrito, activarEstelaMouse } from './brillos.js?v=3';
+import { volarAlCarrito, activarEstelaMouse, activarBotonBrillos } from './brillos.js?v=4';
 
 const CLAVE_CARRITO = 'discordia-carrito';
 const IMAGEN_VACIA = 'assets/default.png';
@@ -240,4 +240,5 @@ async function cargar() {
 }
 
 activarEstelaMouse();
+activarBotonBrillos($('activarBrillos'));
 cargar();
