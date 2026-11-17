@@ -94,3 +94,8 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; }
 .destacado-detalles { min-height: 48px; padding: 12px 22px; border: 1px solid #e7c9d2; border-radius: 10px; background: none; color: #fff; font-size: 1rem; }
 .destacado-agotado { min-height: 48px; padding: 12px 22px; border-radius: 10px; background: #eee; color: #555; }
 .destacado :focus-visible { outline-color: #fff; }
+
+.detalle-tonos { padding: 10px 0 0; }
+.detalle-accion { margin-top: 18px; }
+.detalle-accion .agregar, .detalle-accion .whatsapp { margin: 0; width: 100%; min-height: 48px; font-size: 1rem; }
+.detalle-agotado { display: block; padding: 13px; border-radius: 10px; background: #eee; color: #555; text-align: center; }

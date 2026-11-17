@@ -184,7 +184,42 @@ function abrirDetalle(g, p) {
     b.setAttribute('aria-label', 'Ver foto ' + (i + 1));
     return b;
   }));
-  $('detalle').showModal();
+
+  const tonos = g.conTonos ? g.items.map(item => {
+    const b = el('button', { type: 'button', textContent: item.tono, disabled: item.stock <= 0, className: item.id === p.id ? 'activo' : '' });
+    b.setAttribute('aria-pressed', String(item.id === p.id));
+    b.setAttribute('aria-label', 'Tono ' + item.tono + (item.stock > 0 ? '' : ', agotado'));
+    b.onclick = () => { seleccion.set(g.clave, item.id); pintarCatalogo(); abrirDetalle(g, item); };
+    return b;
+  }) : [];
+  $('detalleTonos').replaceChildren(...tonos);
+  $('detalleTonos').hidden = !tonos.length;
+
+  $('detalleAccion').replaceChildren(botonAccion(p, () => $('detalle').close()));
+  if (!$('detalle').open) $('detalle').showModal();
+}
+
+// Botón principal de un producto: Agregar, Pedir por WhatsApp (precio abierto) o Agotado.
+function botonAccion(p, antesDeVolar) {
+  if (p.stock <= 0) return el('span', { className: 'detalle-agotado', textContent: 'Agotado' });
+  if (precioAbierto(p)) return el('button', { type: 'button', className: 'whatsapp', textContent: 'Pedir por WhatsApp', onclick: () => pedirPorWhatsApp(p) });
+
+  const boton = el('button', { type: 'button', className: 'agregar', textContent: 'Agregar al pedido' });
+  boton.onclick = () => {
+    if ((carrito[p.id] || 0) >= p.stock) {
+      boton.textContent = 'Máximo disponible';
+      setTimeout(() => { boton.textContent = 'Agregar al pedido'; }, 1200);
+      return;
+    }
+    const r = boton.getBoundingClientRect();
+    const origen = { getBoundingClientRect: () => r };
+    antesDeVolar?.();
+    carrito[p.id] = (carrito[p.id] || 0) + 1;
+    enVuelo += 1;
+    guardarCarrito();
+    volarAlCarrito(origen, $('abrirCarrito'), () => { enVuelo -= 1; pintarCarrito(); });
+  };
+  return boton;
 }
 
 // Precio 0 = se acuerda por WhatsApp; reference_price es el valor de referencia del producto.
