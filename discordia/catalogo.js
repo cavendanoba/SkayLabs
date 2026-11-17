@@ -60,7 +60,7 @@ function fotosDe(p) {
 function agrupar(productos) {
   const mapa = new Map();
   productos
-    .filter(p => p.category && p.category !== 'N/A' && p.code !== '0001')
+    .filter(p => p.category && p.category !== 'N/A' && p.code !== '0001' && !p.featured)
     .forEach(p => {
       const m = String(p.code || '').match(CODIGO_TONO);
       const clave = m ? p.category + '|' + m[1].trim().toUpperCase() : 'id|' + p.id;
@@ -175,7 +175,7 @@ function abrirDetalle(g, p) {
   $('detalleTitulo').textContent = titulo;
   $('detalleMarca').textContent = p.brand || '';
   $('detalleMarca').hidden = !p.brand;
-  $('detallePrecio').textContent = fmt(p.price);
+  $('detallePrecio').textContent = textoPrecio(p);
   $('detalleTexto').textContent = descripcion && !descripcion.startsWith('Pendiente de precio') ? descripcion : SIN_DESCRIPCION;
   mostrarFotoDetalle(fotos[0], titulo);
 
@@ -185,6 +185,59 @@ function abrirDetalle(g, p) {
     return b;
   }));
   $('detalle').showModal();
+}
+
+// Precio 0 = se acuerda por WhatsApp; reference_price es el valor de referencia del producto.
+const precioAbierto = p => !(Number(p.price) > 0);
+const textoPrecio = p => (precioAbierto(p) ? 'Escríbenos por el tuyo' : fmt(p.price));
+
+function pedirPorWhatsApp(p) {
+  const mensaje = `Hola Discordia, me interesa el ${p.name}. ¿Me cuentas el precio y cómo lo puedo pedir?`;
+  window.open(`https://wa.me/${CONFIG.WHATSAPP_PHONE}?text=${encodeURIComponent(mensaje)}`, '_blank', 'noopener');
+}
+
+function pintarDestacado(productos) {
+  const seccion = $('destacado');
+  const p = productos.find(x => x.featured);
+  if (!p) { seccion.hidden = true; return; }
+
+  const item = { ...p, price: Number(p.price), stock: Number(p.stock), tono: null };
+  const g = { clave: 'destacado|' + p.id, titulo: p.name, conTonos: false, items: [item] };
+  const hay = item.stock > 0;
+  const foto = urlImagen(p);
+
+  const botonFoto = el('button', { type: 'button', className: 'destacado-foto', onclick: () => abrirDetalle(g, item) },
+    foto ? el('img', { src: foto, alt: p.name }) : 'Foto próximamente');
+  botonFoto.setAttribute('aria-label', 'Ver detalles de ' + p.name);
+
+  const acciones = el('div', { className: 'destacado-acciones' });
+  if (!hay) {
+    acciones.append(el('span', { className: 'destacado-agotado', textContent: 'Agotado' }));
+  } else if (precioAbierto(item)) {
+    acciones.append(el('button', { type: 'button', className: 'whatsapp', textContent: 'Pedir por WhatsApp', onclick: () => pedirPorWhatsApp(item) }));
+  } else {
+    const agregar = el('button', { type: 'button', className: 'agregar', textContent: 'Agregar' });
+    agregar.onclick = () => {
+      if ((carrito[item.id] || 0) >= item.stock) return;
+      carrito[item.id] = (carrito[item.id] || 0) + 1;
+      enVuelo += 1;
+      guardarCarrito();
+      volarAlCarrito(agregar, $('abrirCarrito'), () => { enVuelo -= 1; pintarCarrito(); });
+    };
+    acciones.append(agregar);
+  }
+  acciones.append(el('button', { type: 'button', className: 'destacado-detalles', textContent: 'Ver detalles', onclick: () => abrirDetalle(g, item) }));
+
+  const info = el('div', { className: 'destacado-info' },
+    el('p', { className: 'destacado-etiqueta', textContent: ['Destacado', p.brand].filter(Boolean).join(' · ') }),
+    el('h2', { textContent: p.name }));
+  const resumen = String(p.description || '').split(/(?<=\.)\s/)[0];
+  if (resumen) info.append(el('p', { className: 'destacado-texto', textContent: resumen }));
+  if (Number(p.reference_price) > 0) info.append(el('p', { className: 'destacado-valor', textContent: 'Productos valorados en ' + fmt(p.reference_price) }));
+  info.append(el('p', { className: 'destacado-precio', textContent: textoPrecio(item) }), acciones);
+
+  seccion.replaceChildren(el('div', { className: 'destacado-cuerpo' }, botonFoto, info));
+  seccion.hidden = false;
 }
 
 function pintarCatalogo() {
@@ -276,6 +329,7 @@ $('buscar').addEventListener('input', e => { busqueda = e.target.value; pintarCa
 async function cargar() {
   const productos = await fetchProducts();
   grupos = agrupar(productos);
+  pintarDestacado(productos);
   if (!grupos.length) {
     $('catalogo').replaceChildren(el('p', { className: 'vacio', textContent: 'No pudimos cargar el catálogo. Intenta de nuevo en un momento.' }));
     return;
