@@ -99,3 +99,15 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; }
 .detalle-accion { margin-top: 18px; }
 .detalle-accion .agregar, .detalle-accion .whatsapp { margin: 0; width: 100%; min-height: 48px; font-size: 1rem; }
 .detalle-agotado { display: block; padding: 13px; border-radius: 10px; background: #eee; color: #555; text-align: center; }
+
+.descuento { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.precio-antes { font-size: 1rem; }
+.precio-ahora { font-size: 1.6rem; font-weight: 600; }
+.ahorro { display: inline-block; flex-basis: auto; padding: 4px 12px; border-radius: 999px; font-size: .85rem; font-weight: 600; }
+.destacado-descuento { margin-top: 16px; }
+.destacado-descuento .precio-antes { color: #e7c9d2; }
+.destacado-descuento .precio-ahora { font-size: 2rem; color: #fff; }
+.destacado-descuento .ahorro { background: #ffd76a; color: #3a2400; }
+.detalle-descuento .precio-antes { color: #666; }
+.detalle-descuento .precio-ahora { color: #4a1f2e; }
+.detalle-descuento .ahorro { background: #4a1f2e; color: #fff; }

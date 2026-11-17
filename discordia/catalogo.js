@@ -175,7 +175,7 @@ function abrirDetalle(g, p) {
   $('detalleTitulo').textContent = titulo;
   $('detalleMarca').textContent = p.brand || '';
   $('detalleMarca').hidden = !p.brand;
-  $('detallePrecio').textContent = textoPrecio(p);
+  $('detallePrecio').replaceChildren(enDescuento(p) ? nodoDescuento(p, 'detalle-descuento') : textoPrecio(p));
   $('detalleTexto').textContent = descripcion && !descripcion.startsWith('Pendiente de precio') ? descripcion : SIN_DESCRIPCION;
   mostrarFotoDetalle(fotos[0], titulo);
 
@@ -225,6 +225,19 @@ function botonAccion(p, antesDeVolar) {
 // Precio 0 = se acuerda por WhatsApp; reference_price es el valor de referencia del producto.
 const precioAbierto = p => !(Number(p.price) > 0);
 const textoPrecio = p => (precioAbierto(p) ? 'Escríbenos por el tuyo' : fmt(p.price));
+const enDescuento = p => !precioAbierto(p) && Number(p.reference_price) > Number(p.price);
+
+// Precio con descuento: antes tachado, precio actual y cuánto se ahorra.
+function nodoDescuento(p, clase) {
+  const antes = Number(p.reference_price);
+  const ahorro = antes - Number(p.price);
+  const tachado = el('s', { className: 'precio-antes', textContent: fmt(antes) });
+  tachado.setAttribute('aria-label', 'Antes ' + fmt(antes));
+  return el('div', { className: 'descuento ' + clase },
+    tachado,
+    el('span', { className: 'precio-ahora', textContent: fmt(p.price) }),
+    el('span', { className: 'ahorro', textContent: `Ahorras ${fmt(ahorro)} (${Math.round(ahorro / antes * 100)}%)` }));
+}
 
 function pedirPorWhatsApp(p) {
   const mensaje = `Hola Discordia, me interesa el ${p.name}. ¿Me cuentas el precio y cómo lo puedo pedir?`;
@@ -268,8 +281,12 @@ function pintarDestacado(productos) {
     el('h2', { textContent: p.name }));
   const resumen = String(p.description || '').split(/(?<=\.)\s/)[0];
   if (resumen) info.append(el('p', { className: 'destacado-texto', textContent: resumen }));
-  if (Number(p.reference_price) > 0) info.append(el('p', { className: 'destacado-valor', textContent: 'Productos valorados en ' + fmt(p.reference_price) }));
-  info.append(el('p', { className: 'destacado-precio', textContent: textoPrecio(item) }), acciones);
+  if (enDescuento(item)) {
+    info.append(nodoDescuento(item, 'destacado-descuento'), acciones);
+  } else {
+    if (Number(p.reference_price) > 0) info.append(el('p', { className: 'destacado-valor', textContent: 'Productos valorados en ' + fmt(p.reference_price) }));
+    info.append(el('p', { className: 'destacado-precio', textContent: textoPrecio(item) }), acciones);
+  }
 
   seccion.replaceChildren(el('div', { className: 'destacado-cuerpo' }, botonFoto, info));
   seccion.hidden = false;
