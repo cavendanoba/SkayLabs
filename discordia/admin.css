@@ -149,7 +149,7 @@ body.adm {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   height: 36px; padding: 0 14px; border-radius: 10px;
   border: 1px solid var(--hair-2); background: var(--card);
-  font-weight: 500; font-size: 13px; cursor: pointer; text-decoration: none; color: var(--ink);
+  font-weight: 500; font-size: 13px; cursor: pointer; text-decoration: none; color: var(--ink); white-space: nowrap;
   transition: border-color .2s, background .2s, transform .15s;
 }
 .btn:hover { border-color: color-mix(in oklab, var(--accent) 55%, transparent); }
@@ -171,7 +171,7 @@ body.adm {
 .search { position: relative; flex: 1; min-width: 220px; }
 .search svg { position: absolute; left: 11px; top: 10px; width: 16px; height: 16px; color: var(--faint); }
 .search .input { width: 100%; padding-left: 34px; }
-.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 11px; background: var(--well); border: 1px solid var(--hair); }
+.seg { display: inline-flex; max-width: 100%; overflow-x: auto; scrollbar-width: none; padding: 3px; gap: 2px; border-radius: 11px; background: var(--well); border: 1px solid var(--hair); }
 .seg button { white-space: nowrap; height: 28px; padding: 0 12px; border: 0; border-radius: 8px; background: none; cursor: pointer; font-size: 12.5px; color: var(--dim); }
 .seg button.is-on { background: var(--card-top); color: var(--ink); box-shadow: 0 1px 0 var(--hair-2) inset, 0 4px 10px -6px #0008; }
 
@@ -455,3 +455,30 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
 .adm .circle-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--hair-2); display: grid; place-items: center; background: none; cursor: pointer; color: var(--dim); }
 .circle-btn svg { width: 14px; height: 14px; }
 .circle-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ── Celular: tablas como tarjetas y totales de 2 en 2 ── */
+@media (max-width: 640px) {
+  .dgrid.kpis > .card { grid-column: span 6; padding: 14px; }
+  .dgrid.kpis > .card.wide, .dgrid.kpis > .card.wide ~ .card:last-child:nth-child(even) { grid-column: span 12; }
+  .dgrid.kpis .kpi-value { font-size: 22px; }
+  .dgrid.kpis .kpi { min-height: 0; }
+  .hello h2 { font-size: 26px; }
+  .hello .right { width: 100%; }
+  .hello .right .btn { flex: 1; }
+  .toolbar { padding: 12px 14px; }
+  .toolbar .search { min-width: 100%; }
+  .toolbar select.input, .toolbar .btn.primary { flex: 1; }
+  .toolbar .meta { margin-left: 0; }
+  .card-head .right { margin-left: 0; }
+  .tbl.stack thead { display: none; }
+  .tbl.stack, .tbl.stack tbody { display: block; }
+  .tbl.stack tr { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; padding: 14px 16px; border-bottom: 1px solid var(--hair); }
+  .tbl.stack td { display: block; padding: 0; border: 0; text-align: left; min-width: 0; }
+  .tbl.stack td.r { text-align: left; }
+  .tbl.stack td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 3px; font: 500 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+  .tbl.stack td.full { grid-column: 1 / -1; }
+  .tbl.stack .prod { min-width: 0 !important; }
+  .tbl.stack .prod span { max-width: none; white-space: normal; }
+  .tbl.stack .actions { justify-content: flex-start; }
+  .tbl.stack .stock .hbar { max-width: none; }
+}

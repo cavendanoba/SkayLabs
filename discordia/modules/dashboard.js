@@ -40,7 +40,7 @@ export async function renderDashboard(container, ctx = {}) {
   const d = calcular(state, api);
   container.innerHTML = `
     ${saludo(d, ctx.user)}
-    <section class="dgrid">
+    <section class="dgrid kpis">
       ${kpiHero(d)}
       ${kpi({ icon: I.bag,   label: 'Ventas del mes',      value: d.mes.n, foot: d.mes.n ? `Ticket promedio <b class="num">${formatCurrency(d.mes.total / d.mes.n)}</b>` : 'Aún no hay ventas este mes' })}
       ${kpi({ icon: I.card,  label: 'Por cobrar',          value: formatCurrency(d.deuda.total), foot: d.deuda.n ? `${d.deuda.n} venta${d.deuda.n !== 1 ? 's' : ''} pendiente${d.deuda.n !== 1 ? 's' : ''}` : '<span class="pill good">Todo cobrado</span>', go: 'debts' })}
@@ -202,7 +202,7 @@ function delta(v) {
 function kpiHero(d) {
   const pct = d.mes.total ? Math.round(d.mes.cobrado / d.mes.total * 100) : 0;
   return `
-    <article class="card hero kpi span-3">
+    <article class="card hero kpi span-3 wide">
       <div class="kpi-label"><span class="ico">${I.money}</span>Vendido · ${new Date().toLocaleDateString('es-CO', { month: 'long' })}</div>
       <div class="kpi-value num">${formatCurrency(d.mes.total)}</div>
       <div class="kpi-foot">${delta(d.mes.variacion)} ${d.mes.variacion === null ? 'Sin datos del mes anterior' : 'vs. mismo corte del mes pasado'}</div>
@@ -358,16 +358,16 @@ function tarjetaUltimas(d) {
     <article class="card flush span-8">
       <div class="card-head"><div><h3>Últimas ventas</h3><p>Las 6 más recientes</p></div>
         <div class="right"><button class="link" type="button" data-go="sales">Ver todas</button></div></div>
-      ${d.ultimas.length ? `<div class="table-wrap" style="margin-top:6px"><table class="tbl">
+      ${d.ultimas.length ? `<div class="table-wrap" style="margin-top:6px"><table class="tbl stack">
         <thead><tr><th>Cliente</th><th>Fecha</th><th>Canal</th><th>Estado</th><th class="r">Total</th></tr></thead>
         <tbody>${d.ultimas.map(v => {
           const pend = Number(v.total || 0) - Number(v.amount_paid || 0);
           return `<tr>
-            <td><b style="font-weight:500">${esc(v.customer_name || 'Sin nombre')}</b></td>
-            <td class="code">${new Date(v.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}</td>
-            <td>${esc(v.channel || '—')}</td>
-            <td>${v.payment_status === 'paid' ? '<span class="pill good">Pagado</span>' : `<span class="pill warn">Debe ${formatCurrency(pend)}</span>`}</td>
-            <td class="r money">${formatCurrency(Number(v.total || 0))}</td></tr>`;
+            <td class="full"><b style="font-weight:500">${esc(v.customer_name || 'Sin nombre')}</b></td>
+            <td class="code" data-label="Fecha">${new Date(v.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}</td>
+            <td data-label="Canal">${esc(v.channel || '—')}</td>
+            <td data-label="Estado">${v.payment_status === 'paid' ? '<span class="pill good">Pagado</span>' : `<span class="pill warn">Debe ${formatCurrency(pend)}</span>`}</td>
+            <td class="r money" data-label="Total">${formatCurrency(Number(v.total || 0))}</td></tr>`;
         }).join('')}</tbody></table></div>`
       : `<div style="padding:0 18px 18px">${vacio('Sin ventas registradas', 'Usa “Nueva venta” o presiona N para registrar la primera.', I.bag)}</div>`}
     </article>`;

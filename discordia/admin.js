@@ -9,9 +9,9 @@
 // ─────────────────────────────────────────────────────────────
 
 import { requireAuth, getAdminUser, logout } from '/discordia/auth.js?v=2';
-import { renderDashboard }                   from '/discordia/modules/dashboard.js?v=3';
-import { renderVentas }                      from '/discordia/modules/ventas.js?v=5';
-import { renderDeudas }                      from '/discordia/modules/deudas.js?v=3';
+import { renderDashboard }                   from '/discordia/modules/dashboard.js?v=4';
+import { renderVentas }                      from '/discordia/modules/ventas.js?v=6';
+import { renderDeudas }                      from '/discordia/modules/deudas.js?v=4';
 import { CONFIG }                            from '/discordia/config.js';
 import { formatCurrency }                    from '/discordia/utils.js';
 import { esc, foto, toast, NOMBRES_CATEGORIA, COLOR_CATEGORIA, esProductoReal, sinFoto, ICONOS } from '/discordia/modules/ui.js?v=3';
@@ -168,17 +168,17 @@ function renderCatalogTab(soloTabla = false) {
     const activo = item.active !== false;
     return `
     <tr class="${activo ? '' : 'off'}">
-      <td>
+      <td class="full">
         <div class="prod">
           <img class="thumb" src="${esc(foto(item.image))}" alt="" loading="lazy" onerror="this.src='./assets/default.png';this.onerror=null;">
           <div><b>${esc(item.name)}</b><span>${esc(item.brand || '')}${item.brand && item.description ? ' · ' : ''}${esc(item.description || (item.brand ? '' : 'Sin descripción'))}</span></div>
         </div>
       </td>
-      <td class="code">${esc(item.code || '—')}</td>
-      <td><span class="pill cat" style="--dot:${COLOR_CATEGORIA[item.category] || 'var(--c-other)'}">${esc(nombreCategoria(item.category))}</span></td>
-      <td class="r money">${Number(item.price) ? formatCurrency(Number(item.price)) : '<span class="pill warn">Sin precio</span>'}</td>
-      <td><div class="stock ${nivel}"><span class="num">${stock}</span><div class="hbar"><i style="width:${Math.min(100, stock / maxStock * 100)}%"></i></div></div></td>
-      <td>${activo ? '<span class="pill good">Activo</span>' : '<span class="pill mute">Inactivo</span>'}</td>
+      <td class="code" data-label="Código">${esc(item.code || '—')}</td>
+      <td data-label="Categoría"><span class="pill cat" style="--dot:${COLOR_CATEGORIA[item.category] || 'var(--c-other)'}">${esc(nombreCategoria(item.category))}</span></td>
+      <td class="r money" data-label="Precio">${Number(item.price) ? formatCurrency(Number(item.price)) : '<span class="pill warn">Sin precio</span>'}</td>
+      <td data-label="Stock"><div class="stock ${nivel}"><span class="num">${stock}</span><div class="hbar"><i style="width:${Math.min(100, stock / maxStock * 100)}%"></i></div></div></td>
+      <td data-label="Estado">${activo ? '<span class="pill good">Activo</span>' : '<span class="pill mute">Inactivo</span>'}</td>
       <td>
         <div class="actions">
           <button class="btn sm edit-product" type="button" data-id="${item.id}">${ICONOS.edit}Editar</button>
@@ -191,7 +191,7 @@ function renderCatalogTab(soloTabla = false) {
 
   const flecha = k => ui.orden === k ? (ui.dir > 0 ? ' ↑' : ' ↓') : '';
   const tabla = `
-    <table class="tbl">
+    <table class="tbl stack">
       <thead><tr>
         <th class="th-sort" data-orden="name">Producto${flecha('name')}</th>
         <th>Código</th>
@@ -201,7 +201,7 @@ function renderCatalogTab(soloTabla = false) {
         <th>Estado</th>
         <th class="r">Acciones</th>
       </tr></thead>
-      <tbody>${rows || `<tr><td colspan="7"><div class="empty"><b>No hay productos que coincidan</b>Prueba con otra búsqueda o quita los filtros.</div></td></tr>`}</tbody>
+      <tbody>${rows || `<tr><td colspan="7" class="full"><div class="empty"><b>No hay productos que coincidan</b>Prueba con otra búsqueda o quita los filtros.</div></td></tr>`}</tbody>
     </table>`;
 
   if (soloTabla && panel.querySelector('#catalog-table')) {
@@ -216,7 +216,7 @@ function renderCatalogTab(soloTabla = false) {
   const valor = activos.reduce((s, p) => s + (Number(p.stock) || 0) * (Number(p.price) || 0), 0);
 
   panel.innerHTML = `
-    <section class="dgrid">
+    <section class="dgrid kpis">
       <article class="card span-3 kpi"><div class="kpi-label">Productos activos</div><div class="kpi-value num">${activos.length}</div><div class="kpi-foot">${productos.length - activos.length} inactivos</div></article>
       <article class="card span-3 kpi"><div class="kpi-label">Unidades en inventario</div><div class="kpi-value num">${unidades}</div><div class="kpi-foot">en productos activos</div></article>
       <article class="card span-3 kpi"><div class="kpi-label">Valor a precio de venta</div><div class="kpi-value num">${formatCurrency(valor)}</div><div class="kpi-foot">stock × precio</div></article>
@@ -737,18 +737,18 @@ function renderCustomersTab() {
 
   const rows = clientes.map(c => `
     <tr>
-      <td><div class="prod" style="min-width:200px"><span class="avatar">${esc(iniciales(c.name))}</span><div><b>${esc(c.name)}</b><span>${c.pedidos ? `${c.pedidos} compra${c.pedidos !== 1 ? 's' : ''}` : 'Sin compras registradas'}</span></div></div></td>
-      <td>${c.phone ? `<a class="link mono" href="https://wa.me/${tel(c.phone).length === 10 ? '57' + tel(c.phone) : tel(c.phone)}" target="_blank" rel="noopener">${esc(c.phone)}</a>` : '<span class="pill mute">Sin teléfono</span>'}</td>
-      <td class="r money">${formatCurrency(c.comprado)}</td>
-      <td>${c.deuda > 0 ? `<span class="pill warn">Debe ${formatCurrency(c.deuda)}</span>` : c.pedidos ? '<span class="pill good">Al día</span>' : '<span class="pill mute">—</span>'}</td>
-      <td class="code">${c.ultima ? new Date(c.ultima).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+      <td class="full"><div class="prod" style="min-width:200px"><span class="avatar">${esc(iniciales(c.name))}</span><div><b>${esc(c.name)}</b><span>${c.pedidos ? `${c.pedidos} compra${c.pedidos !== 1 ? 's' : ''}` : 'Sin compras registradas'}</span></div></div></td>
+      <td data-label="WhatsApp">${c.phone ? `<a class="link mono" href="https://wa.me/${tel(c.phone).length === 10 ? '57' + tel(c.phone) : tel(c.phone)}" target="_blank" rel="noopener">${esc(c.phone)}</a>` : '<span class="pill mute">Sin teléfono</span>'}</td>
+      <td class="r money" data-label="Total comprado">${formatCurrency(c.comprado)}</td>
+      <td data-label="Estado">${c.deuda > 0 ? `<span class="pill warn">Debe ${formatCurrency(c.deuda)}</span>` : c.pedidos ? '<span class="pill good">Al día</span>' : '<span class="pill mute">—</span>'}</td>
+      <td class="code" data-label="Última compra">${c.ultima ? new Date(c.ultima).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
     </tr>`).join('');
 
   panel.innerHTML = `
-    <section class="dgrid">
+    <section class="dgrid kpis">
       <article class="card span-4 kpi"><div class="kpi-label">Clientes</div><div class="kpi-value num">${clientes.length}</div><div class="kpi-foot">${conCompras} con compras registradas</div></article>
       <article class="card span-4 kpi"><div class="kpi-label">Por cobrar</div><div class="kpi-value num">${formatCurrency(deudaTotal)}</div><div class="kpi-foot">${clientes.filter(c => c.deuda > 0).length} clientes con saldo</div></article>
-      <article class="card span-4 kpi"><div class="kpi-label">Mejor cliente</div><div class="kpi-value" style="font-size:22px">${conCompras ? esc(clientes[0].name) : '—'}</div><div class="kpi-foot">${conCompras ? formatCurrency(clientes[0].comprado) + ' comprados' : 'Aún no hay ventas'}</div></article>
+      <article class="card span-4 kpi wide"><div class="kpi-label">Mejor cliente</div><div class="kpi-value" style="font-size:22px">${conCompras ? esc(clientes[0].name) : '—'}</div><div class="kpi-foot">${conCompras ? formatCurrency(clientes[0].comprado) + ' comprados' : 'Aún no hay ventas'}</div></article>
     </section>
     <article class="card flush">
       <div class="toolbar">
@@ -756,9 +756,9 @@ function renderCustomersTab() {
         <span class="meta" id="cli-meta">${clientes.length} clientes</span>
       </div>
       <div class="table-wrap">
-        <table class="tbl">
+        <table class="tbl stack">
           <thead><tr><th>Cliente</th><th>WhatsApp</th><th class="r">Total comprado</th><th>Estado</th><th>Última compra</th></tr></thead>
-          <tbody id="cli-body">${rows || `<tr><td colspan="5"><div class="empty"><b>Sin clientes todavía</b>Aparecen aquí cuando registras una venta.</div></td></tr>`}</tbody>
+          <tbody id="cli-body">${rows || `<tr><td colspan="5" class="full"><div class="empty"><b>Sin clientes todavía</b>Aparecen aquí cuando registras una venta.</div></td></tr>`}</tbody>
         </table>
       </div>
     </article>`;

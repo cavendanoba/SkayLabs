@@ -56,17 +56,17 @@ function paintDeudas(container, ventas) {
 
     return `
       <tr>
-        <td><div class="prod" style="min-width:170px"><div><b>${esc(v.customer_name||'Sin nombre')}</b><span>${esc(v.customer_phone||'Sin teléfono')}</span></div></div></td>
-        <td class="code">${fecha}<br><span class="${dias > 30 ? 'pill crit' : dias > 15 ? 'pill warn' : 'pill mute'}" style="margin-top:4px">${dias === 0 ? 'hoy' : `hace ${dias} día${dias!==1?'s':''}`}</span></td>
-        <td style="max-width:220px;font-size:12.5px;color:var(--dim)">${items.slice(0,3).map(i=>`<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(i.name||i.productName||'Producto')} ×${i.quantity}</div>`).join('') || '—'}
+        <td class="full"><div class="prod" style="min-width:170px"><div><b>${esc(v.customer_name||'Sin nombre')}</b><span>${esc(v.customer_phone||'Sin teléfono')}</span></div></div></td>
+        <td class="code" data-label="Fecha">${fecha}<br><span class="${dias > 30 ? 'pill crit' : dias > 15 ? 'pill warn' : 'pill mute'}" style="margin-top:4px">${dias === 0 ? 'hoy' : `hace ${dias} día${dias!==1?'s':''}`}</span></td>
+        <td class="full" data-label="Productos" style="max-width:none;font-size:12.5px;color:var(--dim)">${items.slice(0,3).map(i=>`<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(i.name||i.productName||'Producto')} ×${i.quantity}</div>`).join('') || '—'}
           ${items.length > 3 ? `<div style="color:var(--faint)">+${items.length-3} más</div>` : ''}</td>
-        <td style="min-width:150px">
+        <td data-label="Total / abonado" style="min-width:0">
           <div class="money">${formatCurrency(Number(v.total))}</div>
           <div class="hbar" title="${pct}% abonado"><i style="width:${pct}%;background:var(--good)"></i></div>
           <div style="font-size:11.5px;color:var(--faint);margin-top:4px">Abonado ${formatCurrency(Number(v.amount_paid))} · ${pct}%</div>
         </td>
-        <td class="r"><b class="money" style="color:var(--warn);font-size:15px">${formatCurrency(pendiente)}</b></td>
-        <td>
+        <td class="r" data-label="Pendiente"><b class="money" style="color:var(--warn);font-size:15px">${formatCurrency(pendiente)}</b></td>
+        <td class="full">
           <div class="actions">
             <button type="button" data-sale-id="${v.id}" data-pendiente="${pendiente}" data-name="${esc(v.customer_name||'Cliente')}" class="btn sm btn-abonar">Abonar</button>
             <button type="button" data-sale-id="${v.id}" data-pendiente="${pendiente}" data-name="${esc(v.customer_name||'Cliente')}" class="btn sm ok btn-pagar">Pagado</button>
@@ -76,15 +76,15 @@ function paintDeudas(container, ventas) {
   }).join('');
 
   container.innerHTML = `
-    <section class="dgrid">
-      <article class="card hero kpi span-4"><div class="kpi-label">Total por cobrar</div><div class="kpi-value num">${formatCurrency(totalDeuda)}</div><div class="kpi-foot">${ventas.length} venta${ventas.length!==1?'s':''} pendiente${ventas.length!==1?'s':''}</div></article>
+    <section class="dgrid kpis">
+      <article class="card hero kpi span-4 wide"><div class="kpi-label">Total por cobrar</div><div class="kpi-value num">${formatCurrency(totalDeuda)}</div><div class="kpi-foot">${ventas.length} venta${ventas.length!==1?'s':''} pendiente${ventas.length!==1?'s':''}</div></article>
       <article class="card kpi span-4"><div class="kpi-label">Ya abonado</div><div class="kpi-value num">${formatCurrency(totalAbonado)}</div><div class="kpi-foot">en estas ventas</div></article>
       <article class="card kpi span-4"><div class="kpi-label">Deuda más antigua</div><div class="kpi-value num">${vieja ? diasDesde(vieja.created_at) + ' días' : '—'}</div><div class="kpi-foot">${vieja ? esc(vieja.customer_name || 'Sin nombre') : ''}</div></article>
     </section>
     <article class="card flush">
       <div class="card-head"><div><h3>Ventas por cobrar</h3><p>Registra abonos o marca como pagado</p></div></div>
       <div class="table-wrap" style="margin-top:6px">
-        <table class="tbl">
+        <table class="tbl stack">
           <thead><tr><th>Cliente</th><th>Fecha</th><th>Productos</th><th>Total / abonado</th><th class="r">Pendiente</th><th class="r">Acciones</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
