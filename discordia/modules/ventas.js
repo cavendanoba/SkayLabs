@@ -14,7 +14,20 @@ let ventasDebounceTimer = null;
 
 function debounceVentasRender(container, filtros) {
   clearTimeout(ventasDebounceTimer);
-  ventasDebounceTimer = setTimeout(() => paintVentas(container, filtros), 300);
+  ventasDebounceTimer = setTimeout(() => {
+    // Repintar la tabla reemplaza el buscador: se guarda dónde estaba el cursor y se devuelve después.
+    const activo = document.activeElement;
+    const id = activo && container.contains(activo) ? activo.id : null;
+    const inicio = activo?.selectionStart, fin = activo?.selectionEnd;
+    paintVentas(container, filtros);
+    if (id) {
+      const el = container.querySelector('#' + id);
+      if (el) {
+        el.focus({ preventScroll: true });
+        if (typeof inicio === 'number' && el.setSelectionRange) el.setSelectionRange(inicio, fin);
+      }
+    }
+  }, 300);
 }
 
 export async function renderVentas(container) {

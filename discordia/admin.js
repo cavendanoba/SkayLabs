@@ -10,7 +10,7 @@
 
 import { requireAuth, getAdminUser, logout } from '/discordia/auth.js?v=2';
 import { renderDashboard }                   from '/discordia/modules/dashboard.js?v=3';
-import { renderVentas }                      from '/discordia/modules/ventas.js?v=3';
+import { renderVentas }                      from '/discordia/modules/ventas.js?v=4';
 import { renderDeudas }                      from '/discordia/modules/deudas.js?v=3';
 import { CONFIG }                            from '/discordia/config.js';
 import { formatCurrency }                    from '/discordia/utils.js';
