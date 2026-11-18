@@ -282,7 +282,7 @@ body.adm {
 
 /* Tablas */
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--hair); }
-.toolbar .meta { margin-left: auto; font: 400 11.5px var(--mono); color: var(--faint); }
+.toolbar .meta { margin-left: auto; white-space: nowrap; font: 400 11.5px var(--mono); color: var(--faint); }
 .check { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--dim); cursor: pointer; user-select: none; }
 .check input { accent-color: var(--accent); }
 .table-wrap { overflow-x: auto; }
@@ -468,11 +468,16 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
   .toolbar { padding: 12px 14px; }
   .toolbar .search { min-width: 100%; }
   .toolbar select.input, .toolbar .btn.primary { flex: 1; }
-  .toolbar .meta { margin-left: 0; }
+  .toolbar .meta { margin-left: 0; flex-basis: 100%; }
+  .toolbar select.input { min-width: 130px; }
   .card-head .right { margin-left: 0; }
+}
+
+/* Tablas como tarjetas en celular y tableta */
+@media (max-width: 900px) {
   .tbl.stack thead { display: none; }
   .tbl.stack, .tbl.stack tbody { display: block; }
-  .tbl.stack tr { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; padding: 14px 16px; border-bottom: 1px solid var(--hair); }
+  .tbl.stack tr { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px 14px; padding: 14px 16px; border-bottom: 1px solid var(--hair); }
   .tbl.stack td { display: block; padding: 0; border: 0; text-align: left; min-width: 0; }
   .tbl.stack td.r { text-align: left; }
   .tbl.stack td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 3px; font: 500 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
@@ -481,6 +486,7 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
   .tbl.stack .prod span { max-width: none; white-space: normal; }
   .tbl.stack .actions { justify-content: flex-start; }
   .tbl.stack .stock .hbar { max-width: none; }
+  .tbl.stack td.hide-sm { display: none; }
 }
 
 /* Ofertas */
@@ -495,8 +501,16 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
 @media (max-width: 640px) {
   .sale-bar { top: 58px; }
   .sale-bar .seg { order: 2; width: 100%; }
+}
+@media (max-width: 900px) {
   .tbl.stack tr:has(.of-check) { grid-template-columns: 28px 1fr 1fr; }
   .tbl.stack tr:has(.of-check) td.full { grid-column: 2 / -1; }
   .tbl.stack tr:has(.of-check) td:first-child { grid-row: span 3; }
   .tbl.stack tr:has(.of-check) td.of-stock { grid-column: 2; }
+}
+
+/* Tableta: tres totales en una fila */
+@media (min-width: 641px) and (max-width: 1180px) {
+  .dgrid.kpis > .card.span-4 { grid-column: span 4; }
+  .dgrid.kpis > .card.span-4 .kpi-value { font-size: 24px; }
 }

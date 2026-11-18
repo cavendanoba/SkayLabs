@@ -8,6 +8,7 @@
 
 import { getCatalog } from '/discordia/catalog.js';
 import { formatCurrency } from '/discordia/utils.js';
+import { esc } from '/discordia/modules/ui.js?v=4';
 
 let allSales = [];
 let ventasDebounceTimer = null;
@@ -51,7 +52,7 @@ export async function renderVentas(container) {
 }
 
 function buildSkeleton() {
-  return `<div class="space-y-3">${[1,2,3,4].map(()=>`<div class="animate-pulse bg-gray-100 rounded-2xl h-16"></div>`).join('')}</div>`;
+  return `<div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:320px"></div>`;
 }
 
 function paintVentas(container, filtros = {}) {
@@ -70,94 +71,78 @@ function paintVentas(container, filtros = {}) {
   const totalIngresos = filtered.filter(s=>s.payment_status==='paid').reduce((sum,s)=>sum+Number(s.total),0);
   const totalDeuda    = filtered.filter(s=>s.payment_status==='pending').reduce((sum,s)=>sum+Number(s.total)-Number(s.amount_paid),0);
 
+  const pendientes = filtered.filter(s => s.payment_status === 'pending').length;
+  const icono = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const I = {
+    ver:    icono('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>'),
+    editar: icono('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'),
+    borrar: icono('<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>'),
+    buscar: icono('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
+    mas:    icono('<path d="M12 5v14M5 12h14"/>'),
+  };
+
   const rows = filtered.map(s => {
     const fecha = new Date(s.created_at).toLocaleDateString('es-CO', { day:'numeric', month:'short', year:'2-digit' });
-    const itemCount = (s.items||[]).reduce((sum,i)=>sum+Number(i.quantity||1),0);
+    const items = s.items || [];
+    const itemCount = items.reduce((sum,i)=>sum+Number(i.quantity||1),0);
+    const pendiente = Number(s.total) - Number(s.amount_paid || 0);
     const badge = s.payment_status === 'paid'
-      ? `<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-normal">Pagado</span>`
-      : `<span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-normal">Pendiente</span>`;
+      ? '<span class="pill good">Pagado</span>'
+      : `<span class="pill warn">Debe ${formatCurrency(pendiente)}</span>`;
+    const resumen = items.slice(0, 2).map(i => `${esc(i.name || i.productName || 'Producto')} ×${i.quantity}`).join(', ')
+      + (items.length > 2 ? ` +${items.length - 2} más` : '');
 
     return `
-      <tr class="border-b border-gray-100 hover:bg-[#fdf7fa] transition">
-        <td class="p-3 text-xs text-gray-500 whitespace-nowrap">${fecha}</td>
-        <td class="p-3">
-          <p class="text-gray-900 text-sm">${s.customer_name||'Sin nombre'}</p>
-          <p class="text-xs text-gray-400">${s.customer_phone||'—'}</p>
+      <tr>
+        <td class="full"><div class="prod" style="min-width:180px"><div>
+          <b>${esc(s.customer_name || 'Sin nombre')}</b>
+          <span>${esc(s.customer_phone || 'Sin teléfono')}</span>
+        </div></div></td>
+        <td class="code" data-label="Fecha">${fecha}</td>
+        <td data-label="Productos" style="max-width:240px;font-size:12.5px;color:var(--dim)">
+          <div class="num" style="color:var(--ink)">${itemCount} producto${itemCount !== 1 ? 's' : ''}</div>
+          ${resumen ? `<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${resumen}</div>` : ''}
         </td>
-        <td class="p-3 text-center text-xs text-gray-600">${itemCount} item${itemCount!==1?'s':''}</td>
-        <td class="p-3 text-[#a0346e] text-sm font-bold whitespace-nowrap">${formatCurrency(Number(s.total))}</td>
-        <td class="p-3 text-sm text-gray-600">${s.channel||'—'}</td>
-        <td class="p-3">${badge}</td>
-        <td class="p-3 text-xs text-gray-400 max-w-[200px] truncate">${s.notes||'—'}</td>
-        <td class="p-3">
-          <div class="flex gap-2">
-            <button class="view-sale px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 font-normal text-xs hover:bg-blue-200 transition" data-id="${s.id}">👁️ Ver</button>
-            <button class="edit-sale px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-normal text-xs hover:bg-amber-200 transition" data-id="${s.id}">✏️ Editar</button>
-            <button class="delete-sale px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-normal text-xs hover:bg-rose-200 transition" data-id="${s.id}">🗑️ Eliminar</button>
+        <td data-label="Canal">${esc(s.channel || '—')}</td>
+        <td data-label="Estado">${badge}</td>
+        <td class="r money" data-label="Total"><b>${formatCurrency(Number(s.total))}</b></td>
+        ${s.notes ? `<td class="full" data-label="Notas" style="font-size:12.5px;color:var(--dim);max-width:220px">${esc(s.notes)}</td>` : '<td class="hide-sm" data-label="Notas" style="color:var(--faint)">—</td>'}
+        <td class="full">
+          <div class="actions">
+            <button type="button" class="btn sm view-sale" data-id="${s.id}" aria-label="Ver venta de ${esc(s.customer_name || 'cliente')}">${I.ver}Ver</button>
+            <button type="button" class="btn sm edit-sale" data-id="${s.id}">${I.editar}Editar</button>
+            <button type="button" class="btn sm icon danger delete-sale" data-id="${s.id}" title="Eliminar" aria-label="Eliminar venta de ${esc(s.customer_name || 'cliente')}">${I.borrar}</button>
           </div>
         </td>
       </tr>`;
   }).join('');
 
   container.innerHTML = `
-    <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-
-      <!-- Header -->
-      <div class="bg-gradient-to-r from-[#6d165a] to-[#a0346e] px-5 py-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 class="text-white text-lg" style="font-weight:600;">🛍️ Historial de ventas</h3>
-        <button id="btn-nueva-venta"
-          class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm font-normal rounded-xl transition flex items-center gap-2">
-          <i class="fa-solid fa-plus"></i> Nueva venta
-        </button>
-      </div>
-
-      <!-- Resumen rápido -->
-      <div class="grid grid-cols-3 gap-px bg-gray-100">
-        <div class="bg-white px-4 py-3 text-center">
-          <p class="text-lg font-bold text-[#6d165a]">${filtered.length}</p>
-          <p class="text-xs text-gray-400">Ventas</p>
-        </div>
-        <div class="bg-white px-4 py-3 text-center">
-          <p class="text-lg font-bold text-emerald-600">${formatCurrency(totalIngresos)}</p>
-          <p class="text-xs text-gray-400">Cobrado</p>
-        </div>
-        <div class="bg-white px-4 py-3 text-center">
-          <p class="text-lg font-bold text-amber-600">${formatCurrency(totalDeuda)}</p>
-          <p class="text-xs text-gray-400">Por cobrar</p>
-        </div>
-      </div>
-
-      <!-- Filtros -->
-      <div class="p-4 border-b border-gray-100 flex flex-wrap gap-3">
-        <input id="ventas-search" placeholder="Buscar cliente, canal, nota..."
-          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#9d5fa5]"
-          value="${query}">
-        <select id="ventas-status"
-          class="px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#9d5fa5] bg-white">
+    <section class="dgrid kpis">
+      <article class="card hero kpi span-4 wide"><div class="kpi-label">Ventas</div><div class="kpi-value num">${filtered.length}</div><div class="kpi-foot">${filtered.length === allSales.length ? 'registradas' : `de ${allSales.length} registradas`}</div></article>
+      <article class="card kpi span-4"><div class="kpi-label">Cobrado</div><div class="kpi-value num">${formatCurrency(totalIngresos)}</div><div class="kpi-foot">ventas pagadas</div></article>
+      <article class="card kpi span-4"><div class="kpi-label">Por cobrar</div><div class="kpi-value num">${formatCurrency(totalDeuda)}</div><div class="kpi-foot">${pendientes} pendiente${pendientes !== 1 ? 's' : ''}</div></article>
+    </section>
+    <article class="card flush">
+      <div class="toolbar">
+        <label class="search">${I.buscar}
+          <input id="ventas-search" class="input" type="search" placeholder="Buscar cliente, canal o nota" aria-label="Buscar ventas" value="${esc(query)}">
+        </label>
+        <select id="ventas-status" class="input" aria-label="Estado de pago">
           <option value="all"     ${status==='all'    ?'selected':''}>Todos</option>
           <option value="paid"    ${status==='paid'   ?'selected':''}>Pagados</option>
           <option value="pending" ${status==='pending'?'selected':''}>Pendientes</option>
         </select>
-        <span class="self-center text-xs text-gray-400">Mostrando ${filtered.length} de ${allSales.length}</span>
+        <button id="btn-nueva-venta" class="btn primary" type="button">${I.mas}Nueva venta</button>
+        <span class="meta">Mostrando ${filtered.length} de ${allSales.length}</span>
       </div>
-
-      <!-- Tabla -->
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead class="bg-[#fdf2f7]">
-            <tr>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Fecha</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Cliente</th>
-              <th class="p-3 text-center text-xs uppercase tracking-widest text-[#6d165a] font-medium">Items</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Total</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Canal</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Estado</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Notas</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-medium">Acciones</th>
-            </tr>
-          </thead>
+      <div class="table-wrap">
+        <table class="tbl stack">
+          <thead><tr>
+            <th>Cliente</th><th>Fecha</th><th>Productos</th><th>Canal</th><th>Estado</th><th class="r">Total</th><th>Notas</th><th class="r">Acciones</th>
+          </tr></thead>
           <tbody>
-            ${rows || `<tr><td colspan="8" class="p-6 text-center text-gray-400">No hay ventas que coincidan.</td></tr>`}
+            ${rows || `<tr><td colspan="8" class="full"><div class="empty"><b>No hay ventas que coincidan</b>${allSales.length ? 'Prueba con otra búsqueda o cambia el filtro.' : 'Registra la primera con “Nueva venta”.'}</div></td></tr>`}
           </tbody>
         </table>
       </div>
@@ -622,8 +607,8 @@ async function showEditVentaModal(container, saleId) {
           <h3 class="text-sm font-bold text-[#6d165a] uppercase tracking-widest mb-4">Productos de la Venta</h3>
           
           <!-- Agregar producto -->
-          <div class="grid grid-cols-3 gap-3 mb-4">
-            <div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+            <div class="col-span-2 sm:col-span-1">
               <label class="block text-xs font-semibold text-[#6d165a] mb-2">Producto</label>
               <select id="modal-product-select" onclick="event.stopPropagation()" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#9d5fa5] bg-white">
                 <option value="">-- Seleccionar producto --</option>
@@ -687,8 +672,8 @@ async function showEditVentaModal(container, saleId) {
       }
 
       itemsList.innerHTML = editItems.map((item, idx) => `
-        <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100">
-          <div class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 p-3 bg-white rounded-lg border border-gray-100">
+          <div class="basis-full sm:basis-0 flex-1 min-w-0">
             <p class="font-semibold text-gray-900 text-sm">${item.productName || item.name || 'Producto sin nombre'}</p>
             <p class="text-xs text-gray-500">×${item.quantity || 1}</p>
           </div>
@@ -910,12 +895,12 @@ function showVentaDetailsModal(saleId) {
             </div>`
           : `<div class="space-y-3">
               ${items.map((item, idx) => `
-                <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition">
-                  <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center justify-between gap-y-2 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition">
+                  <div class="basis-full sm:basis-0 flex-1 min-w-0">
                     <p class="font-semibold text-gray-900">${item.name || item.productName || 'Producto sin nombre'}</p>
                     <p class="text-sm text-gray-500">Cantidad: ${item.quantity || 1}</p>
                   </div>
-                  <div class="text-right ml-4">
+                  <div class="text-left sm:text-right sm:ml-4">
                     <p class="text-xs text-gray-500">Precio unitario</p>
                     <p class="font-bold text-gray-900">${formatCurrency(item.price)}</p>
                   </div>
