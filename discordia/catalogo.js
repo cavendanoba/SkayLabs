@@ -11,6 +11,7 @@ const IMAGEN_VACIA = 'assets/default.png';
 const NOMBRES_CATEGORIA = { LABI: 'Labios', OJOS: 'Ojos', CEJAS: 'Cejas', PIEL: 'Piel', SKIN: 'Cuidado de la piel', ACCE: 'Accesorios' };
 const ORDEN_CATEGORIA = Object.values(NOMBRES_CATEGORIA);
 const CODIGO_TONO = /^(.+?)\s*#\s*([\w.-]+)$/;
+const VERSION_FOTOS = '2';
 const SIN_DESCRIPCION = 'Pronto agregaremos más información de este producto.';
 
 const $ = id => document.getElementById(id);
@@ -38,7 +39,8 @@ let enVuelo = 0;
 
 function rutaImagen(ruta) {
   if (!ruta || ruta === IMAGEN_VACIA) return null;
-  return /^(https?:)?\//.test(ruta) ? ruta : './' + ruta;
+  // VERSION_FOTOS obliga a recargar las fotos locales cuando se reemplazan con el mismo nombre.
+  return /^(https?:)?\//.test(ruta) ? ruta : './' + ruta + '?v=' + VERSION_FOTOS;
 }
 
 const urlImagen = p => rutaImagen(p.image);
