@@ -219,7 +219,21 @@ function getUniqueCustomers() {
     }
   });
   
-  return Array.from(customerMap.values()).sort((a, b) => b.totalSpent - a.totalSpent);
+  // Clientes guardados en la tabla customers (los carga admin.js), aunque aún no tengan ventas.
+  let guardados = [];
+  try { guardados = JSON.parse(localStorage.getItem('skcCustomers') || '[]'); } catch {}
+  guardados.forEach(c => {
+    const key = String(c.name || '').trim().toLowerCase();
+    if (!key) return;
+    if (!customerMap.has(key)) {
+      customerMap.set(key, { name: String(c.name).trim(), phone: c.phone || '', purchases: 0, totalSpent: 0, pendingDebt: 0, lastPurchase: null, channel: '' });
+    } else if (!customerMap.get(key).phone && c.phone) {
+      customerMap.get(key).phone = c.phone;
+    }
+  });
+
+  return Array.from(customerMap.values())
+    .sort((a, b) => b.totalSpent - a.totalSpent || a.name.localeCompare(b.name));
 }
 
 // ── MODAL NUEVA VENTA ─────────────────────────────────────────
@@ -394,7 +408,7 @@ async function showNuevaVentaModal(container) {
           channelSelect.value = customer.channel || '';
           
           // Mostrar historial del cliente
-          const lastPurchaseDate = new Date(customer.lastPurchase).toLocaleDateString('es-CO');
+          const lastPurchaseDate = customer.lastPurchase ? new Date(customer.lastPurchase).toLocaleDateString('es-CO') : 'Sin compras aún';
           customerHistoryDiv.innerHTML = `
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
               <div><strong>Compras totales:</strong> ${customer.purchases}</div>

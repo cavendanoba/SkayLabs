@@ -4,6 +4,7 @@
 // DELETE → /api/discordia/sales/:id (eliminar)
 
 import { getSql, json } from '../_lib/db.js';
+import { registrarCliente } from '../_lib/clientes.js';
 
 export async function onRequestPut({ request, env, params }) {
   const sql = getSql(env);
@@ -35,6 +36,8 @@ export async function onRequestPut({ request, env, params }) {
     if (!updated.length) {
       return json({ ok: false, message: 'Venta no encontrada.' }, 404);
     }
+
+    await registrarCliente(sql, saleId, customerName, customerPhone);
 
     // Actualizar items si fueron enviados
     if (items && items.length > 0) {

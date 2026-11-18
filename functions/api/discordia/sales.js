@@ -5,6 +5,7 @@
 // Nota: PUT y DELETE están en sales/[id].js para rutas dinámicas (/api/discordia/sales/:id)
 
 import { getSql, json } from './_lib/db.js';
+import { registrarCliente } from './_lib/clientes.js';
 
 export async function onRequestGet({ request, env }) {
   const sql = getSql(env);
@@ -87,6 +88,8 @@ export async function onRequestPost({ request, env }) {
         `;
       }
     }
+
+    await registrarCliente(sql, sale.id, customerName, customerPhone);
 
     return json({ ok: true, data: sale }, 201);
   } catch (err) {
