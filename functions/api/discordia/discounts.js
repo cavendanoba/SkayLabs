@@ -20,21 +20,24 @@ export async function onRequestPost({ request, env }) {
   if (!Number.isFinite(pct) || pct < 0 || pct > 90) return json({ ok: false, message: 'El descuento debe estar entre 1 % y 90 %.' }, 400);
 
   const sql = getSql(env);
+  // Con fetch_types: false (Hyperdrive) postgres.js no sabe enviar arreglos de JS:
+  // los ids viajan como texto "1,2,3" y la base los convierte a int[].
+  const lista = ids.join(',');
   try {
     const rows = pct === 0
       ? await sql`
           UPDATE products
           SET price = reference_price, reference_price = NULL, updated_at = NOW()
-          WHERE id = ANY(${ids}) AND reference_price > price
+          WHERE id = ANY(string_to_array(${lista}, ',')::int[]) AND reference_price > price
           RETURNING *`
       : await sql`
           UPDATE products p
           SET reference_price = b.base,
-              price = GREATEST(100, ROUND(b.base * (100 - ${pct}) / 10000.0) * 100),
+              price = GREATEST(100, ROUND(b.base * (100 - ${pct}::numeric) / 10000.0) * 100),
               updated_at = NOW()
           FROM (
             SELECT id, CASE WHEN reference_price > price THEN reference_price ELSE price END AS base
-            FROM products WHERE id = ANY(${ids}) AND price > 0
+            FROM products WHERE id = ANY(string_to_array(${lista}, ',')::int[]) AND price > 0
           ) b
           WHERE p.id = b.id
           RETURNING p.*`;
