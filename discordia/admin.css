@@ -482,3 +482,21 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
   .tbl.stack .actions { justify-content: flex-start; }
   .tbl.stack .stock .hbar { max-width: none; }
 }
+
+/* Ofertas */
+.pill.sale { color: #fff; background: var(--grad); font-weight: 600; }
+.pill.sale::before { display: none; }
+.tbl .antes { font-size: 11.5px; color: var(--faint); text-decoration: line-through; }
+.tbl tr.is-sel { background: color-mix(in oklab, var(--accent) 9%, transparent); }
+.tbl input[type="checkbox"], #of-all { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; }
+.sale-bar { position: sticky; top: 64px; z-index: 6; background: color-mix(in oklab, var(--card-top) 92%, transparent); backdrop-filter: blur(8px); }
+.pct-input { display: inline-flex; align-items: center; gap: 6px; color: var(--dim); }
+.pct-input .input { width: 76px; text-align: right; }
+@media (max-width: 640px) {
+  .sale-bar { top: 58px; }
+  .sale-bar .seg { order: 2; width: 100%; }
+  .tbl.stack tr:has(.of-check) { grid-template-columns: 28px 1fr 1fr; }
+  .tbl.stack tr:has(.of-check) td.full { grid-column: 2 / -1; }
+  .tbl.stack tr:has(.of-check) td:first-child { grid-row: span 3; }
+  .tbl.stack tr:has(.of-check) td.of-stock { grid-column: 2; }
+}

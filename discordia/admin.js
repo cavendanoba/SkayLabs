@@ -9,12 +9,12 @@
 // ─────────────────────────────────────────────────────────────
 
 import { requireAuth, getAdminUser, logout } from '/discordia/auth.js?v=2';
-import { renderDashboard }                   from '/discordia/modules/dashboard.js?v=4';
-import { renderVentas }                      from '/discordia/modules/ventas.js?v=6';
-import { renderDeudas }                      from '/discordia/modules/deudas.js?v=4';
+import { renderDashboard }                   from '/discordia/modules/dashboard.js?v=5';
+import { renderVentas }                      from '/discordia/modules/ventas.js?v=7';
+import { renderDeudas }                      from '/discordia/modules/deudas.js?v=5';
 import { CONFIG }                            from '/discordia/config.js';
 import { formatCurrency }                    from '/discordia/utils.js';
-import { esc, foto, toast, NOMBRES_CATEGORIA, COLOR_CATEGORIA, esProductoReal, sinFoto, ICONOS } from '/discordia/modules/ui.js?v=3';
+import { esc, foto, toast, NOMBRES_CATEGORIA, COLOR_CATEGORIA, esProductoReal, sinFoto, ICONOS, enOferta, pctOferta } from '/discordia/modules/ui.js?v=4';
 
 const nombreCategoria = c => NOMBRES_CATEGORIA[c] || c || 'Sin categoría';
 
@@ -49,6 +49,7 @@ function saveToStorage(key, value) {
 const TABS = [
   { id: 'dashboard', label: 'Resumen',  title: 'Resumen',  sub: 'Cómo va Discordia' },
   { id: 'catalog',   label: 'Catálogo', title: 'Catálogo', sub: 'Productos, precios e inventario' },
+  { id: 'offers',    label: 'Ofertas',  title: 'Ofertas',  sub: 'Descuentos que se ven en el catálogo' },
   { id: 'sales',     label: 'Ventas',   title: 'Ventas',   sub: 'Historial y registro de ventas' },
   { id: 'debts',     label: 'Deudas',   title: 'Deudas',   sub: 'Saldos pendientes y abonos' },
   { id: 'customers', label: 'Clientes', title: 'Clientes', sub: 'Quién compra y cuánto' },
@@ -62,6 +63,7 @@ function counts() {
     catalog:   { n: agotados, warn: agotados > 0, title: `${agotados} agotados` },
     debts:     { n: pendientes, warn: pendientes > 0, title: `${pendientes} ventas por cobrar` },
     customers: { n: state.customers.length, title: `${state.customers.length} clientes` },
+    offers:    { n: productos.filter(enOferta).length, title: 'productos en oferta' },
   };
 }
 
@@ -100,6 +102,7 @@ export async function switchTab(tabId, opciones = {}) {
     case 'sales':     await renderVentas(panel); break;
     case 'debts':     await renderDeudas(panel); break;
     case 'customers': renderCustomersTab(); break;
+    case 'offers':    renderOffersTab(); break;
   }
 }
 
@@ -139,6 +142,7 @@ const FILTROS = {
   out:     { label: 'Agotados',   fn: p => Number(p.stock) <= 0 },
   nophoto: { label: 'Sin foto',   fn: sinFoto },
   noprice: { label: 'Sin precio', fn: p => !Number(p.price) },
+  sale:    { label: 'En oferta',  fn: enOferta },
 };
 
 function renderCatalogTab(soloTabla = false) {
@@ -176,7 +180,9 @@ function renderCatalogTab(soloTabla = false) {
       </td>
       <td class="code" data-label="Código">${esc(item.code || '—')}</td>
       <td data-label="Categoría"><span class="pill cat" style="--dot:${COLOR_CATEGORIA[item.category] || 'var(--c-other)'}">${esc(nombreCategoria(item.category))}</span></td>
-      <td class="r money" data-label="Precio">${Number(item.price) ? formatCurrency(Number(item.price)) : '<span class="pill warn">Sin precio</span>'}</td>
+      <td class="r money" data-label="Precio">${!Number(item.price) ? '<span class="pill warn">Sin precio</span>'
+        : enOferta(item) ? `<span class="pill sale">-${pctOferta(item)}%</span> ${formatCurrency(Number(item.price))}<div class="antes">${formatCurrency(Number(item.reference_price))}</div>`
+        : formatCurrency(Number(item.price))}</td>
       <td data-label="Stock"><div class="stock ${nivel}"><span class="num">${stock}</span><div class="hbar"><i style="width:${Math.min(100, stock / maxStock * 100)}%"></i></div></div></td>
       <td data-label="Estado">${activo ? '<span class="pill good">Activo</span>' : '<span class="pill mute">Inactivo</span>'}</td>
       <td>
@@ -708,6 +714,187 @@ async function deactivateProduct(productId) {
       }
     });
   });
+}
+
+// ── OFERTAS ───────────────────────────────────────────────────
+const ofertasUi = { query: '', categoria: 'all', pct: 20, seleccion: new Set() };
+
+// Precio con descuento: el mismo cálculo que hace el servidor (redondeado a la centena).
+const precioBase = p => (enOferta(p) ? Number(p.reference_price) : Number(p.price));
+const conDescuento = (p, pct) => Math.max(100, Math.round(precioBase(p) * (100 - pct) / 10000) * 100);
+
+async function guardarDescuento(ids, pct) {
+  const res = await fetch('/api/discordia/discounts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids, pct })
+  });
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.message);
+  // La base puede tardar un minuto en reflejar el cambio: se usa lo que devolvió el servidor.
+  json.data.forEach(row => {
+    const i = state.catalog.findIndex(p => Number(p.id) === Number(row.id));
+    if (i >= 0) state.catalog[i] = { ...state.catalog[i], ...row };
+  });
+  saveToStorage(STORAGE_KEYS.catalog, state.catalog);
+  refreshCounts();
+  return json.data.length;
+}
+
+function renderOffersTab() {
+  const ui = ofertasUi;
+  const productos = state.catalog.filter(p => esProductoReal(p) && p.active !== false);
+  const ofertas = productos.filter(enOferta).sort((a, b) => pctOferta(b) - pctOferta(a));
+  const promedio = ofertas.length ? Math.round(ofertas.reduce((s, p) => s + pctOferta(p), 0) / ofertas.length) : 0;
+  const ahorro = ofertas.reduce((s, p) => s + (Number(p.reference_price) - Number(p.price)), 0);
+  const categorias = [...new Set(productos.map(p => p.category).filter(Boolean))]
+    .sort((a, b) => nombreCategoria(a).localeCompare(nombreCategoria(b)));
+
+  panel.innerHTML = `
+    <section class="dgrid kpis">
+      <article class="card hero kpi span-4 wide"><div class="kpi-label">Productos en oferta</div><div class="kpi-value num">${ofertas.length}</div><div class="kpi-foot">con listón de descuento en el catálogo</div></article>
+      <article class="card kpi span-4"><div class="kpi-label">Descuento promedio</div><div class="kpi-value num">${promedio}%</div><div class="kpi-foot">${ofertas.length ? 'entre los productos en oferta' : 'sin ofertas activas'}</div></article>
+      <article class="card kpi span-4"><div class="kpi-label">Ahorro por unidad</div><div class="kpi-value num">${formatCurrency(ahorro)}</div><div class="kpi-foot">suma de una unidad de cada oferta</div></article>
+    </section>
+
+    <article class="card flush">
+      <div class="card-head"><div><h3>En oferta ahora</h3><p>Así se ven en la página principal</p></div>
+        ${ofertas.length ? '<div class="right"><button class="btn sm danger" type="button" id="quitar-todas">Quitar todas</button></div>' : ''}</div>
+      ${ofertas.length ? `<div class="table-wrap" style="margin-top:6px"><table class="tbl stack">
+        <thead><tr><th>Producto</th><th class="r">Antes</th><th class="r">Ahora</th><th>Descuento</th><th class="r">Acciones</th></tr></thead>
+        <tbody>${ofertas.map(p => `
+          <tr>
+            <td class="full"><div class="prod"><img class="thumb" src="${esc(foto(p.image))}" alt="" loading="lazy" onerror="this.src='./assets/default.png';this.onerror=null;"><div><b>${esc(p.name)}</b><span>${esc(p.code || '')} · ${esc(nombreCategoria(p.category))}</span></div></div></td>
+            <td class="r money" data-label="Antes"><s style="color:var(--faint)">${formatCurrency(Number(p.reference_price))}</s></td>
+            <td class="r money" data-label="Ahora"><b>${formatCurrency(Number(p.price))}</b></td>
+            <td data-label="Descuento"><span class="pill sale">-${pctOferta(p)}%</span></td>
+            <td><div class="actions"><button class="btn sm danger quitar-oferta" type="button" data-id="${p.id}">Quitar</button></div></td>
+          </tr>`).join('')}</tbody></table></div>`
+      : `<div style="padding:0 18px 18px"><div class="empty"><b>No hay productos en oferta</b>Selecciónalos abajo y elige el porcentaje.</div></div>`}
+    </article>
+
+    <article class="card flush">
+      <div class="card-head"><div><h3>Aplicar descuento</h3><p>Marca los productos, elige el % y aplica</p></div></div>
+      <div class="toolbar">
+        <label class="search">${ICONOS.search}<input id="of-search" class="input" type="search" value="${esc(ui.query)}" placeholder="Buscar por nombre, código o marca" aria-label="Buscar productos"></label>
+        <select id="of-cat" class="input" aria-label="Categoría">
+          <option value="all">Todas las categorías</option>
+          ${categorias.map(c => `<option value="${esc(c)}" ${ui.categoria === c ? 'selected' : ''}>${esc(nombreCategoria(c))}</option>`).join('')}
+        </select>
+      </div>
+      <div class="toolbar sale-bar">
+        <span class="meta" id="of-count" style="margin-left:0"></span>
+        <div class="seg" role="group" aria-label="Porcentaje">
+          ${[10, 15, 20, 30, 50].map(n => `<button type="button" data-pct="${n}">${n}%</button>`).join('')}
+        </div>
+        <label class="pct-input"><input id="of-pct" class="input num" type="number" min="1" max="90" step="1" value="${ui.pct}" aria-label="Porcentaje de descuento"><span>%</span></label>
+        <button class="btn primary" type="button" id="of-aplicar">${ICONOS.offers}Aplicar</button>
+      </div>
+      <div class="table-wrap" id="of-table"></div>
+    </article>`;
+
+  const pintarLista = () => {
+    const q = ui.query.trim().toLowerCase();
+    const lista = productos.filter(p =>
+      (ui.categoria === 'all' || p.category === ui.categoria) &&
+      (!q || `${p.name} ${p.code || ''} ${p.brand || ''}`.toLowerCase().includes(q))
+    ).sort((a, b) => String(a.name).localeCompare(String(b.name)));
+    const elegibles = lista.filter(p => Number(p.price) > 0);
+    const todos = elegibles.length > 0 && elegibles.every(p => ui.seleccion.has(Number(p.id)));
+    panel.querySelector('#of-table').innerHTML = `
+      <table class="tbl stack">
+        <thead><tr>
+          <th style="width:44px"><input type="checkbox" id="of-all" ${todos ? 'checked' : ''} aria-label="Seleccionar todos los visibles"></th>
+          <th>Producto</th><th class="r">Precio actual</th><th class="r">Con ${ui.pct}%</th><th>Stock</th>
+        </tr></thead>
+        <tbody>${lista.map(p => {
+          const sinPrecio = !Number(p.price);
+          const marcado = ui.seleccion.has(Number(p.id));
+          return `<tr class="${marcado ? 'is-sel' : ''}">
+            <td><input type="checkbox" class="of-check" data-id="${p.id}" ${marcado ? 'checked' : ''} ${sinPrecio ? 'disabled' : ''} aria-label="Seleccionar ${esc(p.name)}"></td>
+            <td class="full"><div class="prod"><img class="thumb" src="${esc(foto(p.image))}" alt="" loading="lazy" onerror="this.src='./assets/default.png';this.onerror=null;"><div><b>${esc(p.name)}</b><span>${esc(p.code || '')} · ${esc(nombreCategoria(p.category))}</span></div></div></td>
+            <td class="r money" data-label="Precio actual">${sinPrecio ? '<span class="pill warn">Sin precio</span>' : enOferta(p) ? `<span class="pill sale">-${pctOferta(p)}%</span> ${formatCurrency(Number(p.price))}` : formatCurrency(Number(p.price))}</td>
+            <td class="r money" data-label="Con ${ui.pct}%">${sinPrecio ? '—' : `<b style="color:var(--accent)">${formatCurrency(conDescuento(p, ui.pct))}</b>${enOferta(p) ? `<div class="antes" style="text-decoration:none">sobre ${formatCurrency(Number(p.reference_price))}</div>` : ''}`}</td>
+            <td class="num of-stock" data-label="Stock">${Number(p.stock) || 0}</td>
+          </tr>`;
+        }).join('') || `<tr><td colspan="5" class="full"><div class="empty"><b>Sin resultados</b>Prueba con otra búsqueda.</div></td></tr>`}</tbody>
+      </table>`;
+
+    panel.querySelectorAll('.of-check').forEach(c => c.addEventListener('change', () => {
+      const id = Number(c.dataset.id);
+      c.checked ? ui.seleccion.add(id) : ui.seleccion.delete(id);
+      c.closest('tr').classList.toggle('is-sel', c.checked);
+      const allBox = panel.querySelector('#of-all');
+      if (allBox) allBox.checked = elegibles.every(p => ui.seleccion.has(Number(p.id)));
+      pintarConteo();
+    }));
+    panel.querySelector('#of-all')?.addEventListener('change', e => {
+      elegibles.forEach(p => e.target.checked ? ui.seleccion.add(Number(p.id)) : ui.seleccion.delete(Number(p.id)));
+      pintarLista();
+    });
+    pintarConteo();
+  };
+
+  const pintarConteo = () => {
+    const n = ui.seleccion.size;
+    panel.querySelector('#of-count').textContent = n ? `${n} seleccionado${n !== 1 ? 's' : ''}` : 'Ningún producto seleccionado';
+    const btn = panel.querySelector('#of-aplicar');
+    btn.disabled = !n;
+    btn.lastChild.textContent = n ? `Aplicar ${ui.pct}% a ${n}` : 'Aplicar';
+    panel.querySelectorAll('[data-pct]').forEach(b => {
+      b.classList.toggle('is-on', Number(b.dataset.pct) === ui.pct);
+      b.setAttribute('aria-pressed', String(Number(b.dataset.pct) === ui.pct));
+    });
+  };
+
+  const fijarPct = v => {
+    ui.pct = Math.min(90, Math.max(1, Math.round(Number(v) || 0)));
+    panel.querySelector('#of-pct').value = ui.pct;
+    pintarLista();
+  };
+
+  let t = null;
+  panel.querySelector('#of-search').addEventListener('input', e => { ui.query = e.target.value; clearTimeout(t); t = setTimeout(pintarLista, 200); });
+  panel.querySelector('#of-cat').addEventListener('change', e => { ui.categoria = e.target.value; pintarLista(); });
+  panel.querySelectorAll('[data-pct]').forEach(b => b.addEventListener('click', () => fijarPct(b.dataset.pct)));
+  panel.querySelector('#of-pct').addEventListener('change', e => fijarPct(e.target.value));
+
+  panel.querySelector('#of-aplicar').addEventListener('click', async e => {
+    const btn = e.currentTarget;
+    const ids = [...ui.seleccion];
+    if (!ids.length) return;
+    btn.disabled = true;
+    try {
+      const n = await guardarDescuento(ids, ui.pct);
+      ui.seleccion.clear();
+      toast(`Descuento de ${ui.pct}% aplicado a ${n} producto${n !== 1 ? 's' : ''}`);
+      renderOffersTab();
+    } catch (err) {
+      toast(err.message || 'No se pudo aplicar el descuento', true);
+      btn.disabled = false;
+    }
+  });
+
+  const quitar = async ids => {
+    try {
+      const n = await guardarDescuento(ids, 0);
+      toast(`Descuento quitado de ${n} producto${n !== 1 ? 's' : ''}`);
+      renderOffersTab();
+    } catch (err) {
+      toast(err.message || 'No se pudo quitar el descuento', true);
+    }
+  };
+  panel.querySelectorAll('.quitar-oferta').forEach(b => b.addEventListener('click', () => quitar([Number(b.dataset.id)])));
+  panel.querySelector('#quitar-todas')?.addEventListener('click', async () => {
+    const { isConfirmed } = await Swal.fire({
+      title: '¿Quitar todas las ofertas?',
+      html: `${ofertas.length} productos vuelven a su precio original.`,
+      showCancelButton: true, confirmButtonText: 'Sí, quitar todas', cancelButtonText: 'Cancelar'
+    });
+    if (isConfirmed) quitar(ofertas.map(p => Number(p.id)));
+  });
+
+  pintarLista();
 }
 
 // ── CLIENTES ──────────────────────────────────────────────────

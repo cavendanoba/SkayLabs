@@ -87,12 +87,13 @@ function seleccionado(g) {
 function categorias() {
   const hay = new Set(grupos.map(g => g.categoria));
   const conocidas = ORDEN_CATEGORIA.filter(c => hay.has(c));
-  return ['Todas', ...conocidas, ...[...hay].filter(c => !ORDEN_CATEGORIA.includes(c))];
+  const ofertas = grupos.some(grupoEnOferta) ? [OFERTAS] : [];
+  return ['Todas', ...ofertas, ...conocidas, ...[...hay].filter(c => !ORDEN_CATEGORIA.includes(c))];
 }
 
 function pintarCategorias() {
   $('categorias').replaceChildren(...categorias().map(c => {
-    const b = el('button', { type: 'button', textContent: c, className: c === filtro ? 'activa' : '' });
+    const b = el('button', { type: 'button', textContent: c === OFERTAS ? '% Ofertas' : c, className: (c === filtro ? 'activa' : '') + (c === OFERTAS ? ' chip-ofertas' : '') });
     b.setAttribute('aria-pressed', String(c === filtro));
     b.onclick = () => { filtro = c; pintarCategorias(); pintarCatalogo(); };
     return b;
@@ -112,14 +113,25 @@ function tarjeta(g) {
   foto.setAttribute('aria-label', 'Ver detalles de ' + g.titulo);
   const precio = el('p', { className: 'precio' });
   const boton = el('button', { type: 'button', className: 'agregar' });
-  const tarjetaNodo = el('article', { className: 'card' }, foto, el('h3', { textContent: g.titulo }), precio);
+  const liston = el('span', { className: 'liston' });
+  const tarjetaNodo = el('article', { className: 'card' }, foto, liston, el('h3', { textContent: g.titulo }), precio);
   let botonesTono = [];
 
   function actualizar() {
     const p = seleccionado(g);
     const hay = p.stock > 0;
     pintarFoto(foto, g, p);
-    precio.textContent = fmt(p.price);
+    if (enDescuento(p)) {
+      const antes = el('s', { className: 'precio-antes', textContent: fmt(p.reference_price) });
+      antes.setAttribute('aria-label', 'Antes ' + fmt(p.reference_price));
+      precio.replaceChildren(antes, ' ', el('span', { className: 'precio-oferta', textContent: fmt(p.price) }));
+      liston.textContent = `-${pctDescuento(p)}%`;
+      liston.setAttribute('aria-label', `${pctDescuento(p)}% de descuento`);
+      liston.hidden = false;
+    } else {
+      precio.textContent = fmt(p.price);
+      liston.hidden = true;
+    }
     tarjetaNodo.classList.toggle('sin-stock', !hay);
     boton.disabled = !hay;
     boton.textContent = hay ? 'Agregar' : 'Agotado';
@@ -228,6 +240,9 @@ function botonAccion(p, antesDeVolar) {
 const precioAbierto = p => !(Number(p.price) > 0);
 const textoPrecio = p => (precioAbierto(p) ? 'Escríbenos por el tuyo' : fmt(p.price));
 const enDescuento = p => !precioAbierto(p) && Number(p.reference_price) > Number(p.price);
+const pctDescuento = p => Math.round((1 - Number(p.price) / Number(p.reference_price)) * 100);
+const grupoEnOferta = g => g.items.some(enDescuento);
+const OFERTAS = 'Ofertas';
 
 // Precio con descuento: antes tachado, precio actual y cuánto se ahorra.
 function nodoDescuento(p, clase) {
@@ -296,8 +311,9 @@ function pintarDestacado(productos) {
 
 function pintarCatalogo() {
   const q = normalizar(busqueda);
-  const secciones = (filtro === 'Todas' ? categorias().slice(1) : [filtro]).map(cat => {
-    const lista = grupos.filter(g => g.categoria === cat && (!q || g.texto.includes(q)));
+  const cats = filtro === 'Todas' ? categorias().slice(1).filter(c => c !== OFERTAS) : [filtro];
+  const secciones = cats.map(cat => {
+    const lista = grupos.filter(g => (cat === OFERTAS ? grupoEnOferta(g) : g.categoria === cat) && (!q || g.texto.includes(q)));
     if (!lista.length) return null;
     return el('section', {}, el('h2', { className: 'titulo-cat', textContent: cat }), el('div', { className: 'grid' }, ...lista.map(tarjeta)));
   }).filter(Boolean);

@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { formatCurrency } from '/discordia/utils.js';
-import { esc } from '/discordia/modules/ui.js?v=3';
+import { esc } from '/discordia/modules/ui.js?v=4';
 
 export async function renderDeudas(container) {
   container.innerHTML = `<div class="skeleton" style="height:300px"></div>`;

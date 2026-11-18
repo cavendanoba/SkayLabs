@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { formatCurrency } from '/discordia/utils.js';
-import { esc, foto, NOMBRES_CATEGORIA, COLOR_CATEGORIA, nombreCategoria, esProductoReal, sinFoto, svg } from '/discordia/modules/ui.js?v=3';
+import { esc, foto, NOMBRES_CATEGORIA, COLOR_CATEGORIA, nombreCategoria, esProductoReal, sinFoto, svg } from '/discordia/modules/ui.js?v=4';
 
 const I = {
   money: svg('<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'),
