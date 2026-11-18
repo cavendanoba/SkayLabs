@@ -7,9 +7,10 @@
 // ─────────────────────────────────────────────────────────────
 
 import { formatCurrency } from '/discordia/utils.js';
+import { esc } from '/discordia/modules/ui.js?v=3';
 
 export async function renderDeudas(container) {
-  container.innerHTML = `<div class="animate-pulse bg-gray-100 rounded-2xl h-64"></div>`;
+  container.innerHTML = `<div class="skeleton" style="height:300px"></div>`;
 
   let ventas = [];
   try {
@@ -31,85 +32,60 @@ export async function renderDeudas(container) {
 
 function paintDeudas(container, ventas) {
   const totalDeuda = ventas.reduce((s,v) => s + (Number(v.total) - Number(v.amount_paid)), 0);
+  const totalAbonado = ventas.reduce((s,v) => s + Number(v.amount_paid || 0), 0);
+  const vieja = ventas.reduce((a, v) => (!a || new Date(v.created_at) < new Date(a.created_at) ? v : a), null);
+  const diasDesde = f => Math.max(0, Math.floor((Date.now() - new Date(f)) / 86400000));
 
   if (!ventas.length) {
     container.innerHTML = `
-      <article class="bg-emerald-50 border border-emerald-100 rounded-2xl p-10 text-center shadow-sm">
-        <span class="text-5xl block mb-4">🎉</span>
-        <p class="text-emerald-800 text-xl" style="font-family:'Playfair Display',serif;font-weight:600;">¡Sin deudas pendientes!</p>
-        <p class="text-emerald-600 mt-2 text-sm">Todas las clientas han pagado sus compras.</p>
+      <article class="card">
+        <div class="empty" style="padding:48px 10px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+          <b>Sin deudas pendientes</b>Todas las clientas están al día.
+        </div>
       </article>`;
     return;
   }
 
   const rows = ventas.map(v => {
-    const fecha    = new Date(v.created_at).toLocaleDateString('es-CO', { day:'numeric', month:'short', year:'2-digit' });
+    const fecha     = new Date(v.created_at).toLocaleDateString('es-CO', { day:'numeric', month:'short', year:'2-digit' });
     const pendiente = Number(v.total) - Number(v.amount_paid);
-    const pct       = Math.round((Number(v.amount_paid) / Number(v.total)) * 100);
-    const itemNames = (v.items||[]).map(i=>`${i.product_name} x${i.quantity}`).join(', ') || '—';
+    const pct       = Math.round((Number(v.amount_paid) / Number(v.total)) * 100) || 0;
+    const items     = (v.items||[]);
+    const dias      = diasDesde(v.created_at);
 
     return `
-      <tr class="border-b border-gray-100 hover:bg-[#fdf7fa] transition">
-        <td class="p-3">
-          <p class="text-gray-900 text-sm">${v.customer_name||'Sin nombre'}</p>
-          <p class="text-xs text-gray-400 mt-0.5">${v.customer_phone||'—'}</p>
+      <tr>
+        <td><div class="prod" style="min-width:170px"><div><b>${esc(v.customer_name||'Sin nombre')}</b><span>${esc(v.customer_phone||'Sin teléfono')}</span></div></div></td>
+        <td class="code">${fecha}<br><span class="${dias > 30 ? 'pill crit' : dias > 15 ? 'pill warn' : 'pill mute'}" style="margin-top:4px">${dias === 0 ? 'hoy' : `hace ${dias} día${dias!==1?'s':''}`}</span></td>
+        <td style="max-width:220px;font-size:12.5px;color:var(--dim)">${items.slice(0,3).map(i=>`<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(i.name||i.productName||'Producto')} ×${i.quantity}</div>`).join('') || '—'}
+          ${items.length > 3 ? `<div style="color:var(--faint)">+${items.length-3} más</div>` : ''}</td>
+        <td style="min-width:150px">
+          <div class="money">${formatCurrency(Number(v.total))}</div>
+          <div class="hbar" title="${pct}% abonado"><i style="width:${pct}%;background:var(--good)"></i></div>
+          <div style="font-size:11.5px;color:var(--faint);margin-top:4px">Abonado ${formatCurrency(Number(v.amount_paid))} · ${pct}%</div>
         </td>
-        <td class="p-3 text-xs text-gray-600">${fecha}</td>
-        <td class="p-3 text-xs text-gray-600 max-w-[180px]">
-          <div class="space-y-0.5">${(v.items||[]).slice(0,3).map(i=>`<p class="truncate">${i.name||i.productName||'Producto'} ×${i.quantity}</p>`).join('')}
-          ${(v.items||[]).length > 3 ? `<p class="text-gray-400 text-xs">+${(v.items||[]).length-3} más</p>` : ''}</div>
-        </td>
-        <td class="p-3">
-          <p class="text-gray-700 text-sm">${formatCurrency(Number(v.total))}</p>
-          <p class="text-xs text-gray-500 mt-1">Abonado: <span class="text-emerald-600">${formatCurrency(Number(v.amount_paid))}</span></p>
-          <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-            <div class="bg-emerald-500 h-1.5 rounded-full" style="width:${pct}%"></div>
-          </div>
-        </td>
-        <td class="p-3 whitespace-nowrap">
-          <p class="text-rose-600 text-lg font-bold">${formatCurrency(pendiente)}</p>
-          <p class="text-xs text-gray-400 mt-1">por cobrar</p>
-        </td>
-        <td class="p-3">
-          <div class="flex gap-2">
-            <button data-sale-id="${v.id}" data-pendiente="${pendiente}" data-name="${v.customer_name||'Cliente'}"
-              class="btn-abonar px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 font-normal text-xs hover:bg-amber-200 transition whitespace-nowrap">
-              💳 Abonar
-            </button>
-            <button data-sale-id="${v.id}" data-pendiente="${pendiente}" data-name="${v.customer_name||'Cliente'}"
-              class="btn-pagar px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 font-normal text-xs hover:bg-emerald-200 transition whitespace-nowrap">
-              ✅ Pagado
-            </button>
+        <td class="r"><b class="money" style="color:var(--warn);font-size:15px">${formatCurrency(pendiente)}</b></td>
+        <td>
+          <div class="actions">
+            <button type="button" data-sale-id="${v.id}" data-pendiente="${pendiente}" data-name="${esc(v.customer_name||'Cliente')}" class="btn sm btn-abonar">Abonar</button>
+            <button type="button" data-sale-id="${v.id}" data-pendiente="${pendiente}" data-name="${esc(v.customer_name||'Cliente')}" class="btn sm ok btn-pagar">Pagado</button>
           </div>
         </td>
       </tr>`;
   }).join('');
 
   container.innerHTML = `
-    <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div class="bg-gradient-to-r from-amber-500 to-orange-400 px-5 py-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h3 class="text-white text-lg" style="font-family:'Playfair Display',serif;font-weight:600;">⚠️ Deudas pendientes</h3>
-          <p class="text-white/70 text-xs mt-0.5">${ventas.length} venta${ventas.length!==1?'s':''} por cobrar</p>
-        </div>
-        <div class="text-right">
-          <p class="text-white text-xs font-medium">Total adeudado</p>
-          <p class="text-white text-2xl font-bold mt-1">${formatCurrency(totalDeuda)}</p>
-        </div>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead class="bg-amber-50">
-            <tr>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Cliente</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Fecha</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Productos</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Total / Abonado</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Pendiente</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-amber-700 font-medium">Acciones</th>
-            </tr>
-          </thead>
+    <section class="dgrid">
+      <article class="card hero kpi span-4"><div class="kpi-label">Total por cobrar</div><div class="kpi-value num">${formatCurrency(totalDeuda)}</div><div class="kpi-foot">${ventas.length} venta${ventas.length!==1?'s':''} pendiente${ventas.length!==1?'s':''}</div></article>
+      <article class="card kpi span-4"><div class="kpi-label">Ya abonado</div><div class="kpi-value num">${formatCurrency(totalAbonado)}</div><div class="kpi-foot">en estas ventas</div></article>
+      <article class="card kpi span-4"><div class="kpi-label">Deuda más antigua</div><div class="kpi-value num">${vieja ? diasDesde(vieja.created_at) + ' días' : '—'}</div><div class="kpi-foot">${vieja ? esc(vieja.customer_name || 'Sin nombre') : ''}</div></article>
+    </section>
+    <article class="card flush">
+      <div class="card-head"><div><h3>Ventas por cobrar</h3><p>Registra abonos o marca como pagado</p></div></div>
+      <div class="table-wrap" style="margin-top:6px">
+        <table class="tbl">
+          <thead><tr><th>Cliente</th><th>Fecha</th><th>Productos</th><th>Total / abonado</th><th class="r">Pendiente</th><th class="r">Acciones</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>
@@ -141,13 +117,13 @@ async function registrarAbono(saleId, pendiente, customerName, container) {
   const { value, isConfirmed } = await Swal.fire({
     title: `Registrar abono`,
     html: `
-      <p style="color:#6d165a;font-weight:600;margin-bottom:12px;">${customerName}</p>
-      <p style="font-size:13px;color:#6b7280;margin-bottom:8px;">Pendiente: <strong style="color:#a0346e;">${formatCurrency(pendiente)}</strong></p>
+      <p style="color:var(--ink);font-weight:600;margin-bottom:12px;">${esc(customerName)}</p>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:8px;">Pendiente: <strong style="color:var(--accent);">${formatCurrency(pendiente)}</strong></p>
       <input id="sw-abono" type="number" min="1" max="${pendiente}" class="swal2-input" placeholder="Monto del abono">
       <input id="sw-nota" class="swal2-input" placeholder="Nota (opcional)">`,
     showCancelButton: true,
     confirmButtonText: 'Registrar abono',
-    confirmButtonColor: '#9d5fa5',
+    
     preConfirm: () => {
       const amount = Number(document.getElementById('sw-abono').value);
       if (!amount || amount <= 0) { Swal.showValidationMessage('Ingresa un monto válido.'); return false; }
@@ -164,11 +140,11 @@ async function registrarAbono(saleId, pendiente, customerName, container) {
 async function marcarPagado(saleId, pendiente, customerName, container) {
   const { isConfirmed } = await Swal.fire({
     title: '¿Marcar como pagado?',
-      html: `<p style="color:#6d165a;">${customerName}</p><p style="font-size:13px;color:#6b7280;">Se registrará el pago completo de <strong>${formatCurrency(pendiente)}</strong></p>`,
+      html: `<p style="color:var(--ink);">${esc(customerName)}</p><p style="font-size:13px;color:var(--dim);">Se registrará el pago completo de <strong>${formatCurrency(pendiente)}</strong></p>`,
     icon: 'question',
     showCancelButton: true,
     confirmButtonText: 'Sí, marcar pagado',
-    confirmButtonColor: '#10b981',
+    
   });
 
   if (!isConfirmed) return;

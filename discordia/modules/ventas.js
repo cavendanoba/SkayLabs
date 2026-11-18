@@ -91,7 +91,7 @@ function paintVentas(container, filtros = {}) {
 
       <!-- Header -->
       <div class="bg-gradient-to-r from-[#6d165a] to-[#a0346e] px-5 py-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 class="text-white text-lg" style="font-family:'Playfair Display',serif;font-weight:600;">🛍️ Historial de ventas</h3>
+        <h3 class="text-white text-lg" style="font-weight:600;">🛍️ Historial de ventas</h3>
         <button id="btn-nueva-venta"
           class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm font-normal rounded-xl transition flex items-center gap-2">
           <i class="fa-solid fa-plus"></i> Nueva venta
@@ -235,19 +235,19 @@ async function showNuevaVentaModal(container) {
  
         <!-- SECCIÓN: SELECCIONAR CLIENTE EXISTENTE -->
         <section>
-          <h3 style="font-size:13px;font-weight:800;color:#a0346e;text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
+          <h3 style="font-size:13px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
             ¿Cliente recurrente?
           </h3>
           <div style="display:flex;flex-direction:column;gap:12px;">
             <div>
-              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Buscar cliente existente</label>
+              <label style="font-size:12px;font-weight:600;color:var(--accent);display:block;margin-bottom:6px;">Buscar cliente existente</label>
               <select id="sw-existing-customer" class="swal2-input" style="margin:0;width:100%;height:44px;">
                 <option value="">— Crear nueva clienta —</option>
                 ${customerOptions}
               </select>
             </div>
-            <div id="sw-customer-info" style="display:none;background:#f0f9ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;">
-              <div style="color:#1e40af;font-weight:600;margin-bottom:8px;">Historial de la clienta:</div>
+            <div id="sw-customer-info" style="display:none;background:var(--well);border:1px solid #bfdbfe;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;">
+              <div style="color:var(--dim);font-weight:600;margin-bottom:8px;">Historial de la clienta:</div>
               <div id="sw-customer-history"></div>
             </div>
           </div>
@@ -257,21 +257,21 @@ async function showNuevaVentaModal(container) {
  
         <!-- SECCIÓN: DATOS DEL CLIENTE -->
         <section>
-          <h3 style="font-size:13px;font-weight:800;color:#a0346e;text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
+          <h3 style="font-size:13px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
             Datos del cliente
           </h3>
           <div style="display:flex;flex-direction:column;gap:12px;">
             <div>
-              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Cliente</label>
+              <label style="font-size:12px;font-weight:600;color:var(--accent);display:block;margin-bottom:6px;">Cliente</label>
               <input id="sw-customer-name" class="swal2-input" style="margin:0;width:100%;height:44px;" placeholder="Nombre de la clienta">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
               <div>
-                <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Teléfono</label>
+                <label style="font-size:12px;font-weight:600;color:var(--accent);display:block;margin-bottom:6px;">Teléfono</label>
                 <input id="sw-customer-phone" class="swal2-input" style="margin:0;width:100%;height:44px;" placeholder="WhatsApp / Celular">
               </div>
               <div>
-                <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Canal</label>
+                <label style="font-size:12px;font-weight:600;color:var(--accent);display:block;margin-bottom:6px;">Canal</label>
                 <select id="sw-channel" class="swal2-input" style="margin:0;width:100%;height:44px;">
                   <option value="">— Selecciona un canal —</option>
                   <option value="WhatsApp">WhatsApp</option>
@@ -290,19 +290,19 @@ async function showNuevaVentaModal(container) {
  
         <!-- SECCIÓN: PAGO -->
         <section>
-          <h3 style="font-size:13px;font-weight:800;color:#a0346e;text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
+          <h3 style="font-size:13px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
             Pago
           </h3>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
             <div>
-              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Estado de pago</label>
+              <label style="font-size:12px;font-weight:600;color:var(--accent);display:block;margin-bottom:6px;">Estado de pago</label>
               <select id="sw-payment" class="swal2-input" style="margin:0;width:100%;height:44px;">
                 <option value="paid">Pagado ✅</option>
                 <option value="pending">Pendiente ⚠️</option>
               </select>
             </div>
             <div>
-              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Notas</label>
+              <label style="font-size:12px;font-weight:600;color:var(--accent);display:block;margin-bottom:6px;">Notas</label>
               <input id="sw-notes" class="swal2-input" style="margin:0;width:100%;height:44px;" placeholder="Opcional">
             </div>
           </div>
@@ -312,7 +312,7 @@ async function showNuevaVentaModal(container) {
  
         <!-- SECCIÓN: PRODUCTOS -->
         <section>
-          <h3 style="font-size:13px;font-weight:800;color:#a0346e;text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
+          <h3 style="font-size:13px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;">
             Productos de la venta
           </h3>
  
@@ -322,27 +322,27 @@ async function showNuevaVentaModal(container) {
  
           <div style="display:grid;grid-template-columns:1fr 90px;gap:10px;align-items:end;">
             <div>
-              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Producto</label>
+              <label style="font-size:12px;font-weight:600;color:var(--accent);display:block;margin-bottom:6px;">Producto</label>
               <select id="sw-product" class="swal2-input" style="margin:0;width:100%;height:44px;">
                 ${productOptions}
               </select>
             </div>
             <div>
-              <label style="font-size:12px;font-weight:600;color:#6d165a;display:block;margin-bottom:6px;">Cant.</label>
+              <label style="font-size:12px;font-weight:600;color:var(--accent);display:block;margin-bottom:6px;">Cant.</label>
               <input id="sw-qty" type="number" min="1" value="1" class="swal2-input" style="margin:0;width:100%;height:44px;text-align:center;">
             </div>
           </div>
  
           <button id="sw-add-item" type="button"
-            style="margin-top:12px;background:linear-gradient(90deg,#9d5fa5,#d94a7b);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;width:100%;">
+            style="margin-top:12px;background:var(--grad);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-weight:700;font-size:14px;cursor:pointer;width:100%;">
             + Agregar producto a la venta
           </button>
  
           <div id="sw-items-list"
-            style="margin-top:14px;min-height:48px;background:#fdf2f7;border-radius:12px;padding:12px;font-size:13px;">
+            style="margin-top:14px;min-height:48px;background:var(--well);border-radius:12px;padding:12px;font-size:13px;">
           </div>
  
-          <div style="margin-top:14px;padding-top:14px;border-top:2px solid #f1d7e2;font-size:17px;font-weight:800;color:#a0346e;text-align:right;">
+          <div style="margin-top:14px;padding-top:14px;border-top:2px solid #f1d7e2;font-size:17px;font-weight:800;color:var(--accent);text-align:right;">
             Total: <span id="sw-total">$0</span>
           </div>
         </section>
@@ -417,9 +417,9 @@ async function showNuevaVentaModal(container) {
           ? window._swItems.map((i,idx) =>
               `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #f1d7e2;">
                 <span style="font-weight:500;">${i.name} <span style="color:#c48bb0;">×${i.qty}</span></span>
-                <span style="color:#a0346e;font-weight:700;display:flex;align-items:center;gap:8px;">
+                <span style="color:var(--accent);font-weight:700;display:flex;align-items:center;gap:8px;">
                   ${formatCurrency(i.price*i.qty)}
-                  <button data-idx="${idx}" style="background:#fff;border:1px solid #f1d7e2;color:#a0346e;cursor:pointer;width:24px;height:24px;border-radius:50%;font-size:13px;line-height:1;">✕</button>
+                  <button data-idx="${idx}" style="background:var(--card);border:1px solid #f1d7e2;color:var(--accent);cursor:pointer;width:24px;height:24px;border-radius:50%;font-size:13px;line-height:1;">✕</button>
                 </span>
               </div>`).join('')
           : '<span style="color:#9ca3af;font-size:13px;">Sin productos aún</span>';
@@ -517,7 +517,7 @@ async function showEditVentaModal(container, saleId) {
 
       <!-- Header -->
       <div class="bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] px-6 py-5 flex items-center justify-between">
-        <h2 class="text-xl font-bold text-white" style="font-family: 'Playfair Display', serif;">
+        <h2 class="text-xl font-bold text-white" >
           ✏️ Editar Venta
         </h2>
         <button class="close-modal text-white hover:bg-white/20 p-2 rounded-lg transition">
@@ -827,7 +827,7 @@ function showVentaDetailsModal(saleId) {
     <!-- Header -->
     <div class="bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] px-6 py-5 flex items-center justify-between sticky top-0 z-10">
       <div class="flex-1">
-        <h2 class="text-xl font-bold text-white" style="font-family: 'Playfair Display', serif;">
+        <h2 class="text-xl font-bold text-white" >
           👁️ Detalles de Compra
         </h2>
         <p class="text-white/80 text-sm mt-1">${fecha}</p>

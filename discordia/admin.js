@@ -1,33 +1,27 @@
 // discordia/admin.js
 // ─────────────────────────────────────────────────────────────
-// Panel de administración de Discordia.
-// 5 módulos: Dashboard · Catálogo · Ventas · Deudas · Clientes
+// Panel de administración de Discordia, con estilo de tablero.
+// Secciones: Resumen · Catálogo · Ventas · Deudas · Clientes
 //
-// Arquitectura:
-// - admin.js es el coordinador. Solo maneja tabs y nav.
-// - Cada módulo vive en su propio archivo (dashboard.js, etc.)
-//   y exporta una función renderXxx(container).
-// - admin.js llama a esa función cuando el usuario activa el tab.
+// - admin.js arma la estructura (barra lateral, encabezado, tema)
+//   y las vistas de Catálogo y Clientes.
+// - Resumen, Ventas y Deudas viven en /discordia/modules/.
 // ─────────────────────────────────────────────────────────────
 
 import { requireAuth, getAdminUser, logout } from '/discordia/auth.js?v=2';
-import { renderDashboard }                   from '/discordia/modules/dashboard.js';
-import { renderVentas }                      from '/discordia/modules/ventas.js';
-import { renderDeudas }                      from '/discordia/modules/deudas.js';
-import { fetchProducts }                     from '/discordia/products.js';
+import { renderDashboard }                   from '/discordia/modules/dashboard.js?v=3';
+import { renderVentas }                      from '/discordia/modules/ventas.js?v=3';
+import { renderDeudas }                      from '/discordia/modules/deudas.js?v=3';
 import { CONFIG }                            from '/discordia/config.js';
 import { formatCurrency }                    from '/discordia/utils.js';
+import { esc, foto, toast, NOMBRES_CATEGORIA, COLOR_CATEGORIA, esProductoReal, sinFoto, ICONOS } from '/discordia/modules/ui.js?v=3';
 
-// ── GUARD (no ejecutar aquí, hacerlo en init) ─────────────────
-// requireAuth() se ejecutará dentro de init() para mejor manejo
+const nombreCategoria = c => NOMBRES_CATEGORIA[c] || c || 'Sin categoría';
 
 // ── ESTADO ────────────────────────────────────────────────────
 let activeTab = 'dashboard';
+let panel = null;
 
-let panel            = null;
-let summaryContainer = null;
-
-// ── STORAGE (para compatibilidad con funciones heredadas) ─────
 const STORAGE_KEYS = {
   catalog:   CONFIG.CATALOG_STORAGE_KEY   || 'skcCatalog',
   sales:     CONFIG.SALES_STORAGE_KEY     || 'skcSales',
@@ -51,196 +45,223 @@ function saveToStorage(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
 }
 
-// ── TABS ──────────────────────────────────────────────────────
+// ── NAVEGACIÓN ────────────────────────────────────────────────
 const TABS = [
-  { id: 'dashboard', label: '📊 Dashboard',  icon: '📊' },
-  { id: 'catalog',   label: '📦 Catálogo',   icon: '📦' },
-  { id: 'sales',     label: '🛍️ Ventas',     icon: '🛍️' },
-  { id: 'debts',     label: '⚠️ Deudas',     icon: '⚠️' },
-  { id: 'customers', label: '👥 Clientes',   icon: '👥' },
+  { id: 'dashboard', label: 'Resumen',  title: 'Resumen',  sub: 'Cómo va Discordia' },
+  { id: 'catalog',   label: 'Catálogo', title: 'Catálogo', sub: 'Productos, precios e inventario' },
+  { id: 'sales',     label: 'Ventas',   title: 'Ventas',   sub: 'Historial y registro de ventas' },
+  { id: 'debts',     label: 'Deudas',   title: 'Deudas',   sub: 'Saldos pendientes y abonos' },
+  { id: 'customers', label: 'Clientes', title: 'Clientes', sub: 'Quién compra y cuánto' },
 ];
+
+function counts() {
+  const productos = state.catalog.filter(esProductoReal);
+  const agotados = productos.filter(p => p.active !== false && Number(p.stock) <= 0).length;
+  const pendientes = state.sales.filter(s => s.payment_status === 'pending').length;
+  return {
+    catalog:   { n: agotados, warn: agotados > 0, title: `${agotados} agotados` },
+    debts:     { n: pendientes, warn: pendientes > 0, title: `${pendientes} ventas por cobrar` },
+    customers: { n: state.customers.length, title: `${state.customers.length} clientes` },
+  };
+}
 
 function buildTabs() {
   const nav = document.getElementById('admin-tabs-nav');
-  if (!nav) return;
-  nav.innerHTML = TABS.map(t => `
-    <button data-admin-tab="${t.id}"
-      class="admin-tab-btn flex-none px-3 md:px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap
-             ${t.id === activeTab ? 'bg-[#6d165a] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
-      ${t.label}
-    </button>`).join('');
-
-  nav.querySelectorAll('.admin-tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.adminTab));
-  });
+  const c = counts();
+  nav.innerHTML = TABS.map(t => {
+    const k = c[t.id];
+    const badge = k && k.n ? `<span class="count${k.warn ? ' warn' : ''}" title="${k.title}">${k.n}</span>` : '';
+    return `<button type="button" class="nav-btn${t.id === activeTab ? ' is-active' : ''}" data-admin-tab="${t.id}"
+      ${t.id === activeTab ? 'aria-current="page"' : ''}>${ICONOS[t.id]}${t.label}${badge}</button>`;
+  }).join('');
+  nav.querySelectorAll('[data-admin-tab]').forEach(btn =>
+    btn.addEventListener('click', () => switchTab(btn.dataset.adminTab)));
 }
 
-function updateTabStyles() {
-  document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-    const isActive = btn.dataset.adminTab === activeTab;
-    btn.className = `admin-tab-btn flex-none px-3 md:px-4 py-2.5 rounded-xl font-semibold text-sm transition whitespace-nowrap ${
-      isActive ? 'bg-[#6d165a] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-    }`;
-  });
+export function refreshCounts() {
+  buildTabs();
+  pintarHoy();
 }
 
-async function switchTab(tabId) {
+export async function switchTab(tabId, opciones = {}) {
   activeTab = tabId;
-  updateTabStyles();
-  panel.innerHTML = `<div class="animate-pulse bg-gray-100 rounded-2xl h-64"></div>`;
+  const tab = TABS.find(t => t.id === tabId) || TABS[0];
+  document.getElementById('page-title').textContent = tab.title;
+  document.getElementById('page-sub').textContent = tab.sub;
+  document.title = `${tab.title} — DISCORDIA Admin`;
+  document.body.classList.remove('nav-open');
+  buildTabs();
+  panel.innerHTML = `<div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:320px"></div>`;
+  window.scrollTo({ top: 0 });
 
   switch (tabId) {
-    case 'dashboard': await renderDashboard(panel);             break;
-    case 'catalog':   renderCatalogTab();                       break;
-    case 'sales':     await renderVentas(panel);                break;
-    case 'debts':     await renderDeudas(panel);                break;
-    case 'customers': renderCustomersTab();                     break;
+    case 'dashboard': await renderDashboard(panel, { state, goTo: switchTab, user: getAdminUser() }); break;
+    case 'catalog':   Object.assign(catalogUiState, opciones); renderCatalogTab(); break;
+    case 'sales':     await renderVentas(panel); break;
+    case 'debts':     await renderDeudas(panel); break;
+    case 'customers': renderCustomersTab(); break;
   }
 }
 
-// ── RESUMEN (header KPIs) ─────────────────────────────────────
-function renderSummary() {
-  const totalProducts = state.catalog.length;
-  const totalSales    = state.sales.length;
-  const totalRevenue  = state.sales.reduce((s, v) => s + Number(v.total || 0), 0);
-  const totalPendingDebt = state.sales.reduce((s, v) => {
-    if (v.payment_status === 'pending') {
-      return s + (Number(v.total || 0) - Number(v.amount_paid || 0));
-    }
-    return s;
-  }, 0);
-  const user = getAdminUser();
-
-  const cards = [
-    { label: 'Productos',       value: totalProducts,                note: 'en catálogo' },
-    { label: 'Deuda Pendiente', value: formatCurrency(totalPendingDebt), note: 'por cobrar' },
-    { label: 'Ventas',          value: totalSales,                   note: 'registradas' },
-    { label: 'Ingresos',        value: formatCurrency(totalRevenue), note: `· Admin: ${user}` },
-  ];
-
-  if (summaryContainer) {
-    summaryContainer.innerHTML = cards.map(c => `
-      <article class="bg-white border border-gray-100 rounded-2xl p-3 md:p-4 shadow-sm">
-        <p class="text-xs uppercase tracking-[0.15em] text-gray-400 font-medium">${c.label}</p>
-        <p class="text-xl md:text-2xl font-bold text-[#6d165a] mt-1.5">${c.value}</p>
-        <p class="text-xs text-gray-400 mt-0.5">${c.note}</p>
-      </article>`).join('');
-  }
+// Mini resumen de hoy en la barra lateral
+function pintarHoy() {
+  const box = document.getElementById('side-today');
+  if (!box) return;
+  const hoy = new Date().toDateString();
+  const ventasHoy = state.sales.filter(s => new Date(s.created_at).toDateString() === hoy);
+  const total = ventasHoy.reduce((s, v) => s + Number(v.total || 0), 0);
+  const productos = state.catalog.filter(p => esProductoReal(p) && p.active !== false);
+  const conFoto = productos.filter(p => !sinFoto(p)).length;
+  const pct = productos.length ? Math.round(conFoto / productos.length * 100) : 0;
+  const C = 2 * Math.PI * 19;
+  box.hidden = false;
+  box.innerHTML = `
+    <div class="gring" title="${conFoto} de ${productos.length} productos activos con foto">
+      <svg viewBox="0 0 46 46"><circle class="track" cx="23" cy="23" r="19" stroke-width="5"/>
+        <circle class="val" cx="23" cy="23" r="19" stroke-width="5" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct / 100)}"/></svg>
+      <em>${pct}%</em>
+    </div>
+    <div><span>Hoy</span><b class="num">${formatCurrency(total)}</b><span>${ventasHoy.length} venta${ventasHoy.length !== 1 ? 's' : ''} · ${pct}% con foto</span></div>`;
 }
 
 // ── CATÁLOGO ──────────────────────────────────────────────────
-const catalogUiState = { query: '', lowStockOnly: false, showInactive: false };
+const catalogUiState = { query: '', categoria: 'all', filtro: 'all', showInactive: false, orden: 'name', dir: 1 };
 let catalogDebounceTimer = null;
 
-// Debounce helper para evitar re-renders frecuentes
 function debounceCatalogRender() {
   clearTimeout(catalogDebounceTimer);
-  catalogDebounceTimer = setTimeout(() => renderCatalogTab(), 300);
+  catalogDebounceTimer = setTimeout(() => renderCatalogTab(true), 250);
 }
 
-function renderCatalogTab() {
-  const q        = catalogUiState.query.trim().toLowerCase();
-  const filtered = state.catalog.filter(item => {
-    const matchQ = !q || `${item.name} ${item.code||''} ${item.category||''} ${item.description||''}`.toLowerCase().includes(q);
-    const matchS = !catalogUiState.lowStockOnly || Number(item.stock||0) <= 5;
-    const matchA = catalogUiState.showInactive || item.active !== false; // Mostrar inactivos solo si se activa el checkbox
-    return matchQ && matchS && matchA;
+const FILTROS = {
+  all:     { label: 'Todos',      fn: () => true },
+  low:     { label: 'Última unidad', fn: p => Number(p.stock) === 1 },
+  out:     { label: 'Agotados',   fn: p => Number(p.stock) <= 0 },
+  nophoto: { label: 'Sin foto',   fn: sinFoto },
+  noprice: { label: 'Sin precio', fn: p => !Number(p.price) },
+};
+
+function renderCatalogTab(soloTabla = false) {
+  const ui = catalogUiState;
+  const q = ui.query.trim().toLowerCase();
+  const productos = state.catalog.filter(esProductoReal);
+  const categorias = [...new Set(productos.map(p => p.category).filter(Boolean))]
+    .sort((a, b) => nombreCategoria(a).localeCompare(nombreCategoria(b)));
+
+  const filtered = productos.filter(item => {
+    const matchQ = !q || `${item.name} ${item.code || ''} ${item.brand || ''} ${nombreCategoria(item.category)} ${item.description || ''}`.toLowerCase().includes(q);
+    const matchC = ui.categoria === 'all' || item.category === ui.categoria;
+    const matchF = (FILTROS[ui.filtro] || FILTROS.all).fn(item);
+    const matchA = ui.showInactive || ui.filtro === 'noprice' || item.active !== false;
+    return matchQ && matchC && matchF && matchA;
+  }).sort((a, b) => {
+    const k = ui.orden;
+    const va = k === 'name' ? String(a.name || '') : Number(a[k] || 0);
+    const vb = k === 'name' ? String(b.name || '') : Number(b[k] || 0);
+    return (k === 'name' ? va.localeCompare(vb) : va - vb) * ui.dir;
   });
 
-  const rows = filtered.map(item => `
-    <tr class="border-b border-gray-100 hover:bg-[#fdf7fa]">
-      <td class="p-3 text-center font-medium text-sm text-gray-500">${item.id}</td>
-      <td class="p-3 text-center font-medium text-xs text-gray-500">${item.code||'—'}</td>
-      <td class="p-3">
-        <div class="flex items-center gap-3">
-          <img src="${item.image||'./assets/default.png'}" alt="${item.name}"
-            class="w-11 h-11 rounded-lg object-cover border border-gray-200"
-            onerror="this.src='./assets/default.png';this.onerror=null;">
-          <div>
-            <p class="font-semibold text-gray-900 text-sm leading-tight">${item.name}</p>
-            <p class="text-xs text-gray-400 mt-0.5 truncate max-w-[200px]">${item.description||'Sin descripción'}</p>
-          </div>
+  const maxStock = Math.max(5, ...productos.map(p => Number(p.stock) || 0));
+  const rows = filtered.map(item => {
+    const stock = Number(item.stock) || 0;
+    const nivel = stock <= 0 ? 'out' : stock === 1 ? 'low' : '';
+    const activo = item.active !== false;
+    return `
+    <tr class="${activo ? '' : 'off'}">
+      <td>
+        <div class="prod">
+          <img class="thumb" src="${esc(foto(item.image))}" alt="" loading="lazy" onerror="this.src='./assets/default.png';this.onerror=null;">
+          <div><b>${esc(item.name)}</b><span>${esc(item.brand || '')}${item.brand && item.description ? ' · ' : ''}${esc(item.description || (item.brand ? '' : 'Sin descripción'))}</span></div>
         </div>
       </td>
-      <td class="p-3 font-bold text-[#a0346e] text-sm">${formatCurrency(Number(item.price||0))}</td>
-      <td class="p-3">
-        <span class="text-sm font-semibold ${Number(item.stock)<=3?'text-rose-600':Number(item.stock)<=5?'text-amber-600':'text-gray-800'}">${item.stock}</span>
-      </td>
-      <td class="p-3 text-xs font-mono text-gray-500">${item.code||'—'}</td>
-      <td class="p-3 text-sm text-gray-600">${item.category||'—'}</td>
-      <td class="p-3">
-        <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${item.active!==false?'bg-emerald-100 text-emerald-700':'bg-gray-100 text-gray-500'}">
-          ${item.active!==false?'Activo':'Inactivo'}
-        </span>
-      </td>
-      <td class="p-3">
-        <div class="flex gap-2">
-          <button class="edit-product px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-semibold text-xs hover:bg-amber-200 transition" data-id="${item.id}">Editar</button>
-          <button class="delete-product px-3 py-1.5 rounded-lg ${item.active!==false?'bg-rose-100 text-rose-700 hover:bg-rose-200':'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'} font-semibold text-xs transition" data-id="${item.id}">${item.active!==false?'🗑️ Desactivar':'♻️ Reactivar'}</button>
+      <td class="code">${esc(item.code || '—')}</td>
+      <td><span class="pill cat" style="--dot:${COLOR_CATEGORIA[item.category] || 'var(--c-other)'}">${esc(nombreCategoria(item.category))}</span></td>
+      <td class="r money">${Number(item.price) ? formatCurrency(Number(item.price)) : '<span class="pill warn">Sin precio</span>'}</td>
+      <td><div class="stock ${nivel}"><span class="num">${stock}</span><div class="hbar"><i style="width:${Math.min(100, stock / maxStock * 100)}%"></i></div></div></td>
+      <td>${activo ? '<span class="pill good">Activo</span>' : '<span class="pill mute">Inactivo</span>'}</td>
+      <td>
+        <div class="actions">
+          <button class="btn sm edit-product" type="button" data-id="${item.id}">${ICONOS.edit}Editar</button>
+          <button class="btn sm icon ${activo ? 'danger' : 'ok'} delete-product" type="button" data-id="${item.id}"
+            title="${activo ? 'Desactivar' : 'Reactivar'}" aria-label="${activo ? 'Desactivar' : 'Reactivar'} ${esc(item.name)}">${activo ? ICONOS.off : ICONOS.on}</button>
         </div>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
+
+  const flecha = k => ui.orden === k ? (ui.dir > 0 ? ' ↑' : ' ↓') : '';
+  const tabla = `
+    <table class="tbl">
+      <thead><tr>
+        <th class="th-sort" data-orden="name">Producto${flecha('name')}</th>
+        <th>Código</th>
+        <th>Categoría</th>
+        <th class="r th-sort" data-orden="price">Precio${flecha('price')}</th>
+        <th class="th-sort" data-orden="stock">Stock${flecha('stock')}</th>
+        <th>Estado</th>
+        <th class="r">Acciones</th>
+      </tr></thead>
+      <tbody>${rows || `<tr><td colspan="7"><div class="empty"><b>No hay productos que coincidan</b>Prueba con otra búsqueda o quita los filtros.</div></td></tr>`}</tbody>
+    </table>`;
+
+  if (soloTabla && panel.querySelector('#catalog-table')) {
+    panel.querySelector('#catalog-table').innerHTML = tabla;
+    panel.querySelector('#catalog-meta').textContent = `${filtered.length} de ${productos.length}`;
+    wireCatalogTable();
+    return;
+  }
+
+  const activos = productos.filter(p => p.active !== false);
+  const unidades = activos.reduce((s, p) => s + (Number(p.stock) || 0), 0);
+  const valor = activos.reduce((s, p) => s + (Number(p.stock) || 0) * (Number(p.price) || 0), 0);
 
   panel.innerHTML = `
-    <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div class="bg-gradient-to-r from-[#6d165a] to-[#a0346e] px-5 py-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">📦 Catálogo de productos</h3>
-        <button id="add-product"
-          class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold rounded-xl transition flex items-center gap-2">
-          + Agregar producto
-        </button>
-      </div>
-
-      <div class="p-4 border-b border-gray-100 flex flex-wrap gap-3">
-        <input id="catalog-search" value="${catalogUiState.query}"
-          placeholder="Buscar por nombre, código, categoría o descripción..."
-          class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#9d5fa5]">
-        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
-          <input id="catalog-low-stock" type="checkbox" ${catalogUiState.lowStockOnly?'checked':''} class="w-3.5 h-3.5 accent-[#9d5fa5]">
-          Solo stock bajo (≤ 5)
+    <section class="dgrid">
+      <article class="card span-3 kpi"><div class="kpi-label">Productos activos</div><div class="kpi-value num">${activos.length}</div><div class="kpi-foot">${productos.length - activos.length} inactivos</div></article>
+      <article class="card span-3 kpi"><div class="kpi-label">Unidades en inventario</div><div class="kpi-value num">${unidades}</div><div class="kpi-foot">en productos activos</div></article>
+      <article class="card span-3 kpi"><div class="kpi-label">Valor a precio de venta</div><div class="kpi-value num">${formatCurrency(valor)}</div><div class="kpi-foot">stock × precio</div></article>
+      <article class="card span-3 kpi"><div class="kpi-label">Sin foto</div><div class="kpi-value num">${activos.filter(sinFoto).length}</div><div class="kpi-foot">productos activos</div></article>
+    </section>
+    <article class="card flush">
+      <div class="toolbar">
+        <label class="search">${ICONOS.search}
+          <input id="catalog-search" class="input" type="search" value="${esc(ui.query)}" placeholder="Buscar por nombre, código, marca o categoría" aria-label="Buscar productos">
         </label>
-        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
-          <input id="catalog-show-inactive" type="checkbox" ${catalogUiState.showInactive?'checked':''} class="w-3.5 h-3.5 accent-[#9d5fa5]">
-          Mostrar desactivados
-        </label>
-        <span class="self-center text-xs text-gray-400">Mostrando ${filtered.length} de ${state.catalog.length}</span>
+        <select id="catalog-cat" class="input" aria-label="Categoría">
+          <option value="all">Todas las categorías</option>
+          ${categorias.map(c => `<option value="${esc(c)}" ${ui.categoria === c ? 'selected' : ''}>${esc(nombreCategoria(c))}</option>`).join('')}
+        </select>
+        <button id="add-product" class="btn primary" type="button">${ICONOS.plus}Agregar producto</button>
       </div>
-
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead class="bg-[#fdf2f7]">
-            <tr>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">ID</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Código</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Producto</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Precio</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Stock</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Código</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Categoría</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Estado</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows || `<tr><td colspan="8" class="p-6 text-center text-gray-400">No hay productos que coincidan.</td></tr>`}
-          </tbody>
-        </table>
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Filtro rápido">
+          ${Object.entries(FILTROS).map(([k, f]) => `<button type="button" data-filtro="${k}" class="${ui.filtro === k ? 'is-on' : ''}" aria-pressed="${ui.filtro === k}">${f.label}</button>`).join('')}
+        </div>
+        <label class="check"><input id="catalog-show-inactive" type="checkbox" ${ui.showInactive ? 'checked' : ''}> Mostrar desactivados</label>
+        <span class="meta" id="catalog-meta">${filtered.length} de ${productos.length}</span>
       </div>
+      <div class="table-wrap" id="catalog-table">${tabla}</div>
     </article>`;
 
-  panel.querySelector('#catalog-search').addEventListener('input', e => {
-    catalogUiState.query = e.target.value;
-    debounceCatalogRender();
-  });
-  panel.querySelector('#catalog-low-stock').addEventListener('change', e => {
-    catalogUiState.lowStockOnly = e.target.checked;
-    renderCatalogTab();
-  });
-  panel.querySelector('#catalog-show-inactive').addEventListener('change', e => {
-    catalogUiState.showInactive = e.target.checked;
-    renderCatalogTab();
-  });
+  panel.querySelector('#catalog-search').addEventListener('input', e => { ui.query = e.target.value; debounceCatalogRender(); });
+  panel.querySelector('#catalog-cat').addEventListener('change', e => { ui.categoria = e.target.value; renderCatalogTab(true); });
+  panel.querySelector('#catalog-show-inactive').addEventListener('change', e => { ui.showInactive = e.target.checked; renderCatalogTab(true); });
+  panel.querySelectorAll('[data-filtro]').forEach(b => b.addEventListener('click', () => {
+    ui.filtro = b.dataset.filtro;
+    panel.querySelectorAll('[data-filtro]').forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-pressed', x === b); });
+    renderCatalogTab(true);
+  }));
   panel.querySelector('#add-product').addEventListener('click', () => showProductModal(null));
+  wireCatalogTable();
+}
+
+function wireCatalogTable() {
+  panel.querySelectorAll('.th-sort').forEach(th => th.addEventListener('click', () => {
+    const k = th.dataset.orden;
+    catalogUiState.dir = catalogUiState.orden === k ? -catalogUiState.dir : 1;
+    catalogUiState.orden = k;
+    renderCatalogTab(true);
+  }));
   panel.querySelectorAll('.edit-product').forEach(btn => btn.addEventListener('click', () => showProductModal(Number(btn.dataset.id))));
   panel.querySelectorAll('.delete-product').forEach(btn => btn.addEventListener('click', () => deactivateProduct(Number(btn.dataset.id))));
 }
@@ -282,7 +303,7 @@ async function showProductModal(productId) {
 
       <!-- Header -->
       <div class="bg-gradient-to-r from-[#6d165a] to-[#9d5fa5] px-6 py-5 flex items-center justify-between">
-        <h2 class="text-xl font-bold text-white" style="font-family: 'Playfair Display', serif;">
+        <h2 class="text-xl font-bold text-white" >
           ${editing ? '✏️ Editar Producto' : '➕ Nuevo Producto'}
         </h2>
         <button class="close-modal text-white hover:bg-white/20 p-2 rounded-lg transition">
@@ -537,15 +558,10 @@ async function showProductModal(productId) {
           state.catalog.push(json.data);
         }
         saveToStorage(STORAGE_KEYS.catalog, state.catalog);
-        renderSummary();
+        refreshCounts();
         renderCatalogTab();
 
-        // Toast de éxito
-        const toast = document.createElement('div');
-        toast.className = 'success-toast';
-        toast.textContent = editing ? '✓ Producto actualizado correctamente' : '✓ Producto agregado correctamente';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        toast(editing ? '✓ Producto actualizado correctamente' : '✓ Producto agregado correctamente');
 
         closeModal();
       } catch (err) {
@@ -678,19 +694,14 @@ async function deactivateProduct(productId) {
         }
         
         saveToStorage(STORAGE_KEYS.catalog, state.catalog);
-        renderSummary();
+        refreshCounts();
         renderCatalogTab();
 
-        // Toast de éxito
-        const toast = document.createElement('div');
-        toast.className = 'fixed top-5 right-5 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg';
-        toast.textContent = isActive ? '✓ Producto desactivado correctamente' : '✓ Producto reactivado correctamente';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        toast(isActive ? '✓ Producto desactivado correctamente' : '✓ Producto reactivado correctamente');
 
         closeModal();
       } catch (err) {
-        alert('Error: ' + (err.message || 'Intenta de nuevo'));
+        toast('No se pudo: ' + (err.message || 'intenta de nuevo'), true);
         deleteBtn.disabled = false;
         deleteLoader.classList.add('hidden');
         deleteText.textContent = isActive ? '🗑️ Desactivar' : '♻️ Reactivar';
@@ -701,118 +712,117 @@ async function deactivateProduct(productId) {
 
 // ── CLIENTES ──────────────────────────────────────────────────
 function renderCustomersTab() {
-  // Extraer clientes únicos desde las ventas
-  const customerMap = new Map();
-  state.sales.forEach(sale => {
-    const key = (sale.customer_name||'Sin nombre').toLowerCase();
-    if (!customerMap.has(key)) {
-      const totalDebt = sale.payment_status === 'pending' ? Number(sale.total) - Number(sale.amount_paid||0) : 0;
-      customerMap.set(key, {
-        name: sale.customer_name||'Sin nombre',
-        phone: sale.customer_phone||'—',
-        order_count: 1,
-        total_spent: Number(sale.total),
-        total_debt: totalDebt,
-        last_purchase_at: sale.created_at,
-        payment_status: sale.payment_status
-      });
-    } else {
-      const existing = customerMap.get(key);
-      existing.order_count += 1;
-      existing.total_spent += Number(sale.total);
-      if (sale.payment_status === 'pending') {
-        existing.total_debt += Number(sale.total) - Number(sale.amount_paid||0);
-      }
-      if (new Date(sale.created_at) > new Date(existing.last_purchase_at)) {
-        existing.last_purchase_at = sale.created_at;
-      }
-    }
+  // Clientes registrados + lo que se ve en las ventas (por id o por nombre).
+  const mapa = new Map();
+  const clave = n => String(n || 'Sin nombre').trim().toLowerCase();
+  state.customers.forEach(c => mapa.set(clave(c.name), {
+    name: c.name || 'Sin nombre', phone: c.phone || '', id: c.id,
+    pedidos: 0, comprado: 0, deuda: 0, ultima: null
+  }));
+  state.sales.forEach(s => {
+    const k = clave(s.customer_name);
+    if (!mapa.has(k)) mapa.set(k, { name: s.customer_name || 'Sin nombre', phone: s.customer_phone || '', pedidos: 0, comprado: 0, deuda: 0, ultima: null });
+    const c = mapa.get(k);
+    c.pedidos += 1;
+    c.comprado += Number(s.total || 0);
+    if (s.payment_status === 'pending') c.deuda += Number(s.total || 0) - Number(s.amount_paid || 0);
+    if (!c.phone && s.customer_phone) c.phone = s.customer_phone;
+    if (!c.ultima || new Date(s.created_at) > new Date(c.ultima)) c.ultima = s.created_at;
   });
-  const customers = Array.from(customerMap.values())
-    .sort((a,b) => Number(b.total_spent||0) - Number(a.total_spent||0));
+  const clientes = [...mapa.values()].sort((a, b) => b.comprado - a.comprado || a.name.localeCompare(b.name));
+  const conCompras = clientes.filter(c => c.pedidos > 0).length;
+  const deudaTotal = clientes.reduce((s, c) => s + c.deuda, 0);
+  const iniciales = n => String(n).trim().split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase() || '?';
+  const tel = p => String(p || '').replace(/\D/g, '');
 
-  const rows = customers.map(c => `
-    <tr class="border-b border-gray-100 hover:bg-[#fdf7fa]">
-      <td class="p-3">
-        <p class="font-semibold text-gray-900 text-sm">${c.name||'Sin nombre'}</p>
-        <p class="text-xs text-gray-400">Registrado en ventas</p>
-      </td>
-      <td class="p-3 text-sm text-gray-600">${c.phone||'—'}</td>
-      <td class="p-3 text-center text-sm text-gray-600">${c.order_count} compra${c.order_count!==1?'s':''}</td>
-      <td class="p-3 font-bold text-[#a0346e] text-sm whitespace-nowrap">${formatCurrency(Number(c.total_spent||0))}</td>
-      <td class="p-3">
-        ${Number(c.total_debt||0) > 0
-          ? `<span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">💰 ${formatCurrency(Number(c.total_debt))}</span>`
-          : `<span class="text-xs text-emerald-600 font-semibold">✅ Pagado</span>`}
-      </td>
-      <td class="p-3 text-xs text-gray-400">${c.last_purchase_at ? new Date(c.last_purchase_at).toLocaleDateString('es-CO') : '—'}</td>
+  const rows = clientes.map(c => `
+    <tr>
+      <td><div class="prod" style="min-width:200px"><span class="avatar">${esc(iniciales(c.name))}</span><div><b>${esc(c.name)}</b><span>${c.pedidos ? `${c.pedidos} compra${c.pedidos !== 1 ? 's' : ''}` : 'Sin compras registradas'}</span></div></div></td>
+      <td>${c.phone ? `<a class="link mono" href="https://wa.me/${tel(c.phone).length === 10 ? '57' + tel(c.phone) : tel(c.phone)}" target="_blank" rel="noopener">${esc(c.phone)}</a>` : '<span class="pill mute">Sin teléfono</span>'}</td>
+      <td class="r money">${formatCurrency(c.comprado)}</td>
+      <td>${c.deuda > 0 ? `<span class="pill warn">Debe ${formatCurrency(c.deuda)}</span>` : c.pedidos ? '<span class="pill good">Al día</span>' : '<span class="pill mute">—</span>'}</td>
+      <td class="code">${c.ultima ? new Date(c.ultima).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
     </tr>`).join('');
 
   panel.innerHTML = `
-    <article class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-      <div class="bg-gradient-to-r from-[#a0346e] to-[#9d5fa5] px-5 py-4">
-        <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">👥 Clientes</h3>
-        <p class="text-white/70 text-xs mt-0.5">${customers.length} registrados · Ordenados por total comprado</p>
+    <section class="dgrid">
+      <article class="card span-4 kpi"><div class="kpi-label">Clientes</div><div class="kpi-value num">${clientes.length}</div><div class="kpi-foot">${conCompras} con compras registradas</div></article>
+      <article class="card span-4 kpi"><div class="kpi-label">Por cobrar</div><div class="kpi-value num">${formatCurrency(deudaTotal)}</div><div class="kpi-foot">${clientes.filter(c => c.deuda > 0).length} clientes con saldo</div></article>
+      <article class="card span-4 kpi"><div class="kpi-label">Mejor cliente</div><div class="kpi-value" style="font-size:22px">${conCompras ? esc(clientes[0].name) : '—'}</div><div class="kpi-foot">${conCompras ? formatCurrency(clientes[0].comprado) + ' comprados' : 'Aún no hay ventas'}</div></article>
+    </section>
+    <article class="card flush">
+      <div class="toolbar">
+        <label class="search">${ICONOS.search}<input id="cli-search" class="input" type="search" placeholder="Buscar por nombre o teléfono" aria-label="Buscar clientes"></label>
+        <span class="meta" id="cli-meta">${clientes.length} clientes</span>
       </div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead class="bg-[#fdf2f7]">
-            <tr>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Cliente</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Teléfono</th>
-              <th class="p-3 text-center text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Órdenes</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Total comprado</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Estado de pago</th>
-              <th class="p-3 text-left text-xs uppercase tracking-widest text-[#6d165a] font-semibold">Última compra</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows || `<tr><td colspan="7" class="p-6 text-center text-gray-400">Sin clientes registrados aún.</td></tr>`}
-          </tbody>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Cliente</th><th>WhatsApp</th><th class="r">Total comprado</th><th>Estado</th><th>Última compra</th></tr></thead>
+          <tbody id="cli-body">${rows || `<tr><td colspan="5"><div class="empty"><b>Sin clientes todavía</b>Aparecen aquí cuando registras una venta.</div></td></tr>`}</tbody>
         </table>
       </div>
     </article>`;
+
+  const body = panel.querySelector('#cli-body');
+  panel.querySelector('#cli-search').addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase();
+    let n = 0;
+    body.querySelectorAll('tr').forEach(tr => {
+      const ok = !q || tr.textContent.toLowerCase().includes(q);
+      tr.hidden = !ok; if (ok) n++;
+    });
+    panel.querySelector('#cli-meta').textContent = `${n} de ${clientes.length} clientes`;
+  });
 }
 
-// ── LOGOUT BUTTON ─────────────────────────────────────────────
-function setupLogoutButton() {
-  const logoutBtn = document.getElementById('logout-btn');
-  if (logoutBtn) logoutBtn.addEventListener('click', logout);
-}
+// ── ESTRUCTURA: tema, reloj, menú, atajos ─────────────────────
+function setupShell() {
+  document.getElementById('logout-btn').addEventListener('click', logout);
 
-// ── INIT ──────────────────────────────────────────────────────
-async function init() {
-  // Paso 1: Verificar autenticación
-  try {
-    requireAuth(); // Si no hay token, redirige a login
-  } catch (err) {
-    console.error('Auth check failed:', err.message);
-    return; // No continuar si falla autenticación
-  }
+  const user = getAdminUser();
+  document.getElementById('user-name').textContent = user;
+  document.getElementById('user-initials').textContent = String(user).slice(0, 2).toUpperCase();
 
-  // Paso 2: Esperar a que el DOM esté listo
-  await new Promise((resolve) => {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', resolve);
-    } else {
-      resolve();
-    }
+  document.getElementById('theme-btn').addEventListener('click', () => {
+    const claro = document.documentElement.dataset.theme !== 'light';
+    if (claro) document.documentElement.dataset.theme = 'light';
+    else delete document.documentElement.dataset.theme;
+    try { localStorage.setItem('discordia-admin-tema', claro ? 'light' : 'dark'); } catch {}
+    if (activeTab === 'dashboard') switchTab('dashboard');
   });
 
-  // Paso 3: Inicializar elementos del DOM
-  panel            = document.getElementById('admin-panel');
-  summaryContainer = document.getElementById('admin-summary');
-  
-  if (!panel || !summaryContainer) {
-    console.error('Required DOM elements not found');
-    return;
-  }
+  document.getElementById('refresh-btn').addEventListener('click', async () => {
+    await cargarDatos();
+    refreshCounts();
+    await switchTab(activeTab);
+    toast('Datos actualizados');
+  });
 
-  setupLogoutButton();
+  document.getElementById('menu-btn').addEventListener('click', () => document.body.classList.toggle('nav-open'));
+  document.getElementById('scrim').addEventListener('click', () => document.body.classList.remove('nav-open'));
 
-  // Paso 4: Hidratar state desde la API
+  const nuevaVenta = async () => {
+    if (activeTab !== 'sales') await switchTab('sales');
+    panel.querySelector('#btn-nueva-venta')?.click();
+  };
+  document.getElementById('nueva-venta').addEventListener('click', nuevaVenta);
+  document.addEventListener('keydown', e => {
+    const escribiendo = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
+    if (escribiendo || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'n' || e.key === 'N') { if (!document.querySelector('.swal2-container, .fixed.inset-0')) { e.preventDefault(); nuevaVenta(); } }
+    if (e.key === '/') { const s = panel.querySelector('input[type="search"]'); if (s) { e.preventDefault(); s.focus(); } }
+  });
+
+  const reloj = document.getElementById('clock');
+  const tic = () => {
+    reloj.textContent = new Date().toLocaleString('es-CO', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  };
+  tic(); setInterval(tic, 20000);
+}
+
+async function cargarDatos() {
   try {
-    const res  = await fetch(CONFIG.ADMIN_API_PATH);
+    const res = await fetch(CONFIG.ADMIN_API_PATH, { cache: 'no-store' });
     if (!res.ok) throw new Error(`API returned ${res.status}`);
     const json = await res.json();
     if (json.ok) {
@@ -825,20 +835,30 @@ async function init() {
     }
   } catch (err) {
     console.warn('API load failed, using local data:', err.message);
-    // Continuar con datos locales del fallback
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init() {
+  try {
+    requireAuth(); // sin token redirige a login
+  } catch (err) {
+    console.error('Auth check failed:', err.message);
+    return;
   }
 
-  // Paso 5: Renderizar UI
+  panel = document.getElementById('admin-panel');
+  if (!panel) return;
+
+  setupShell();
   buildTabs();
-  renderSummary();
+  await cargarDatos();
+  refreshCounts();
   await switchTab('dashboard');
 }
 
-// Ejecutar init cuando el DOM esté listo
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
 }
-
-

@@ -17,7 +17,7 @@ export async function onRequestGet({ env, data }) {
     }
     const [products, sales, customers] = await Promise.all([
       sql`SELECT * FROM products WHERE active = true ORDER BY id`,
-      sql`SELECT * FROM sales ORDER BY created_at DESC LIMIT 100`,
+      sql`SELECT * FROM sales ORDER BY created_at DESC LIMIT 500`,
       sql`SELECT * FROM customers ORDER BY name`,
     ]);
 
